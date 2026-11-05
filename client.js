@@ -903,13 +903,29 @@ document.addEventListener('DOMContentLoaded', () => {
   const guestEmailInput = document.getElementById('guest-email');
   const guestWishInput = document.getElementById('guest-wish');
   const wishesWall = document.getElementById('wishes-wall');
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxEBqRF5o1O50-HCIZUE6YuHrw6rCO5o-R7id8-Lf7HOpZW2AAqO9jfb_98q34yWE1ocg/exec';
+  const SCRIPT_TOKEN = 'aB3k9XmQ7vP1wZ5rN8tY2uL4';
+
+  try {
+    localStorage.removeItem('kim_hoang_wishes');
+  } catch (e) {}
 
   async function loadWishes() {
+    if (!wishesWall) return;
     try {
-      const stored = JSON.parse(localStorage.getItem('kim_hoang_wishes') || '[]');
-      if (Array.isArray(stored)) {
-        stored.slice().reverse().forEach((w) => appendWishToWall(w.name, w.wish, false));
-      }
+      const res = await fetch(SCRIPT_URL, {
+        method: 'GET',
+        redirect: 'follow',
+      });
+      if (!res.ok) return;
+      const data = await res.json().catch(() => null);
+      const list = Array.isArray(data) ? data : (data && Array.isArray(data.wishes) ? data.wishes : []);
+      wishesWall.innerHTML = '';
+      list.forEach((w) => {
+        if (w && w.name && w.wish) {
+          appendWishToWall(w.name, w.wish, false);
+        }
+      });
     } catch (e) {}
   }
 
@@ -970,11 +986,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (submitBtn) submitBtn.disabled = true;
       try {
-        const scriptUrl = 'https://script.google.com/macros/s/AKfycbxEBqRF5o1O50-HCIZUE6YuHrw6rCO5o-R7id8-Lf7HOpZW2AAqO9jfb_98q34yWE1ocg/exec';
-        const res = await fetch(scriptUrl, {
+        const res = await fetch(SCRIPT_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({ token: 'aB3k9XmQ7vP1wZ5rN8tY2uL4', name, email, wish }),
+          body: JSON.stringify({ token: SCRIPT_TOKEN, name, email, wish }),
+          redirect: 'follow',
         });
         const data = await res.json().catch(() => ({}));
 
@@ -982,12 +998,6 @@ document.addEventListener('DOMContentLoaded', () => {
           showToast(data.error || 'Chưa gửi được lời chúc, vui lòng thử lại.');
           return;
         }
-
-        try {
-          const stored = JSON.parse(localStorage.getItem('kim_hoang_wishes') || '[]');
-          stored.push({ name, wish });
-          localStorage.setItem('kim_hoang_wishes', JSON.stringify(stored));
-        } catch (e) {}
 
         appendWishToWall(name, wish, true);
         guestbookForm.reset();
