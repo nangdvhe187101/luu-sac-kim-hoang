@@ -398,6 +398,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  function getSegmentAnchorOffset() {
+    return Math.min(130, window.innerHeight * 0.18);
+  }
+
+  function jumpToSegmentStart(trackIndex) {
+    const seg = narrationSegments[trackIndex];
+    if (!seg) return;
+    const rect = seg.getBoundingClientRect();
+    const segTop = rect.top + window.scrollY;
+    const startY = Math.max(0, segTop - getSegmentAnchorOffset());
+    isAutoScrollStep = true;
+    window.scrollTo({ top: startY, behavior: 'auto' });
+    setTimeout(() => {
+      isAutoScrollStep = false;
+    }, 60);
+  }
+
   function stepAutoScroll() {
     if (narrationAudio.paused || narrationAudio.ended) {
       autoScrollRaf = null;
@@ -415,17 +432,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const rect = seg.getBoundingClientRect();
         const segTop = rect.top + window.scrollY;
         const segHeight = rect.height;
-        const anchorOffset = Math.min(200, window.innerHeight * 0.28);
+        const anchorOffset = getSegmentAnchorOffset();
         const progress = Math.min(1, Math.max(0, narrationAudio.currentTime / narrationAudio.duration));
-        const travel = Math.max(0, segHeight - window.innerHeight * 0.62);
-        const targetY = Math.max(0, segTop - anchorOffset + travel * progress);
+        const startY = Math.max(0, segTop - anchorOffset);
+        const endY = Math.max(startY, segTop + segHeight - window.innerHeight * 0.78);
+        const targetY = startY + (endY - startY) * progress;
         const diff = targetY - window.scrollY;
 
-        if (Math.abs(diff) > 1.5) {
+        if (Math.abs(diff) > 1) {
           isAutoScrollStep = true;
-          const maxStep = Math.abs(diff) > 600 ? 3.2 : 0.85;
-          const step = Math.sign(diff) * Math.min(Math.abs(diff) * 0.022, maxStep);
-          window.scrollTo(0, window.scrollY + step);
+          window.scrollTo(0, window.scrollY + diff * 0.18);
           isAutoScrollStep = false;
         }
       }
@@ -441,10 +457,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (resetScrollHold) {
       userScrollPauseUntil = 0;
     }
+    jumpToSegmentStart(currentTrackIdx);
 
     const wantedSrc = new URL(track.src, window.location.href).href;
     if (narrationAudio.src !== wantedSrc) {
       narrationAudio.src = track.src;
+      narrationAudio.currentTime = 0;
+    } else {
       narrationAudio.currentTime = 0;
     }
     applyPlaybackSpeed();

@@ -2247,28 +2247,12 @@ html[data-site-lang="en"] .lang-opt--en {
   opacity: 0.6;
 }
 
-[data-scroll-reveal] {
-  opacity: 0;
-  transform: translateY(40px);
-  transition: opacity 0.8s ease-out,
-              transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-[data-scroll-reveal].is-revealed {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.node-image-figure[data-scroll-reveal] {
-  transform: translateY(60px) scale(0.95);
-}
-
+[data-scroll-reveal],
+[data-scroll-reveal].is-revealed,
+.node-image-figure[data-scroll-reveal],
 .node-image-figure[data-scroll-reveal].is-revealed {
-  transform: translateY(0) scale(1);
-}
-
-[data-scroll-reveal][data-scroll-delay] {
-  transition-delay: calc(var(--scroll-delay, 0) * 1ms);
+  opacity: 1;
+  transform: none;
 }
 
 .fixed-bg-kimhoang {
