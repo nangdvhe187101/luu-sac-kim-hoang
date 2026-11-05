@@ -565,24 +565,58 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   const coverGate = document.getElementById('cover-gate');
+  const coverEnvelope = document.getElementById('cover-envelope');
   const coverOpenBtn = document.getElementById('cover-open-btn');
 
   function openCover() {
     if (!coverGate || coverGate.classList.contains('is-opening')) return;
     playChimeSound();
     coverGate.classList.add('is-opening');
-    document.body.classList.remove('cover-locked');
-    window.scrollTo({ top: 0, behavior: 'instant' });
 
-    startNarrationAt(0, true);
+    const firstTrack = narrationTracks[0];
+    if (firstTrack) {
+      narrationAudio.src = firstTrack.src;
+      narrationAudio.muted = true;
+      narrationAudio.play().then(() => {
+        narrationAudio.pause();
+        narrationAudio.currentTime = 0;
+        narrationAudio.muted = false;
+      }).catch(() => {
+        narrationAudio.muted = false;
+      });
+    }
 
-    const removeDelay = prefersReducedMotion.matches ? 50 : 1800;
-    setTimeout(() => coverGate.remove(), removeDelay);
+    const revealDelay = prefersReducedMotion.matches ? 20 : 1450;
+    const removeDelay = prefersReducedMotion.matches ? 60 : 2900;
+
+    setTimeout(() => {
+      coverGate.classList.add('is-revealing');
+      document.body.classList.remove('cover-locked');
+      window.scrollTo({ top: 0, behavior: 'instant' });
+      startNarrationAt(0, true);
+    }, revealDelay);
+
+    setTimeout(() => {
+      coverGate.remove();
+    }, removeDelay);
   }
 
   if (coverOpenBtn) {
-    coverOpenBtn.addEventListener('click', openCover);
+    coverOpenBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openCover();
+    });
     coverOpenBtn.focus();
+  }
+
+  if (coverEnvelope) {
+    coverEnvelope.addEventListener('click', openCover);
+    coverEnvelope.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        openCover();
+      }
+    });
   }
 
   narrationSegments.forEach((seg, segIdx) => {
