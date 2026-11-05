@@ -41,7 +41,7 @@ const RATE_WINDOW_MS = 10 * 60 * 1000;
 const RATE_MAX = 5;
 const hits = new Map();
 
-const BLOCKED_PREFIXES = ['/server.js', '/data', '/plans', '/docs', '/node_modules'];
+const BLOCKED_PREFIXES = ['/local-server.js', '/data', '/plans', '/docs', '/node_modules'];
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
