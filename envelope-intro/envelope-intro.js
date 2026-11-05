@@ -1,11 +1,3 @@
-/*!
- * Envelope intro – Lưu Sắc Kim Hoàng
- * Nhúng: <link rel="stylesheet" href="/envelope-intro/envelope-intro.css">
- *        <script src="/envelope-intro/envelope-intro.js" defer></script>
- * Tuỳ chọn trên thẻ script: data-once="session" (chỉ hiện 1 lần mỗi phiên)
- * Khi vào trang trong: sự kiện window "invitation:opened" + hàm window.onInvitationOpened()
- * Mở lại thủ công: window.showEnvelopeIntro()
- */
 (function(){
   var cs=document.currentScript, base=cs&&cs.src?cs.src.replace(/[^\/]*$/,''):'/envelope-intro/';
   var once=cs&&cs.dataset.once==='session', KEY='ei-seen';
@@ -17,7 +9,6 @@
     var A=base+'assets/';
     var root=document.createElement('div');root.className='ei-root';root.setAttribute('role','dialog');root.setAttribute('aria-label','Thiệp mời Lưu Sắc Kim Hoàng');
     root.innerHTML=
-     '<button class="ei-skip" type="button">Bỏ qua · Skip</button>'+
      '<div class="ei-stage"><div class="ei-env">'+
       '<div class="ei-liner"></div>'+
       '<div class="ei-card"><p><small>Thiệp mời · Invitation</small><b>Tranh dân gian Việt Nam</b></p><img src="'+A+'invitation-logo.jpg" alt="Lưu Sắc Kim Hoàng"></div>'+
@@ -29,7 +20,7 @@
     document.body.appendChild(root);
     var de=document.documentElement,prev=de.style.overflow;de.style.overflow='hidden';
     var env=root.querySelector('.ei-env'),flap=root.querySelector('.ei-flap'),seal=root.querySelector('.ei-seal'),stage=root.querySelector('.ei-stage');
-    var state='idle',skip=false;
+    var state='idle';
     function enter(){
       if(state==='gone')return;state='gone';
       try{if(once)sessionStorage.setItem(KEY,'1');}catch(e){}
@@ -56,12 +47,11 @@
       flap.classList.add('ei-open');await sleep(430);flap.classList.add('ei-behind');await sleep(520);
       env.classList.add('ei-up');await sleep(950);
       state='opened';
-      await sleep(1100);          /* cho người xem ngắm thiệp một nhịp */
+      await sleep(1100);
       if(state==='opened')enter();
     }
     seal.addEventListener('click',open);
     root.addEventListener('click',function(e){if(state==='opened')enter();});
-    root.querySelector('.ei-skip').addEventListener('click',function(e){e.stopPropagation();enter();});
     document.addEventListener('keydown',function onk(e){if(!document.body.contains(root)){document.removeEventListener('keydown',onk);return;}
       if(e.key==='Escape')enter();});
     seal.focus({preventScroll:true});
