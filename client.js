@@ -369,7 +369,7 @@ document.addEventListener('DOMContentLoaded', () => {
     {
       id: 'chapter-4',
       title: 'Tia Sáng Paris',
-      text: 'Tưởng chừng số phận dòng tranh đã chấm dứt, nhưng nhà nghiên cứu người Pháp Maurice Durand đã từng sưu tầm tranh thờ và tranh Tết ở Bắc Bộ, lưu trữ tại Viện Viễn Đông Bác Cổ. Năm 1960, cuốn sách Tranh Dân Gian Việt Nam của ông được xuất bản tại Paris. Đến năm 2011, cuốn sách được tái bản với đầy đủ hình in màu minh họa. Qua đối chiếu phong cách và sắc đỏ cam đặc trưng, các nhà nghiên cứu xác nhận có tới 58 bức tranh dân gian Kim Hoàng. Đây chính là chiếc chìa khóa định mệnh mở ra hy vọng phục sinh một di sản đã mất.',
+      text: 'Tưởng chừng số phận dòng tranh đã chấm dứt, nhưng nhà nghiên cứu người Pháp Maurice Durand đã từng sưu tầm tranh thờ và tranh Tết ở Bắc Bộ, lưu trữ tại Viện Viễn Đông Bác Cổ. Năm 1960, cuốn sách Tranh Dân Gian Việt Nam của ông được xuất bản tại Paris. Đến năm 2011, cuốn sách được tái bản với đầy đủ hình in màu minh họa. Qua đối chiếu phong cách và sắc đỏ cam đặc trưng, các nhà nghiên cứu xác nhận có tới 58 bức tranh dân gian Kim Hoàng. Đây chính là chiếc chìa khóa định mệnh mở ra hy vọng phục hồi dòng tranh đã mất.',
     },
     {
       id: 'chapter-5',
@@ -384,7 +384,7 @@ document.addEventListener('DOMContentLoaded', () => {
     {
       id: 'chapter-7',
       title: 'Nốt Đỏ Trở Lại Đương Đại',
-      text: 'Dự án đã phục dựng thành công 33 mẫu mộc bản và 19 mẫu vẽ tay. Nghệ nhân Đào Đình Chung nay đã có thể tự nuôi sống mình bằng chính nghề làm tranh di sản. Cùng với sự chung tay của thế hệ trẻ qua các triển lãm như Nốt Đỏ Di Sản, sắc đỏ Kim Hoàng đã chính thức thức giấc, đàng hoàng bước vào đời sống đương đại.',
+      text: 'Dự án đã phục dựng thành công 33 mẫu mộc bản và 19 mẫu vẽ tay. Nghệ nhân Đào Đình Chung nay đã có thể tự nuôi sống mình bằng chính nghề làm tranh truyền thống. Cùng với sự chung tay của thế hệ trẻ qua các triển lãm như Nốt Đỏ, sắc đỏ Kim Hoàng đã chính thức thức giấc, đàng hoàng bước vào đời sống đương đại.',
     },
   ];
 
@@ -1012,18 +1012,123 @@ document.addEventListener('DOMContentLoaded', () => {
     loadWishes();
   }
 
+  const blessingPaintings = [
+    {
+      src: 'tranh/phuong-mua.jpeg',
+      name: 'Phượng Múa',
+      title: 'LINH ĐIỂU PHƯỢNG MÚA • 2026',
+      line1: 'Cao Quý Cát Tường • Gia Đạo Thái Bình',
+      line2: 'Điềm Lành Hội Tụ • Phúc Lộc Viên Mãn',
+    },
+    {
+      src: 'tranh/ngua-vang.jpeg',
+      name: 'Ngựa Vàng',
+      title: 'MÃ ĐÁO THÀNH CÔNG • 2026',
+      line1: 'Công Danh Hanh Thông • Vạn Sự Thành Đạt',
+      line2: 'Chí Lớn Vươn Xa • Lộc Tài Rộng Mở',
+    },
+    {
+      src: 'tranh/ga-trong-than-ke.jpeg',
+      name: 'Gà Trống Thần Kê',
+      title: 'THẦN KÊ ĐẠI CÁT • 2026',
+      line1: 'Trấn Trạch Bình An • Đón Ánh Thái Dương',
+      line2: 'Vạn Sự Hanh Thông • An Khang Thịnh Vượng',
+    },
+    {
+      src: 'tranh/rong-vang.jpeg',
+      name: 'Rồng Vàng',
+      title: 'KIM LONG HIỂN THÁNH • 2026',
+      line1: 'Mưa Thuận Gió Hòa • Hưng Thịnh Bền Lâu',
+      line2: 'Khí Thế Vươn Cao • Phúc Lộc Dồi Dào',
+    },
+    {
+      src: 'tranh/vo-tuong.jpeg',
+      name: 'Võ Tướng',
+      title: 'THẦN TƯỚNG TRẤN TRẠCH • 2026',
+      line1: 'Gia Môn Vững Chãi • Bốn Mùa Bình An',
+      line2: 'Oai Phong Vững Vàng • Tai Qua Nạn Khỏi',
+    },
+    {
+      src: 'tranh/tien-loc-tien-tai.jpeg',
+      name: 'Tiến Lộc Tiến Tài',
+      title: 'TIẾN LỘC TIẾN TÀI • 2026',
+      line1: 'Tài Lộc Dồi Dào • Phú Quý Vinh Hoa',
+      line2: 'Phúc Thọ An Khang • Vạn Sự Như Ý',
+    },
+    {
+      src: 'tranh/tre-em-hai-chuoi.jpeg',
+      name: 'Trẻ Em Hái Chuối',
+      title: 'SUM VẦY NO ĐỦ • 2026',
+      line1: 'Gia Đình Hòa Thuận • Con Cháu Thảo Hiền',
+      line2: 'Niềm Vui Đong Đầy • Ấm No Hạnh Phúc',
+    },
+    {
+      src: 'tranh/muc-dong-cuoi-trau.jpeg',
+      name: 'Mục Đồng Cưỡi Trâu',
+      title: 'THANH BÌNH AN LẠC • 2026',
+      line1: 'Tâm An Tự Tại • Đời Sống Thảnh Thơi',
+      line2: 'Mùa Màng Bội Thu • Phúc Lành Ngập Tràn',
+    },
+    {
+      src: 'tranh/ngua-trang.jpeg',
+      name: 'Ngựa Trắng',
+      title: 'BẠCH MÃ KHỞI HÀNH • 2026',
+      line1: 'Thuận Buồm Xuôi Gió • Sự Nghiệp Thăng Hoa',
+      line2: 'Vững Bước Đường Xa • Công Thành Danh Toại',
+    },
+    {
+      src: 'tranh/ho-me-con.jpeg',
+      name: 'Hổ Mẹ Con',
+      title: 'MẪU TỬ BÌNH AN • 2026',
+      line1: 'Sức Khỏe Dồi Dào • Vững Vàng Che Chở',
+      line2: 'Gia Đạo Hòa Vui • Vạn Điều May Mắn',
+    },
+    {
+      src: 'tranh/nguoi-cuoi-rong.jpeg',
+      name: 'Người Cưỡi Rồng',
+      title: 'LONG VÂN HỘI NGỘ • 2026',
+      line1: 'Vận Hội Thăng Hoa • Bay Cao Vươn Xa',
+      line2: 'Cát Tinh Chiếu Mệnh • Vạn Sự Hanh Thông',
+    },
+    {
+      src: 'tranh/ga-trong-cat-tuong.jpeg',
+      name: 'Gà Trống Cát Tường',
+      title: 'NGŨ ĐỨC CÁT TƯỜNG • 2026',
+      line1: 'Văn Võ Dũng Nhân • Trọn Vẹn Chữ Tín',
+      line2: 'Khởi Đầu Tốt Đẹp • Phúc Lộc Trường Tồn',
+    },
+  ];
+
+  let lastBlessingIdx = -1;
   const downloadBtn = document.getElementById('download-blessing-btn');
   if (downloadBtn) {
     downloadBtn.addEventListener('click', async () => {
-      
+      let idx = Math.floor(Math.random() * blessingPaintings.length);
+      if (blessingPaintings.length > 1 && idx === lastBlessingIdx) {
+        idx = (idx + 1 + Math.floor(Math.random() * (blessingPaintings.length - 1))) % blessingPaintings.length;
+      }
+      lastBlessingIdx = idx;
+      const item = blessingPaintings[idx];
+
       try {
         await Promise.all([
-          document.fonts.load('bold 74px "Be Vietnam Pro"', 'LƯU SẮC KIM HOÀNG'),
-          document.fonts.load('italic 42px "Be Vietnam Pro"', 'Chạm Sắc Son'),
-          document.fonts.load('600 48px "Be Vietnam Pro"', 'THẦN KÊ ĐẠI CÁT'),
-          document.fonts.load('36px "Be Vietnam Pro"', 'Vạn Sự Hanh Thông'),
+          document.fonts.load('bold 68px "Be Vietnam Pro"', 'LƯU SẮC KIM HOÀNG'),
+          document.fonts.load('italic 38px "Be Vietnam Pro"', 'Chạm Sắc Son'),
+          document.fonts.load('600 46px "Be Vietnam Pro"', item.title),
+          document.fonts.load('36px "Be Vietnam Pro"', item.line1),
         ]);
       } catch (e) {}
+
+      const loadPainting = (src) =>
+        new Promise((resolve) => {
+          const img = new Image();
+          img.crossOrigin = 'anonymous';
+          img.onload = () => resolve(img);
+          img.onerror = () => resolve(null);
+          img.src = src;
+        });
+
+      const paintingImg = await loadPainting(item.src);
 
       const offscreenCanvas = document.createElement('canvas');
       offscreenCanvas.width = 1080;
@@ -1034,40 +1139,63 @@ document.addEventListener('DOMContentLoaded', () => {
       const token = (name) => rootStyle.getPropertyValue(name).trim();
 
       const gradient = offCtx.createLinearGradient(0, 0, 0, 1920);
-      gradient.addColorStop(0, token('--bg-1'));
-      gradient.addColorStop(0.5, token('--bg-2'));
-      gradient.addColorStop(1, token('--bg-3'));
+      gradient.addColorStop(0, token('--bg-1') || '#4a0607');
+      gradient.addColorStop(0.5, token('--bg-2') || '#6e0b0d');
+      gradient.addColorStop(1, token('--bg-3') || '#2e0304');
       offCtx.fillStyle = gradient;
       offCtx.fillRect(0, 0, 1080, 1920);
 
-      offCtx.strokeStyle = token('--color-gold');
+      offCtx.strokeStyle = token('--color-gold') || '#d4a23a';
       offCtx.lineWidth = 14;
       offCtx.strokeRect(40, 40, 1000, 1840);
+      offCtx.lineWidth = 2;
+      offCtx.strokeRect(64, 64, 952, 1792);
 
-      offCtx.fillStyle = token('--color-gold-light');
+      offCtx.fillStyle = token('--color-gold-light') || '#ffd56b';
       offCtx.textAlign = 'center';
-      offCtx.font = 'bold 74px "Be Vietnam Pro", sans-serif';
-      offCtx.fillText('LƯU SẮC KIM HOÀNG', 540, 440);
+      offCtx.font = 'bold 68px "Be Vietnam Pro", sans-serif';
+      offCtx.fillText('LƯU SẮC KIM HOÀNG', 540, 210);
 
-      offCtx.fillStyle = token('--color-cream');
-      offCtx.font = 'italic 42px "Be Vietnam Pro", sans-serif';
-      offCtx.fillText('“Chạm Sắc Son, Lưu Dấu Người...”', 540, 550);
+      offCtx.fillStyle = token('--color-cream') || '#fff5e1';
+      offCtx.font = 'italic 38px "Be Vietnam Pro", sans-serif';
+      offCtx.fillText('“Chạm Sắc Son, Lưu Dấu Người...”', 540, 290);
 
-      offCtx.fillStyle = token('--color-gold-light');
-      offCtx.font = 'bold 180px "Songti SC", "STSong", "Noto Serif CJK SC", "SimSun", serif';
-      offCtx.fillText('神 雞', 540, 940);
+      if (paintingImg && paintingImg.width && paintingImg.height) {
+        const maxW = 740;
+        const maxH = 840;
+        const scale = Math.min(maxW / paintingImg.width, maxH / paintingImg.height);
+        const drawW = Math.round(paintingImg.width * scale);
+        const drawH = Math.round(paintingImg.height * scale);
+        const drawX = Math.round((1080 - drawW) / 2);
+        const drawY = Math.round(350 + (maxH - drawH) / 2);
 
-      offCtx.fillStyle = token('--color-gold-light');
-      offCtx.font = '600 48px "Be Vietnam Pro", sans-serif';
-      offCtx.fillText('THẦN KÊ ĐẠI CÁT • 2026', 540, 1100);
+        offCtx.fillStyle = 'rgba(20, 4, 4, 0.45)';
+        offCtx.fillRect(drawX - 18, drawY - 18, drawW + 36, drawH + 36);
+        offCtx.strokeStyle = token('--color-gold-light') || '#ffd56b';
+        offCtx.lineWidth = 6;
+        offCtx.strokeRect(drawX - 14, drawY - 14, drawW + 28, drawH + 28);
+        offCtx.drawImage(paintingImg, drawX, drawY, drawW, drawH);
+      }
 
-      offCtx.fillStyle = token('--color-paper-warm');
-      offCtx.font = '36px "Be Vietnam Pro", sans-serif';
-      offCtx.fillText('Vạn Sự Hanh Thông • An Khang Thịnh Vượng', 540, 1220);
-      offCtx.fillText('Di Sản Tranh Đỏ Thăng Long Ngàn Năm', 540, 1300);
+      offCtx.fillStyle = token('--color-gold-light') || '#ffd56b';
+      offCtx.font = 'bold 48px "Be Vietnam Pro", sans-serif';
+      offCtx.fillText(item.title, 540, 1340);
+
+      offCtx.fillStyle = token('--color-gold') || '#d4a23a';
+      offCtx.font = 'italic 34px "Be Vietnam Pro", sans-serif';
+      offCtx.fillText(`Tranh dân gian Kim Hoàng: ${item.name}`, 540, 1410);
+
+      offCtx.fillStyle = token('--color-paper-warm') || '#f8e6c1';
+      offCtx.font = '38px "Be Vietnam Pro", sans-serif';
+      offCtx.fillText(item.line1, 540, 1515);
+      offCtx.fillText(item.line2, 540, 1585);
+
+      offCtx.fillStyle = token('--color-gold-light') || '#ffd56b';
+      offCtx.font = '30px "Be Vietnam Pro", sans-serif';
+      offCtx.fillText('Tranh Đỏ Thăng Long Ngàn Năm', 540, 1730);
 
       const link = document.createElement('a');
-      link.download = 'Loc-Do-Kim-Hoang-2026.png';
+      link.download = `Loc-Do-Kim-Hoang-${item.src.split('/').pop().replace('.jpeg', '')}.png`;
       link.href = offscreenCanvas.toDataURL('image/png');
       link.click();
     });
