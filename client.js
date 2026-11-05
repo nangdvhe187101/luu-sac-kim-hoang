@@ -274,49 +274,106 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (e) {}
   }
 
-  const chapters = [
-    {
-      id: 'chapter-1',
-      title: 'Khởi Sắc Năm 1701',
-      text: 'Vào năm Chính Hòa thứ 22, năm 1701, người dân hai làng Kim Bảng và Hoàng Bảng từ Thanh Hóa di cư ra Bắc, cùng nhau lập nên làng Kim Hoàng ở phía tây thành Thăng Long. Nhận thấy tranh Đông Hồ chỉ đủ phục vụ mạn Hà Bắc, Hải Dương, còn tranh Hàng Trống lại quá đắt đỏ, hai dòng họ Nguyễn Sỹ và Nguyễn Thế đã quyết tâm sáng tạo một dòng tranh mới, kết hợp tinh hoa của cả hai nơi. Cứ mỗi độ giáp Tết, khắp làng lại rộn rã tiếng cười, người dân tất bật thâu đêm chong đèn chấm màu rồi gánh tranh đi bán khắp các phiên chợ đón xuân.',
-    },
-    {
-      id: 'chapter-2',
-      title: 'Ký Ức Gánh Tranh Của Cha',
-      text: 'Cụ Trần Sơn Phương, hậu duệ người làng tranh xúc động nhớ lại: Cụ thân sinh tôi làm nghề buôn tranh, cứ Tết đến lại đón hàng mang bán khắp vùng. Tranh Kim Hoàng ngày ấy là thứ không thể thiếu trong mỗi gia đình, nên hàng lấy ngày nào, bán hết ngay ngày đó. Chiều về, gánh trên vai cha nhẹ bẫng, mấy anh em tôi hớn hở chạy theo, đòi cha cho đu bám dây quang.',
-    },
-    {
-      id: 'chapter-3',
-      title: 'Đại Hạn Vỡ Đê Năm 1915',
-      text: 'Thế nhưng, năm Ất Mão đời vua Duy Tân, tức năm 1915, trận đại hồng thủy do vỡ đê Liên Mạc đã làm ngập cả vùng Tây Hà Nội, cuốn trôi sạch kho ván mộc quý báu của làng. Nghề làm tranh từ đó suy giảm nặng nề. Đến năm 1945, chiến tranh và nạn đói khiến các ván in còn lại đành phải bán đi. Đến cuối những năm 50 của thế kỷ trước, phong trào bài trừ mê tín dị đoan đã khiến những ván in cổ bị chẻ làm củi đun. Cứ thế, Kim Hoàng mất hẳn một dòng tranh dân gian rực rỡ, tưởng chừng đã vĩnh viễn lùi sâu vào dĩ vãng.',
-    },
-    {
-      id: 'chapter-4',
-      title: 'Tia Sáng Paris',
-      text: 'Tưởng chừng số phận dòng tranh đã chấm dứt, nhưng nhà nghiên cứu người Pháp Maurice Durand đã từng sưu tầm tranh thờ và tranh Tết ở Bắc Bộ, lưu trữ tại Viện Viễn Đông Bác Cổ. Năm 1960, cuốn sách Tranh Dân Gian Việt Nam của ông được xuất bản tại Paris. Đến năm 2011, cuốn sách được tái bản với đầy đủ hình in màu minh họa. Qua đối chiếu phong cách và sắc đỏ cam đặc trưng, các nhà nghiên cứu xác nhận có tới 58 bức tranh dân gian Kim Hoàng. Đây chính là chiếc chìa khóa định mệnh mở ra hy vọng phục hồi dòng tranh đã mất.',
-    },
-    {
-      id: 'chapter-5',
-      title: 'Hành Trình Đến Làng Tìm Lại Nốt Son',
-      text: 'Không cam tâm để dòng tranh chỉ tồn tại trên trang sách, năm 2015, Tiến sĩ Nguyễn Thị Thu Hòa đã khởi xướng dự án phục hồi tranh dân gian Kim Hoàng. Nhóm nghiên cứu đã về làng và may mắn gặp được cụ Trần Thị Liên, người bán tranh cuối cùng vào năm 1947. Cụ cùng các bô lão trong làng đã cùng thống nhất: sắc đỏ cam trên giấy xuyến chỉ chính là màu sắc chuẩn xác nhất của tranh Kim Hoàng xưa.',
-    },
-    {
-      id: 'chapter-6',
-      title: 'Kỹ Nghệ Gian Truân',
-      text: 'Quá trình phục hồi là một hành trình gian nan cùng cực. Nhóm nghiên cứu đã làm hỏng hơn 700 tờ giấy dó mới tìm ra cách nhuộm phẳng giấy xuyến chỉ dưới nắng nhẹ; người thợ phải dùng tới 40 loại đục để đục lại ván mộc gỗ thị mềm dẻo, tái hiện nét khắc đanh thép và tinh xảo hơn cả Đông Hồ.',
-    },
-    {
-      id: 'chapter-7',
-      title: 'Nốt Đỏ Trở Lại Đương Đại',
-      text: 'Dự án đã phục dựng thành công 33 mẫu mộc bản và 19 mẫu vẽ tay. Nghệ nhân Đào Đình Chung nay đã có thể tự nuôi sống mình bằng chính nghề làm tranh truyền thống. Cùng với sự chung tay của thế hệ trẻ qua các triển lãm như Nốt Đỏ, sắc đỏ Kim Hoàng đã chính thức thức giấc, đàng hoàng bước vào đời sống đương đại.',
-    },
-  ];
-
   if (window.speechSynthesis) {
     window.speechSynthesis.cancel();
   }
 
   const storyNodes = document.querySelectorAll('.story-node');
+  const narrationSegments = Array.from(document.querySelectorAll('.narration-segment'));
+  const narrationDock = document.getElementById('narration-dock');
+  const dockPlayBtn = document.getElementById('dock-play-btn');
+  const dockStatus = document.getElementById('dock-status');
+  const dockSpeedBtn = document.getElementById('dock-speed-btn');
+
+  const narrationTracks = [
+    {
+      src: 'assets/audio/bang-1.m4a',
+      chapterIndex: 0,
+      blockIndex: 0,
+      labelVi: 'Phần 1 / 7 • Khởi nguồn 1701',
+      labelEn: 'Part 1 / 7 • Origins 1701',
+    },
+    {
+      src: 'assets/audio/bang-2.m4a',
+      chapterIndex: 1,
+      blockIndex: 1,
+      labelVi: 'Phần 2 / 7 • Biến cố 1915 – 1950s',
+      labelEn: 'Part 2 / 7 • 1915 – 1950s',
+    },
+    {
+      src: 'assets/audio/bang-3.m4a',
+      chapterIndex: 2,
+      blockIndex: 2,
+      labelVi: 'Phần 3 / 7 • Tư liệu 1960 – 2013',
+      labelEn: 'Part 3 / 7 • Archives 1960 – 2013',
+    },
+    {
+      src: 'assets/audio/bang-4.m4a',
+      chapterIndex: 3,
+      blockIndex: 3,
+      labelVi: 'Phần 4 / 7 • Dự án phục hồi 2015',
+      labelEn: 'Part 4 / 7 • Revival Project 2015',
+    },
+    {
+      src: 'assets/audio/bang-5a.m4a',
+      chapterIndex: 4,
+      blockIndex: 4,
+      labelVi: 'Phần 5a / 7 • Nghiên cứu màu & giấy',
+      labelEn: 'Part 5a / 7 • Colours & Paper',
+    },
+    {
+      src: 'assets/audio/bang-5b.m4a',
+      chapterIndex: 4,
+      blockIndex: 5,
+      labelVi: 'Phần 5b / 7 • Khắc mộc bản & nhuộm giấy',
+      labelEn: 'Part 5b / 7 • Woodblocks & Dyeing',
+    },
+    {
+      src: 'assets/audio/bang-5c.m4a',
+      chapterIndex: 4,
+      blockIndex: 6,
+      labelVi: 'Phần 5c / 7 • Sáng tạo mẫu tranh Nghê',
+      labelEn: 'Part 5c / 7 • New Nghe Designs',
+    },
+    {
+      src: 'assets/audio/bang-6.m4a',
+      chapterIndex: 5,
+      blockIndex: 7,
+      labelVi: 'Phần 6 / 7 • Trao truyền cho nghệ nhân',
+      labelEn: 'Part 6 / 7 • Passing Down the Craft',
+    },
+    {
+      src: 'assets/audio/bang-7.m4a',
+      chapterIndex: 6,
+      blockIndex: 8,
+      labelVi: 'Phần 7 / 7 • Sức sống đương đại',
+      labelEn: 'Part 7 / 7 • Contemporary Vitality',
+    },
+  ];
+
+  const speedOptions = [1.25, 1.35, 1.5, 1.0];
+  let currentSpeedIdx = 1;
+  let currentTrackIdx = 0;
+  let userScrollPauseUntil = 0;
+  let isAutoScrollStep = false;
+  let autoScrollRaf = null;
+
+  const narrationAudio = new Audio();
+  narrationAudio.preload = 'auto';
+
+  function applyPlaybackSpeed() {
+    const rate = speedOptions[currentSpeedIdx];
+    narrationAudio.defaultPlaybackRate = rate;
+    narrationAudio.playbackRate = rate;
+    if ('preservesPitch' in narrationAudio) {
+      narrationAudio.preservesPitch = true;
+    } else if ('webkitPreservesPitch' in narrationAudio) {
+      narrationAudio.webkitPreservesPitch = true;
+    }
+    if (dockSpeedBtn) {
+      dockSpeedBtn.textContent = `${rate}x`;
+    }
+  }
 
   function updateActiveChapterVisual(index) {
     storyNodes.forEach((node, i) => {
@@ -325,6 +382,146 @@ document.addEventListener('DOMContentLoaded', () => {
       } else {
         node.classList.remove('is-reading');
       }
+    });
+  }
+
+  function updateDockUI() {
+    const track = narrationTracks[currentTrackIdx] || narrationTracks[0];
+    const isPlaying = !narrationAudio.paused && !narrationAudio.ended;
+    const isEn = document.documentElement.getAttribute('data-site-lang') === 'en';
+    if (dockStatus && track) {
+      dockStatus.textContent = isEn ? track.labelEn : track.labelVi;
+    }
+    if (narrationDock) {
+      narrationDock.classList.toggle('is-speaking', isPlaying);
+    }
+    if (dockPlayBtn) {
+      dockPlayBtn.innerHTML = `<i data-lucide="${isPlaying ? 'pause' : 'play'}"></i>`;
+      if (window.lucide) {
+        window.lucide.createIcons({ attrs: {}, nameAttr: 'data-lucide', root: dockPlayBtn });
+      }
+    }
+  }
+
+  function stepAutoScroll() {
+    if (narrationAudio.paused || narrationAudio.ended) {
+      autoScrollRaf = null;
+      return;
+    }
+    const now = performance.now();
+    const modalOpen =
+      (letterModal && letterModal.classList.contains('is-visible')) ||
+      (lightboxModal && lightboxModal.classList.contains('is-active')) ||
+      document.body.classList.contains('cover-locked');
+
+    if (!modalOpen && now > userScrollPauseUntil && narrationAudio.duration > 0) {
+      const seg = narrationSegments[currentTrackIdx];
+      if (seg) {
+        const rect = seg.getBoundingClientRect();
+        const segTop = rect.top + window.scrollY;
+        const segHeight = rect.height;
+        const anchorOffset = Math.min(130, window.innerHeight * 0.18);
+        const progress = Math.min(1, Math.max(0, narrationAudio.currentTime / narrationAudio.duration));
+        const travel = Math.max(0, segHeight - window.innerHeight * 0.45);
+        const targetY = Math.max(0, segTop - anchorOffset + travel * progress);
+        const diff = targetY - window.scrollY;
+
+        if (Math.abs(diff) > 1.5) {
+          isAutoScrollStep = true;
+          const step = Math.abs(diff) > 500 ? diff * 0.08 : diff * 0.045;
+          window.scrollTo(0, window.scrollY + step);
+          isAutoScrollStep = false;
+        }
+      }
+    }
+    autoScrollRaf = requestAnimationFrame(stepAutoScroll);
+  }
+
+  function startNarrationAt(trackIndex, resetScrollHold = true) {
+    if (trackIndex < 0 || trackIndex >= narrationTracks.length) return;
+    currentTrackIdx = trackIndex;
+    const track = narrationTracks[currentTrackIdx];
+    updateActiveChapterVisual(track.chapterIndex);
+    if (resetScrollHold) {
+      userScrollPauseUntil = 0;
+    }
+
+    const wantedSrc = new URL(track.src, window.location.href).href;
+    if (narrationAudio.src !== wantedSrc) {
+      narrationAudio.src = track.src;
+      narrationAudio.currentTime = 0;
+    }
+    applyPlaybackSpeed();
+    narrationAudio.play().then(() => {
+      applyPlaybackSpeed();
+      updateDockUI();
+      if (!autoScrollRaf) {
+        autoScrollRaf = requestAnimationFrame(stepAutoScroll);
+      }
+    }).catch(() => {
+      updateDockUI();
+    });
+    updateDockUI();
+  }
+
+  function toggleNarration() {
+    if (!narrationAudio.src) {
+      startNarrationAt(currentTrackIdx, true);
+      return;
+    }
+    if (narrationAudio.paused) {
+      userScrollPauseUntil = 0;
+      applyPlaybackSpeed();
+      narrationAudio.play().then(() => {
+        applyPlaybackSpeed();
+        updateDockUI();
+        if (!autoScrollRaf) {
+          autoScrollRaf = requestAnimationFrame(stepAutoScroll);
+        }
+      }).catch(() => {});
+    } else {
+      narrationAudio.pause();
+      updateDockUI();
+    }
+  }
+
+  narrationAudio.addEventListener('play', () => {
+    applyPlaybackSpeed();
+    updateDockUI();
+    if (!autoScrollRaf) {
+      autoScrollRaf = requestAnimationFrame(stepAutoScroll);
+    }
+  });
+
+  narrationAudio.addEventListener('pause', () => {
+    updateDockUI();
+  });
+
+  narrationAudio.addEventListener('ended', () => {
+    if (currentTrackIdx + 1 < narrationTracks.length) {
+      startNarrationAt(currentTrackIdx + 1, false);
+    } else {
+      updateDockUI();
+    }
+  });
+
+  const pauseAutoScrollOnUserInput = () => {
+    if (isAutoScrollStep) return;
+    if (!narrationAudio.paused) {
+      userScrollPauseUntil = performance.now() + 4000;
+    }
+  };
+  window.addEventListener('wheel', pauseAutoScrollOnUserInput, { passive: true });
+  window.addEventListener('touchmove', pauseAutoScrollOnUserInput, { passive: true });
+
+  if (dockPlayBtn) {
+    dockPlayBtn.addEventListener('click', toggleNarration);
+  }
+
+  if (dockSpeedBtn) {
+    dockSpeedBtn.addEventListener('click', () => {
+      currentSpeedIdx = (currentSpeedIdx + 1) % speedOptions.length;
+      applyPlaybackSpeed();
     });
   }
 
@@ -338,6 +535,8 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.classList.remove('cover-locked');
     window.scrollTo({ top: 0, behavior: 'instant' });
 
+    startNarrationAt(0, true);
+
     const removeDelay = prefersReducedMotion.matches ? 50 : 1800;
     setTimeout(() => coverGate.remove(), removeDelay);
   }
@@ -347,11 +546,16 @@ document.addEventListener('DOMContentLoaded', () => {
     coverOpenBtn.focus();
   }
 
-  storyNodes.forEach((node, idx) => {
-    node.addEventListener('click', () => {
-      updateActiveChapterVisual(idx);
+  narrationSegments.forEach((seg, segIdx) => {
+    seg.addEventListener('click', (e) => {
+      if (e.target.closest('button, a')) return;
+      if (currentTrackIdx !== segIdx || narrationAudio.paused) {
+        startNarrationAt(segIdx, true);
+      }
     });
   });
+
+  updateDockUI();
 
   const galleryItems = document.querySelectorAll('.gallery-item');
   const lightboxModal = document.getElementById('lightbox-modal');
@@ -467,6 +671,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (lightboxModal && lightboxModal.classList.contains('is-active') && galleryList[lightboxIndex]) {
       lightboxCaption.textContent = getItemCaption(galleryList[lightboxIndex]);
     }
+    updateDockUI();
     try {
       sessionStorage.setItem('kim_hoang_lang', nextLang);
     } catch (e) {}

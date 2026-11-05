@@ -2489,6 +2489,7 @@ html[data-site-lang="en"] .lang-opt--en {
 }
 
 body.cover-locked { overflow: hidden; }
+body.cover-locked .narration-dock { opacity: 0; pointer-events: none; }
 
 .cover-gate {
   position: fixed;
