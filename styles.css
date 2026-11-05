@@ -2273,7 +2273,7 @@ html[data-site-lang="en"] .lang-opt--en {
 .fixed-bg-overlay {
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse at 50% 40%, rgba(var(--bg-deep-rgb), 0) 0%, rgba(var(--bg-deep-rgb), 0.45) 100%);
+  background: radial-gradient(ellipse at 50% 40%, rgba(var(--bg-deep-rgb), 0) 0%, rgba(var(--bg-deep-rgb), 0.16) 100%);
 }
 
 .fixed-bg-clouds {
@@ -2477,7 +2477,7 @@ body.cover-locked .narration-dock { opacity: 0; pointer-events: none; }
   width: 50%;
   
   background-color: #6e1712;
-  background-image: url('assets/pptx-extracted/ppt/media/image1.png');
+  background-image: url('assets/bg-kimhoang.jpg');
   background-size: 200% 100%;
   background-repeat: no-repeat;
   transition: transform 1.6s cubic-bezier(0.7, 0, 0.25, 1);
