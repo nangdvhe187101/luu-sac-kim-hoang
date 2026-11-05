@@ -1362,8 +1362,8 @@ body {
 }
 
 .node-year-badge--loss {
-  background: rgba(var(--red-rich-rgb), 0.7);
-  border-color: var(--color-gold-light);
+  background: var(--color-red-primary);
+  border-color: var(--color-gold);
 }
 
 .section-lead {
