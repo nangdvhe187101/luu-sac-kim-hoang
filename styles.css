@@ -6,6 +6,9 @@
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
+  ascent-override: 90%;
+  descent-override: 25%;
+  line-gap-override: 0%;
 }
 
 @font-face {
@@ -14,6 +17,9 @@
   font-weight: 100 900;
   font-style: italic;
   font-display: swap;
+  ascent-override: 90%;
+  descent-override: 25%;
+  line-gap-override: 0%;
 }
 
 @font-face {
@@ -164,7 +170,7 @@ html {
   color: var(--color-paper);
   font-family: var(--font-body);
   font-size: 16px;
-  line-height: 1.85;
+  line-height: 1.55;
   overflow-x: hidden;
 }
 
@@ -1023,7 +1029,7 @@ body {
 
 .letter-body {
   font-size: 1.08rem;
-  line-height: 2;
+  line-height: 1.65;
   color: var(--color-ink-body);
 }
 
@@ -1168,23 +1174,24 @@ body {
   position: relative;
   max-width: 960px;
   margin: 0 auto;
-  padding: 6rem 1.5rem 8rem;
+  padding: 3.5rem 1.5rem 4.5rem;
   z-index: 20;
 }
 
 .section-intro-header {
   text-align: center;
-  margin-bottom: 4.5rem;
+  margin-bottom: 2.2rem;
 }
 
 .section-pretitle {
   font-family: var(--font-display);
   font-size: clamp(1.5rem, 3.2vw, 2.2rem);
   font-weight: 700;
+  line-height: 1.2;
   text-transform: uppercase;
   letter-spacing: 0.12em;
   color: var(--color-gold-light);
-  margin-bottom: 0.65rem;
+  margin-bottom: 0.3rem;
   display: block;
   text-shadow: 0 2px 12px rgba(var(--bg-deep-rgb), 0.8);
 }
@@ -1193,6 +1200,7 @@ body {
   font-family: var(--font-display);
   font-size: clamp(1.9rem, 3.8vw, 2.6rem);
   font-weight: 700;
+  line-height: 1.25;
   color: var(--color-gold-light);
   text-shadow: 0 2px 12px rgba(var(--bg-deep-rgb), 0.8);
 }
@@ -1201,7 +1209,7 @@ body {
   width: 90px;
   height: 2px;
   background: linear-gradient(to right, transparent, var(--color-gold), transparent);
-  margin: 1.25rem auto 0;
+  margin: 0.7rem auto 0;
 }
 
 .timeline-container {
@@ -1289,15 +1297,15 @@ body {
   font-size: 1.7rem;
   font-weight: 700;
   color: var(--color-red-rich);
-  margin-bottom: 1.1rem;
-  line-height: 1.35;
+  margin-bottom: 0.75rem;
+  line-height: 1.25;
 }
 
 .node-text {
   font-size: 1.05rem;
   color: var(--color-ink-body);
-  line-height: 1.9;
-  margin-bottom: 1.4rem;
+  line-height: 1.6;
+  margin-bottom: 1.1rem;
 }
 
 .node-image-figure {
@@ -1343,7 +1351,8 @@ body {
 
 .section-lead {
   color: var(--color-cream);
-  margin-top: 1rem;
+  margin-top: 0.6rem;
+  line-height: 1.5;
   font-size: 1.05rem;
 }
 
@@ -1389,7 +1398,7 @@ body {
   position: relative;
   max-width: 1260px;
   margin: 0 auto;
-  padding: 5rem 2.5rem 8rem;
+  padding: 3.5rem 2.5rem 4.5rem;
   z-index: 20;
   
   background:
@@ -1652,7 +1661,7 @@ body {
   position: relative;
   max-width: 860px;
   margin: 0 auto;
-  padding: 5rem 1.5rem 8rem;
+  padding: 3.5rem 1.5rem 5rem;
   z-index: 20;
 }
 
@@ -1762,7 +1771,7 @@ body {
   position: relative;
   background: linear-gradient(to top, var(--bg-3) 0%, var(--bg-2) 100%);
   border-top: 2px solid var(--color-gold);
-  padding: 6rem 1.5rem 8rem;
+  padding: 4rem 1.5rem 5rem;
   text-align: center;
   z-index: 20;
 }
@@ -1776,15 +1785,16 @@ body {
   font-family: var(--font-display);
   font-size: clamp(2rem, 3.8vw, 2.6rem);
   font-weight: 700;
+  line-height: 1.25;
   color: var(--color-gold-light);
-  margin-bottom: 1rem;
+  margin-bottom: 0.65rem;
 }
 
 .cta-text {
   font-size: 1.08rem;
   color: var(--color-cream-soft);
-  margin-bottom: 2.8rem;
-  line-height: 1.85;
+  margin-bottom: 2rem;
+  line-height: 1.6;
 }
 
 .cta-buttons-group {
@@ -2549,7 +2559,7 @@ body.cover-locked { overflow: hidden; }
 .coverflow {
   position: relative;
   height: clamp(460px, 78vw, 640px);
-  margin-top: 3rem;
+  margin-top: 1.8rem;
   perspective: 1400px;
   overflow: hidden;
   touch-action: pan-y;
