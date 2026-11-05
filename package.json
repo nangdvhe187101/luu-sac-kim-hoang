@@ -1,9 +1,0 @@
-{
-  "name": "luu-sac-kim-hoang",
-  "version": "1.0.0",
-  "private": true,
-  "description": "Thiệp mời di sản Lưu Sắc Kim Hoàng",
-  "scripts": {
-    "dev": "node local-server.js"
-  }
-}
