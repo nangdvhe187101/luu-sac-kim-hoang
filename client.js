@@ -1112,10 +1112,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
       try {
         await Promise.all([
-          document.fonts.load('bold 68px "Be Vietnam Pro"', 'LƯU SẮC KIM HOÀNG'),
-          document.fonts.load('italic 38px "Be Vietnam Pro"', 'Chạm Sắc Son'),
-          document.fonts.load('600 46px "Be Vietnam Pro"', item.title),
-          document.fonts.load('36px "Be Vietnam Pro"', item.line1),
+          document.fonts.load('bold 68px "DFVN Bropella"', 'LƯU SẮC KIM HOÀNG'),
+          document.fonts.load('italic 38px "Asap"', 'Chạm Sắc Son'),
+          document.fonts.load('bold 48px "DFVN Bropella"', item.title),
+          document.fonts.load('38px "Asap"', item.line1),
         ]);
       } catch (e) {}
 
@@ -1153,11 +1153,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
       offCtx.fillStyle = token('--color-gold-light') || '#ffd56b';
       offCtx.textAlign = 'center';
-      offCtx.font = 'bold 68px "Be Vietnam Pro", sans-serif';
+      offCtx.font = 'bold 68px "DFVN Bropella", "Asap", serif';
       offCtx.fillText('LƯU SẮC KIM HOÀNG', 540, 210);
 
       offCtx.fillStyle = token('--color-cream') || '#fff5e1';
-      offCtx.font = 'italic 38px "Be Vietnam Pro", sans-serif';
+      offCtx.font = 'italic 38px "Asap", sans-serif';
       offCtx.fillText('“Chạm Sắc Son, Lưu Dấu Người...”', 540, 290);
 
       if (paintingImg && paintingImg.width && paintingImg.height) {
@@ -1178,20 +1178,20 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       offCtx.fillStyle = token('--color-gold-light') || '#ffd56b';
-      offCtx.font = 'bold 48px "Be Vietnam Pro", sans-serif';
+      offCtx.font = 'bold 48px "DFVN Bropella", "Asap", serif';
       offCtx.fillText(item.title, 540, 1340);
 
       offCtx.fillStyle = token('--color-gold') || '#d4a23a';
-      offCtx.font = 'italic 34px "Be Vietnam Pro", sans-serif';
+      offCtx.font = 'italic 34px "Asap", sans-serif';
       offCtx.fillText(`Tranh dân gian Kim Hoàng: ${item.name}`, 540, 1410);
 
       offCtx.fillStyle = token('--color-paper-warm') || '#f8e6c1';
-      offCtx.font = '38px "Be Vietnam Pro", sans-serif';
+      offCtx.font = '38px "Asap", sans-serif';
       offCtx.fillText(item.line1, 540, 1515);
       offCtx.fillText(item.line2, 540, 1585);
 
       offCtx.fillStyle = token('--color-gold-light') || '#ffd56b';
-      offCtx.font = '30px "Be Vietnam Pro", sans-serif';
+      offCtx.font = '30px "Asap", sans-serif';
       offCtx.fillText('Tranh Đỏ Thăng Long Ngàn Năm', 540, 1730);
 
       const link = document.createElement('a');

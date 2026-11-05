@@ -1,5 +1,101 @@
 
 
+@font-face {
+  font-family: 'DFVN Bropella';
+  src: url('assets/fonts/DFVN-Bropella.otf') format('opentype');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'DFVN Bropella';
+  src: url('assets/fonts/DFVN-Bropella.otf') format('opentype');
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Asap';
+  src: url('assets/fonts/ASAP-LIGHT.TTF') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Asap';
+  src: url('assets/fonts/ASAP-LIGHTITALIC.TTF') format('truetype');
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Asap';
+  src: url('assets/fonts/ASAP-REGULAR.TTF') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Asap';
+  src: url('assets/fonts/ASAP-ITALIC.TTF') format('truetype');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Asap';
+  src: url('assets/fonts/ASAP-REGULAR.TTF') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Asap';
+  src: url('assets/fonts/ASAP-ITALIC.TTF') format('truetype');
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Asap';
+  src: url('assets/fonts/ASAP-BOLD.TTF') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Asap';
+  src: url('assets/fonts/ASAP-BOLDITALIC.TTF') format('truetype');
+  font-weight: 600;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Asap';
+  src: url('assets/fonts/ASAP-BOLD.TTF') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Asap';
+  src: url('assets/fonts/ASAP-BOLDITALIC.TTF') format('truetype');
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
 :root {
   
   --color-red-primary: #B91C1C;   
@@ -47,10 +143,10 @@
   --color-cream-warm: #FEEBC8;    
   --color-cream-pale: #ECE5D8;    
 
-  --font-display: 'Be Vietnam Pro', -apple-system, sans-serif;
+  --font-display: 'DFVN Bropella', 'Asap', serif;
   
   --font-decorative: 'Songti SC', 'STSong', 'Noto Serif CJK SC', 'Noto Serif SC', 'SimSun', serif;
-  --font-body: 'Be Vietnam Pro', -apple-system, sans-serif;
+  --font-body: 'Asap', -apple-system, BlinkMacSystemFont, sans-serif;
 
   --transition-smooth: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   --shadow-elevation: 0 15px 40px -10px rgba(110, 15, 15, 0.4);
@@ -1082,6 +1178,7 @@ body {
 }
 
 .section-pretitle {
+  font-family: var(--font-display);
   font-size: clamp(1.5rem, 3.2vw, 2.2rem);
   font-weight: 700;
   text-transform: uppercase;
