@@ -165,7 +165,7 @@
 }
 
 html {
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
   background-color: var(--bg-3);
   color: var(--color-paper);
   font-family: var(--font-body);

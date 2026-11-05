@@ -356,6 +356,8 @@ document.addEventListener('DOMContentLoaded', () => {
   let userScrollPauseUntil = 0;
   let isAutoScrollStep = false;
   let autoScrollRaf = null;
+  let autoScrollY = 0;
+  let lastFrameTs = 0;
 
   const narrationAudio = new Audio();
   narrationAudio.preload = 'auto';
@@ -402,52 +404,81 @@ document.addEventListener('DOMContentLoaded', () => {
     return Math.min(130, window.innerHeight * 0.18);
   }
 
+  function computeSegmentTargetY(trackIndex) {
+    const seg = narrationSegments[trackIndex];
+    if (!seg) return window.scrollY;
+    const rect = seg.getBoundingClientRect();
+    const segTop = rect.top + window.scrollY;
+    const segHeight = rect.height;
+    const anchorOffset = getSegmentAnchorOffset();
+    const startY = Math.max(0, segTop - anchorOffset);
+    if (!narrationAudio.duration || narrationAudio.duration <= 0) {
+      return startY;
+    }
+    const progress = Math.min(1, Math.max(0, narrationAudio.currentTime / narrationAudio.duration));
+    const endY = Math.max(startY, segTop + segHeight - window.innerHeight * 0.78);
+    return startY + (endY - startY) * progress;
+  }
+
   function jumpToSegmentStart(trackIndex) {
     const seg = narrationSegments[trackIndex];
     if (!seg) return;
     const rect = seg.getBoundingClientRect();
     const segTop = rect.top + window.scrollY;
     const startY = Math.max(0, segTop - getSegmentAnchorOffset());
+    autoScrollY = startY;
+    lastFrameTs = performance.now();
     isAutoScrollStep = true;
-    window.scrollTo({ top: startY, behavior: 'auto' });
-    setTimeout(() => {
-      isAutoScrollStep = false;
-    }, 60);
+    window.scrollTo({ top: startY, behavior: 'instant' });
+    isAutoScrollStep = false;
   }
 
-  function stepAutoScroll() {
-    if (narrationAudio.paused || narrationAudio.ended) {
+  function stepAutoScroll(ts) {
+    if (narrationAudio.paused || narrationAudio.ended || document.hidden) {
       autoScrollRaf = null;
       return;
     }
-    const now = performance.now();
+    const now = typeof ts === 'number' ? ts : performance.now();
+    const dt = lastFrameTs > 0 ? Math.min(64, Math.max(1, now - lastFrameTs)) : 16.67;
+    lastFrameTs = now;
+
     const modalOpen =
       (letterModal && letterModal.classList.contains('is-visible')) ||
       (lightboxModal && lightboxModal.classList.contains('is-active')) ||
       document.body.classList.contains('cover-locked');
 
     if (!modalOpen && now > userScrollPauseUntil && narrationAudio.duration > 0) {
-      const seg = narrationSegments[currentTrackIdx];
-      if (seg) {
-        const rect = seg.getBoundingClientRect();
-        const segTop = rect.top + window.scrollY;
-        const segHeight = rect.height;
-        const anchorOffset = getSegmentAnchorOffset();
-        const progress = Math.min(1, Math.max(0, narrationAudio.currentTime / narrationAudio.duration));
-        const startY = Math.max(0, segTop - anchorOffset);
-        const endY = Math.max(startY, segTop + segHeight - window.innerHeight * 0.78);
-        const targetY = startY + (endY - startY) * progress;
-        const diff = targetY - window.scrollY;
-
-        if (Math.abs(diff) > 1) {
-          isAutoScrollStep = true;
-          window.scrollTo(0, window.scrollY + diff * 0.18);
-          isAutoScrollStep = false;
-        }
+      const targetY = computeSegmentTargetY(currentTrackIdx);
+      if (Math.abs(window.scrollY - autoScrollY) > 60) {
+        autoScrollY = window.scrollY;
       }
+      const diff = targetY - autoScrollY;
+      if (Math.abs(diff) > 0.4) {
+        const alpha = 1 - Math.exp(-dt / 140);
+        autoScrollY += diff * alpha;
+        isAutoScrollStep = true;
+        window.scrollTo({ top: autoScrollY, behavior: 'instant' });
+        isAutoScrollStep = false;
+      }
+    } else {
+      autoScrollY = window.scrollY;
     }
     autoScrollRaf = requestAnimationFrame(stepAutoScroll);
   }
+
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && !narrationAudio.paused && !narrationAudio.ended) {
+      lastFrameTs = performance.now();
+      const targetY = computeSegmentTargetY(currentTrackIdx);
+      autoScrollY = targetY;
+      isAutoScrollStep = true;
+      window.scrollTo({ top: targetY, behavior: 'instant' });
+      isAutoScrollStep = false;
+      if (!autoScrollRaf) {
+        autoScrollRaf = requestAnimationFrame(stepAutoScroll);
+      }
+    }
+  });
 
   function startNarrationAt(trackIndex, resetScrollHold = true) {
     if (trackIndex < 0 || trackIndex >= narrationTracks.length) return;
