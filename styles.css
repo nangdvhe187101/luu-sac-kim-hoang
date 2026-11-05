@@ -2499,14 +2499,6 @@ body.cover-locked .narration-dock { opacity: 0; pointer-events: none; }
   transition: opacity 0.65s ease;
 }
 
-.cover-ornament--medallion {
-  top: 50%;
-  left: 50%;
-  width: min(120vw, 900px);
-  transform: translate(-50%, -50%);
-  opacity: 0.16;
-}
-
 .cover-ornament--cloud-top {
   top: -4%;
   left: -6%;
