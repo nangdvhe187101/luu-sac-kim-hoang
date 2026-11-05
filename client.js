@@ -219,10 +219,9 @@ document.addEventListener('DOMContentLoaded', () => {
   if (startJourneyBtn) {
     startJourneyBtn.addEventListener('click', () => {
       closeLetter();
-      
-      voiceState.currentIndex = 0;
-      if (!voiceState.isPlaying) {
-        startVoiceTour();
+      const storylineSection = document.getElementById('storyline');
+      if (storylineSection) {
+        storylineSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     });
   }
@@ -313,237 +312,21 @@ document.addEventListener('DOMContentLoaded', () => {
     },
   ];
 
-  const voiceState = {
-    isPlaying: false,
-    currentIndex: 0,
-    rate: 1.2, 
-    speechSynth: window.speechSynthesis,
-    preferredVoice: null,
-  };
+  if (window.speechSynthesis) {
+    window.speechSynthesis.cancel();
+  }
 
-  const voicePlayBtn = document.getElementById('voice-play-btn');
-  const playIcon = document.getElementById('play-icon');
-  const voiceStatusText = document.getElementById('voice-status-text');
-  const voiceSpeedBtn = document.getElementById('voice-speed-btn');
-  const audioWaves = document.getElementById('audio-waves');
   const storyNodes = document.querySelectorAll('.story-node');
-
-  function scoreVoice(v) {
-    let score = 0;
-    const name = v.name.toLowerCase();
-    if (/natural|neural|online/.test(name)) score += 50;
-    if (/hoaimy|hoài my|namminh|nam minh/.test(name)) score += 40;
-    if (/google/.test(name)) score += 25;
-    if (/premium|enhanced|siri/.test(name)) score += 20;
-    if (/linh/.test(name)) score += 10;
-    if (!v.localService) score += 5;
-    return score;
-  }
-
-  function pickBestVoice() {
-    if (!voiceState.speechSynth) return;
-    const viVoices = voiceState.speechSynth.getVoices()
-      .filter((v) => /^vi/i.test(v.lang) || /viet/i.test(v.name));
-    if (!viVoices.length) return;
-    viVoices.sort((a, b) => scoreVoice(b) - scoreVoice(a));
-    voiceState.preferredVoice = viVoices[0];
-  }
-
-  if (voiceState.speechSynth) {
-    pickBestVoice();
-    if (speechSynthesis.onvoiceschanged !== undefined) {
-      speechSynthesis.onvoiceschanged = pickBestVoice;
-    }
-  }
-
-  let autoScrollFrame = null;
-
-  function stopAutoScroll() {
-    if (autoScrollFrame) {
-      cancelAnimationFrame(autoScrollFrame);
-      autoScrollFrame = null;
-    }
-  }
-
-  function estimateReadMs(text) {
-    
-    return (text.length / (14 * voiceState.rate)) * 1000;
-  }
-
-  function getNodeScrollRange(node) {
-    const headerOffset = 96;
-    const top = node.getBoundingClientRect().top + window.scrollY - headerOffset;
-    const bottomView = top + node.offsetHeight - window.innerHeight + headerOffset + 48;
-    return { top, bottom: Math.max(top, bottomView) };
-  }
-
-  function scrollSmoothTo(toY, durationMs, ease) {
-    stopAutoScroll();
-    const startY = window.scrollY;
-    const t0 = performance.now();
-    const total = Math.max(1, durationMs);
-
-    function step(now) {
-      const k = Math.min(1, (now - t0) / total);
-      const e = ease ? (k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2) : k;
-      window.scrollTo({ top: startY + (toY - startY) * e, behavior: 'instant' });
-      autoScrollFrame = k < 1 ? requestAnimationFrame(step) : null;
-    }
-    autoScrollFrame = requestAnimationFrame(step);
-  }
-
-  function glideToNode(node) {
-    scrollSmoothTo(getNodeScrollRange(node).top, 1200, true);
-  }
-
-  function scrollToProgress(node, fraction, durationMs) {
-    const { top, bottom } = getNodeScrollRange(node);
-    scrollSmoothTo(top + (bottom - top) * fraction, durationMs, false);
-  }
 
   function updateActiveChapterVisual(index) {
     storyNodes.forEach((node, i) => {
       if (i === index) {
         node.classList.add('is-reading');
-        if (voiceState.isPlaying && chapters[index]) {
-          glideToNode(node);
-        } else {
-          node.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
       } else {
         node.classList.remove('is-reading');
       }
     });
-
-    if (voiceStatusText && chapters[index]) {
-      voiceStatusText.textContent = `Đang đọc: ${chapters[index].title}`;
-    }
   }
-
-  function readChapter(index) {
-    if (!voiceState.speechSynth) {
-      voiceState.isPlaying = false;
-      showToast('Trình duyệt của bạn chưa hỗ trợ giọng đọc. Bạn vẫn có thể đọc câu chuyện bên dưới.');
-      return;
-    }
-
-    if (!voiceState.preferredVoice && !voiceState.noVoiceWarned) {
-      voiceState.noVoiceWarned = true;
-      showToast('Máy chưa có giọng đọc tiếng Việt nên giọng kể có thể không chuẩn.');
-    }
-
-    voiceState.speechSynth.cancel();
-
-    if (index >= chapters.length) {
-      stopVoiceTour();
-      if (voiceStatusText) voiceStatusText.textContent = 'Đã hoàn thành chuyến thuyết minh';
-      return;
-    }
-
-    voiceState.currentIndex = index;
-    updateActiveChapterVisual(index);
-
-    const chapter = chapters[index];
-
-    const sentences = chapter.text.match(/[^.!?…]+[.!?…]*/g) || [chapter.text];
-    const queue = sentences.map((s) => s.trim()).filter(Boolean);
-
-    const totalChars = queue.reduce((sum, s) => sum + s.length, 0) || 1;
-    let readChars = 0;
-    const node = storyNodes[index];
-
-    voiceState.session = (voiceState.session || 0) + 1;
-    const session = voiceState.session;
-
-    const speakSentence = (i) => {
-      if (!voiceState.isPlaying || session !== voiceState.session) return;
-      if (i >= queue.length) {
-        setTimeout(() => {
-          if (voiceState.isPlaying && session === voiceState.session) readChapter(voiceState.currentIndex + 1);
-        }, 350);
-        return;
-      }
-
-      const utterance = new SpeechSynthesisUtterance(queue[i]);
-      utterance.lang = 'vi-VN';
-      utterance.rate = voiceState.rate;
-      
-      utterance.pitch = i === 0 ? 1.08 : 1.0 - (i % 2) * 0.04;
-      if (voiceState.preferredVoice) utterance.voice = voiceState.preferredVoice;
-
-      if (i === 0) {
-        utterance.onstart = () => {
-          voiceState.isPlaying = true;
-          if (audioWaves) audioWaves.classList.add('is-speaking');
-          if (playIcon) playIcon.setAttribute('data-lucide', 'pause');
-          if (window.lucide) window.lucide.createIcons();
-        };
-      }
-
-      const sentenceChars = queue[i].length;
-      const fractionAfter = Math.min(1, (readChars + sentenceChars) / totalChars);
-      const estimatedMs = estimateReadMs(queue[i]) * 1.25;
-      const GLIDE_INTO_NODE_MS = 1200;
-      const startProgressScroll = () => {
-        if (node && session === voiceState.session && voiceState.isPlaying) {
-          scrollToProgress(node, fractionAfter, estimatedMs);
-        }
-      };
-      const baseOnStart = utterance.onstart;
-      utterance.onstart = (ev) => {
-        if (baseOnStart) baseOnStart(ev);
-        if (i === 0) {
-          
-          setTimeout(startProgressScroll, GLIDE_INTO_NODE_MS);
-        } else {
-          startProgressScroll();
-        }
-      };
-
-      utterance.onend = () => {
-        readChars += sentenceChars;
-        
-        const pause = /[.…]$/.test(queue[i]) ? 280 : 160;
-        setTimeout(() => speakSentence(i + 1), pause);
-      };
-
-      voiceState.speechSynth.speak(utterance);
-    };
-
-    speakSentence(0);
-  }
-
-  function startVoiceTour() {
-    voiceState.isPlaying = true;
-    readChapter(voiceState.currentIndex);
-  }
-
-  function pauseVoiceTour() {
-    voiceState.isPlaying = false;
-    stopAutoScroll();
-    if (voiceState.speechSynth) {
-      voiceState.speechSynth.cancel();
-    }
-    if (audioWaves) audioWaves.classList.remove('is-speaking');
-    if (playIcon) playIcon.setAttribute('data-lucide', 'play');
-    if (window.lucide) window.lucide.createIcons();
-    if (voiceStatusText) voiceStatusText.textContent = 'Đã tạm dừng thuyết minh';
-  }
-
-  function stopVoiceTour() {
-    pauseVoiceTour();
-    storyNodes.forEach((node) => node.classList.remove('is-reading'));
-  }
-
-  ['wheel', 'touchstart'].forEach((evt) => {
-    window.addEventListener(evt, () => {
-      if (voiceState.isPlaying) pauseVoiceTour();
-    }, { passive: true });
-  });
-  window.addEventListener('keydown', (e) => {
-    const navKeys = ['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' '];
-    if (voiceState.isPlaying && navKeys.includes(e.key)) pauseVoiceTour();
-  });
 
   const coverGate = document.getElementById('cover-gate');
   const coverOpenBtn = document.getElementById('cover-open-btn');
@@ -555,9 +338,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.classList.remove('cover-locked');
     window.scrollTo({ top: 0, behavior: 'instant' });
 
-    voiceState.currentIndex = 0;
-    if (!voiceState.isPlaying) startVoiceTour();
-
     const removeDelay = prefersReducedMotion.matches ? 50 : 1800;
     setTimeout(() => coverGate.remove(), removeDelay);
   }
@@ -567,38 +347,9 @@ document.addEventListener('DOMContentLoaded', () => {
     coverOpenBtn.focus();
   }
 
-  if (voicePlayBtn) {
-    voicePlayBtn.addEventListener('click', () => {
-      if (voiceState.isPlaying) {
-        pauseVoiceTour();
-      } else {
-        startVoiceTour();
-      }
-    });
-  }
-
-  const speedOptions = [1.2, 1.35, 1.05];
-  let currentSpeedIdx = 0;
-  if (voiceSpeedBtn) {
-    voiceSpeedBtn.addEventListener('click', () => {
-      currentSpeedIdx = (currentSpeedIdx + 1) % speedOptions.length;
-      voiceState.rate = speedOptions[currentSpeedIdx];
-      voiceSpeedBtn.textContent = `${voiceState.rate}x`;
-
-      if (voiceState.isPlaying) {
-        readChapter(voiceState.currentIndex);
-      }
-    });
-  }
-
   storyNodes.forEach((node, idx) => {
     node.addEventListener('click', () => {
-      voiceState.currentIndex = idx;
-      if (voiceState.isPlaying) {
-        readChapter(idx);
-      } else {
-        updateActiveChapterVisual(idx);
-      }
+      updateActiveChapterVisual(idx);
     });
   });
 
