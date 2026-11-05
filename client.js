@@ -366,6 +366,18 @@ document.addEventListener('DOMContentLoaded', () => {
   let lightboxIndex = 0;
   let lightboxOpener = null;
 
+  function getSiteLang() {
+    return document.documentElement.getAttribute('data-site-lang') === 'en' ? 'en' : 'vi';
+  }
+
+  function getItemCaption(item) {
+    if (!item) return '';
+    if (getSiteLang() === 'en') {
+      return item.getAttribute('data-caption-en') || item.getAttribute('data-caption') || '';
+    }
+    return item.getAttribute('data-caption') || '';
+  }
+
   function showLightboxAt(index) {
     if (!lightboxModal || !lightboxImg || galleryList.length === 0) return;
     lightboxIndex = (index + galleryList.length) % galleryList.length;
@@ -373,7 +385,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const thumb = item.querySelector('img');
     lightboxImg.src = item.getAttribute('data-full-src');
     lightboxImg.alt = thumb ? thumb.alt : '';
-    lightboxCaption.textContent = item.getAttribute('data-caption');
+    lightboxCaption.textContent = getItemCaption(item);
     if (lightboxCounter) {
       lightboxCounter.textContent = `${lightboxIndex + 1} / ${galleryList.length}`;
     }
@@ -434,9 +446,44 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     const current = galleryList[coverflowIndex];
-    if (coverflowCaption && current) coverflowCaption.textContent = current.getAttribute('data-caption') || '';
+    if (coverflowCaption && current) coverflowCaption.textContent = getItemCaption(current);
     if (coverflowCounter) coverflowCounter.textContent = `${coverflowIndex + 1} / ${count}`;
   }
+
+  const langToggleBtn = document.getElementById('lang-toggle-btn');
+
+  function applyLanguage(lang) {
+    const nextLang = lang === 'en' ? 'en' : 'vi';
+    document.documentElement.setAttribute('data-site-lang', nextLang);
+    document.documentElement.setAttribute('lang', nextLang);
+    document.querySelectorAll('[data-placeholder-vi]').forEach((el) => {
+      const ph = el.getAttribute(nextLang === 'en' ? 'data-placeholder-en' : 'data-placeholder-vi');
+      if (ph !== null) el.setAttribute('placeholder', ph);
+    });
+    const current = galleryList[coverflowIndex];
+    if (coverflowCaption && current) {
+      coverflowCaption.textContent = getItemCaption(current);
+    }
+    if (lightboxModal && lightboxModal.classList.contains('is-active') && galleryList[lightboxIndex]) {
+      lightboxCaption.textContent = getItemCaption(galleryList[lightboxIndex]);
+    }
+    try {
+      sessionStorage.setItem('kim_hoang_lang', nextLang);
+    } catch (e) {}
+  }
+
+  if (langToggleBtn) {
+    langToggleBtn.addEventListener('click', () => {
+      applyLanguage(getSiteLang() === 'vi' ? 'en' : 'vi');
+    });
+  }
+
+  try {
+    const savedLang = sessionStorage.getItem('kim_hoang_lang');
+    if (savedLang === 'en' || savedLang === 'vi') {
+      applyLanguage(savedLang);
+    }
+  } catch (e) {}
 
   function setCoverflow(index) {
     const count = galleryList.length;
@@ -671,15 +718,28 @@ document.addEventListener('DOMContentLoaded', () => {
         const data = await res.json().catch(() => ({}));
 
         if (!res.ok || (data && data.ok === false)) {
-          showToast(data.error || 'Chưa gửi được lời chúc, vui lòng thử lại.');
+          showToast(
+            data.error ||
+              (getSiteLang() === 'en'
+                ? 'Could not send your message. Please try again.'
+                : 'Chưa gửi được lời chúc, vui lòng thử lại.')
+          );
           return;
         }
 
         appendWishToWall(name, wish, true);
         guestbookForm.reset();
-        showToast('Cảm ơn bạn! Lời chúc đã được gửi đến Lưu Sắc Kim Hoàng.');
+        showToast(
+          getSiteLang() === 'en'
+            ? 'Thank you! Your message has been sent to Luu Sac Kim Hoang.'
+            : 'Cảm ơn bạn! Lời chúc đã được gửi đến Lưu Sắc Kim Hoàng.'
+        );
       } catch (err) {
-        showToast('Chưa gửi được lời chúc, vui lòng kiểm tra kết nối và thử lại.');
+        showToast(
+          getSiteLang() === 'en'
+            ? 'Could not send your message. Please check your connection and try again.'
+            : 'Chưa gửi được lời chúc, vui lòng kiểm tra kết nối và thử lại.'
+        );
       } finally {
         if (submitBtn) submitBtn.disabled = false;
       }
