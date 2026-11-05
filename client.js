@@ -354,6 +354,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const PLAYBACK_SPEED = 1.25;
   let currentTrackIdx = 0;
   let userScrollPauseUntil = 0;
+  let formInteractionHoldUntil = 0;
+  let autoFollowEnabled = true;
   let isAutoScrollStep = false;
   let autoScrollRaf = null;
   let autoScrollY = 0;
@@ -361,6 +363,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const narrationAudio = new Audio();
   narrationAudio.preload = 'auto';
+
+  function isUserInteractingWithForm() {
+    const active = document.activeElement;
+    if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.tagName === 'SELECT' || active.isContentEditable)) {
+      return true;
+    }
+    if (active && active.closest && active.closest('#guestbook-form, #guestbook')) {
+      return true;
+    }
+    return performance.now() < formInteractionHoldUntil;
+  }
+
+  function isOutsideActiveSegment() {
+    const galleryEl = document.getElementById('gallery');
+    if (galleryEl) {
+      const gRect = galleryEl.getBoundingClientRect();
+      if (gRect.top < window.innerHeight * 0.65) {
+        return true;
+      }
+    }
+    const seg = narrationSegments[currentTrackIdx];
+    if (!seg) return false;
+    const rect = seg.getBoundingClientRect();
+    return rect.bottom < 40 || rect.top > window.innerHeight - 40;
+  }
 
   function applyPlaybackSpeed() {
     narrationAudio.defaultPlaybackRate = PLAYBACK_SPEED;
@@ -445,9 +472,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalOpen =
       (letterModal && letterModal.classList.contains('is-visible')) ||
       (lightboxModal && lightboxModal.classList.contains('is-active')) ||
-      document.body.classList.contains('cover-locked');
+      document.body.classList.contains('cover-locked') ||
+      Boolean(document.querySelector('.ei-root'));
 
-    if (!modalOpen && now > userScrollPauseUntil && narrationAudio.duration > 0) {
+    const suspended =
+      modalOpen ||
+      !autoFollowEnabled ||
+      isUserInteractingWithForm() ||
+      now <= userScrollPauseUntil;
+
+    if (!suspended && narrationAudio.duration > 0) {
       const targetY = computeSegmentTargetY(currentTrackIdx);
       if (Math.abs(window.scrollY - autoScrollY) > 60) {
         autoScrollY = window.scrollY;
@@ -469,26 +503,33 @@ document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('visibilitychange', () => {
     if (!document.hidden && !narrationAudio.paused && !narrationAudio.ended) {
       lastFrameTs = performance.now();
-      const targetY = computeSegmentTargetY(currentTrackIdx);
-      autoScrollY = targetY;
-      isAutoScrollStep = true;
-      window.scrollTo({ top: targetY, behavior: 'instant' });
-      isAutoScrollStep = false;
+      if (autoFollowEnabled && !isUserInteractingWithForm() && !isOutsideActiveSegment()) {
+        const targetY = computeSegmentTargetY(currentTrackIdx);
+        autoScrollY = targetY;
+        isAutoScrollStep = true;
+        window.scrollTo({ top: targetY, behavior: 'instant' });
+        isAutoScrollStep = false;
+      } else {
+        autoScrollY = window.scrollY;
+      }
       if (!autoScrollRaf) {
         autoScrollRaf = requestAnimationFrame(stepAutoScroll);
       }
     }
   });
 
-  function startNarrationAt(trackIndex, resetScrollHold = true) {
+  function startNarrationAt(trackIndex, forceFollow = true) {
     if (trackIndex < 0 || trackIndex >= narrationTracks.length) return;
     currentTrackIdx = trackIndex;
     const track = narrationTracks[currentTrackIdx];
     updateActiveChapterVisual(track.chapterIndex);
-    if (resetScrollHold) {
+    if (forceFollow) {
+      autoFollowEnabled = true;
       userScrollPauseUntil = 0;
+      jumpToSegmentStart(currentTrackIdx);
+    } else if (autoFollowEnabled && !isUserInteractingWithForm() && !isOutsideActiveSegment()) {
+      jumpToSegmentStart(currentTrackIdx);
     }
-    jumpToSegmentStart(currentTrackIdx);
 
     const wantedSrc = new URL(track.src, window.location.href).href;
     if (narrationAudio.src !== wantedSrc) {
@@ -517,6 +558,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (narrationAudio.paused) {
       userScrollPauseUntil = 0;
+      if (!isUserInteractingWithForm() && !isOutsideActiveSegment()) {
+        autoFollowEnabled = true;
+      }
       applyPlaybackSpeed();
       narrationAudio.play().then(() => {
         applyPlaybackSpeed();
@@ -551,14 +595,47 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  const pauseAutoScrollOnUserInput = () => {
+  const handleManualUserScroll = () => {
     if (isAutoScrollStep) return;
-    if (!narrationAudio.paused) {
-      userScrollPauseUntil = performance.now() + 4000;
+    userScrollPauseUntil = performance.now() + 4500;
+    autoScrollY = window.scrollY;
+    if (isOutsideActiveSegment()) {
+      autoFollowEnabled = false;
+    } else {
+      const targetY = computeSegmentTargetY(currentTrackIdx);
+      if (Math.abs(window.scrollY - targetY) > window.innerHeight * 0.5) {
+        autoFollowEnabled = false;
+      } else if (!isUserInteractingWithForm()) {
+        autoFollowEnabled = true;
+      }
     }
   };
-  window.addEventListener('wheel', pauseAutoScrollOnUserInput, { passive: true });
-  window.addEventListener('touchmove', pauseAutoScrollOnUserInput, { passive: true });
+  window.addEventListener('wheel', handleManualUserScroll, { passive: true });
+  window.addEventListener('touchmove', handleManualUserScroll, { passive: true });
+
+  ['focusin', 'input', 'keydown', 'pointerdown'].forEach((evtName) => {
+    document.addEventListener(evtName, (e) => {
+      if (e.target && e.target.closest && e.target.closest('#guestbook, #gallery, #community')) {
+        autoFollowEnabled = false;
+        if (e.target.closest('#guestbook-form, input, textarea')) {
+          formInteractionHoldUntil = performance.now() + 10000;
+        }
+      }
+    }, { passive: true });
+  });
+
+  document.querySelectorAll('.site-nav a').forEach((navLink) => {
+    navLink.addEventListener('click', () => {
+      const href = navLink.getAttribute('href') || '';
+      if (href && href !== '#storyline') {
+        autoFollowEnabled = false;
+        userScrollPauseUntil = performance.now() + 10000;
+      } else if (href === '#storyline') {
+        autoFollowEnabled = true;
+        userScrollPauseUntil = 0;
+      }
+    });
+  });
 
   if (dockPlayBtn) {
     dockPlayBtn.addEventListener('click', toggleNarration);
@@ -603,12 +680,13 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('invitation:opened', handleInvitationOpened);
 
   narrationSegments.forEach((seg, segIdx) => {
-    seg.addEventListener('click', (e) => {
-      if (e.target.closest('button, a')) return;
-      if (currentTrackIdx !== segIdx || narrationAudio.paused) {
+    const badge = seg.querySelector('.node-year-badge');
+    if (badge) {
+      badge.style.cursor = 'pointer';
+      badge.addEventListener('click', () => {
         startNarrationAt(segIdx, true);
-      }
-    });
+      });
+    }
   });
 
   updateDockUI();
