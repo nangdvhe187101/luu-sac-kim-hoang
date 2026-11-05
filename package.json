@@ -4,9 +4,6 @@
   "private": true,
   "description": "Thiệp mời di sản Lưu Sắc Kim Hoàng",
   "scripts": {
-    "start": "node server.js"
-  },
-  "engines": {
-    "node": ">=18"
+    "dev": "node server.js"
   }
 }
