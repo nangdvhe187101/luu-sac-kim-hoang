@@ -1,0 +1,41 @@
+/* Envelope intro – Lưu Sắc Kim Hoàng */
+.ei-root{--ei-w:min(90vw,58vh,680px);position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;
+ background:radial-gradient(ellipse at 50% 38%,#b3261a 0%,#7d140d 60%,#4d0a07 100%);color:#f7e2b0;font-family:'Playfair Display',Georgia,serif;overflow:hidden;
+ padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0);transition:opacity .9s ease .15s}
+.ei-root.ei-leave{opacity:0;pointer-events:none}
+.ei-stage{width:var(--ei-w);padding-top:calc(var(--ei-w)*.42);position:relative;transition:transform 1.05s cubic-bezier(.5,0,.8,.4),opacity .8s ease .2s;transform-origin:50% 22%}
+.ei-leave .ei-stage{transform:scale(2.6);opacity:0}
+.ei-env{position:relative;width:100%;aspect-ratio:1/1;perspective:1800px;opacity:0;transform:translateY(24px) scale(.96);animation:ei-in .9s .1s cubic-bezier(.2,.8,.3,1) forwards}
+@keyframes ei-in{to{opacity:1;transform:none}}
+.ei-env::before{content:"";position:absolute;left:5%;right:5%;bottom:-4%;height:8%;background:radial-gradient(ellipse,rgba(0,0,0,.5),transparent 70%);filter:blur(10px)}
+.ei-liner{position:absolute;inset:0;border-radius:2.2%;background:linear-gradient(#6d170e,#9a2a1a);z-index:1;box-shadow:inset 0 10px 24px rgba(0,0,0,.45)}
+.ei-liner{transition:border-radius .2s}
+.ei-opened .ei-liner{border-radius:0 0 2.2% 2.2%}
+.ei-card{position:absolute;z-index:2;left:20%;top:4%;width:60%;aspect-ratio:1/1.2;box-sizing:border-box;padding:3%;background:#fbf1da;border-radius:1.2%;
+ display:flex;flex-direction:column;box-shadow:0 4px 18px rgba(0,0,0,.4);transition:transform 1s cubic-bezier(.3,1.3,.5,1)}
+.ei-card p{margin:0 0 2.5%;text-align:center;line-height:1.15}
+.ei-card small{display:block;font-size:clamp(9px,1.5vw,13px);letter-spacing:.14em;text-transform:uppercase;color:#a0522d}
+.ei-card b{display:block;font-size:clamp(14px,2.6vw,25px);color:#9c1f12}
+.ei-card img{width:100%;aspect-ratio:1;object-fit:cover;display:block;border:2px solid #c99a3b;box-sizing:border-box;border-radius:.8%}
+.ei-up .ei-card{transform:translateY(-52%) rotate(-1.2deg)}
+.ei-body{position:absolute;inset:0;width:100%;height:100%;z-index:3;pointer-events:none;user-select:none}
+.ei-flap{position:absolute;left:0;top:0;width:100%;height:35.45%;z-index:5;transform-origin:50% 0;transform-style:preserve-3d;transition:transform .9s cubic-bezier(.55,0,.25,1)}
+.ei-flap.ei-open{transform:rotateX(180deg)}
+.ei-flap.ei-behind{z-index:1}
+.ei-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;clip-path:polygon(0 0,100% 0,100% 17.9%,50% 100%,0 18%)}
+.ei-face img{width:100%;height:100%;display:block;user-select:none}
+.ei-face.ei-k{transform:rotateY(180deg);background:linear-gradient(rgba(30,4,2,.55),rgba(30,4,2,0) 22%),linear-gradient(#6d170e 0,#7d1b10 45%,#ad3524 100%)}
+.ei-seal{position:absolute;z-index:10;left:50.54%;top:36.09%;width:21.48%;transform:translate(-50%,-50%);border:0;padding:0;background:none;border-radius:50%;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.ei-seal img{width:100%;display:block;filter:drop-shadow(0 6px 8px rgba(40,10,0,.5));transition:transform .25s}
+.ei-seal:hover img,.ei-seal:focus-visible img{transform:scale(1.07) rotate(-2deg)}
+.ei-seal:focus-visible{outline:2px solid #ffe29a;outline-offset:6px}
+.ei-seal::before{content:"";position:absolute;inset:8%;border-radius:50%;animation:ei-ring 2.2s infinite}
+@keyframes ei-ring{0%{box-shadow:0 0 0 0 rgba(255,214,120,.7)}100%{box-shadow:0 0 0 28px rgba(255,214,120,0)}}
+.ei-sp{position:absolute;z-index:11;width:9px;height:9px;margin:-4px;border-radius:50%;background:radial-gradient(#fff3c0,#e0a93a);pointer-events:none}
+.ei-hint{margin-top:30px;text-align:center;line-height:1.5;transition:opacity .4s;pointer-events:none}
+.ei-hint b{display:block;font-weight:600;font-size:clamp(14px,2.3vw,18px);letter-spacing:.04em}
+.ei-hint span{font-size:clamp(11px,1.8vw,14px);opacity:.75;font-style:italic}
+.ei-opened .ei-hint{opacity:0}
+.ei-skip{position:absolute;right:16px;top:calc(12px + env(safe-area-inset-top,0px));z-index:12;background:none;border:1px solid rgba(247,226,176,.5);color:inherit;border-radius:999px;padding:6px 14px;font:inherit;font-size:13px;cursor:pointer;opacity:.8}
+.ei-skip:hover{opacity:1;background:rgba(255,255,255,.08)}
+@media (prefers-reduced-motion:reduce){.ei-flap,.ei-card,.ei-stage{transition-duration:.01s}.ei-seal::before{animation:none}.ei-env{animation-duration:.01s}}

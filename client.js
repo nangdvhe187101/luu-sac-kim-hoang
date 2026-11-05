@@ -564,15 +564,13 @@ document.addEventListener('DOMContentLoaded', () => {
     dockPlayBtn.addEventListener('click', toggleNarration);
   }
 
-  const coverGate = document.getElementById('cover-gate');
-  const coverEnvelope = document.getElementById('cover-envelope');
-  const coverOpenBtn = document.getElementById('cover-open-btn');
+  let audioPrimed = false;
+  let invitationHandled = false;
 
-  function openCover() {
-    if (!coverGate || coverGate.classList.contains('is-opening')) return;
+  function primeNarrationOnGesture() {
+    if (audioPrimed) return;
+    audioPrimed = true;
     playChimeSound();
-    coverGate.classList.add('is-opening');
-
     const firstTrack = narrationTracks[0];
     if (firstTrack) {
       narrationAudio.src = firstTrack.src;
@@ -585,39 +583,24 @@ document.addEventListener('DOMContentLoaded', () => {
         narrationAudio.muted = false;
       });
     }
-
-    const revealDelay = prefersReducedMotion.matches ? 20 : 1450;
-    const removeDelay = prefersReducedMotion.matches ? 60 : 2900;
-
-    setTimeout(() => {
-      coverGate.classList.add('is-revealing');
-      document.body.classList.remove('cover-locked');
-      window.scrollTo({ top: 0, behavior: 'instant' });
-      startNarrationAt(0, true);
-    }, revealDelay);
-
-    setTimeout(() => {
-      coverGate.remove();
-    }, removeDelay);
   }
 
-  if (coverOpenBtn) {
-    coverOpenBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      openCover();
-    });
-    coverOpenBtn.focus();
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('.ei-seal, .ei-skip')) {
+      primeNarrationOnGesture();
+    }
+  }, true);
+
+  function handleInvitationOpened() {
+    if (invitationHandled) return;
+    invitationHandled = true;
+    document.body.classList.remove('cover-locked');
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    startNarrationAt(0, true);
   }
 
-  if (coverEnvelope) {
-    coverEnvelope.addEventListener('click', openCover);
-    coverEnvelope.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        openCover();
-      }
-    });
-  }
+  window.onInvitationOpened = handleInvitationOpened;
+  window.addEventListener('invitation:opened', handleInvitationOpened);
 
   narrationSegments.forEach((seg, segIdx) => {
     seg.addEventListener('click', (e) => {

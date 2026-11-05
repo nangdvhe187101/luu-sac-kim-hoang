@@ -1,0 +1,71 @@
+/*!
+ * Envelope intro – Lưu Sắc Kim Hoàng
+ * Nhúng: <link rel="stylesheet" href="/envelope-intro/envelope-intro.css">
+ *        <script src="/envelope-intro/envelope-intro.js" defer></script>
+ * Tuỳ chọn trên thẻ script: data-once="session" (chỉ hiện 1 lần mỗi phiên)
+ * Khi vào trang trong: sự kiện window "invitation:opened" + hàm window.onInvitationOpened()
+ * Mở lại thủ công: window.showEnvelopeIntro()
+ */
+(function(){
+  var cs=document.currentScript, base=cs&&cs.src?cs.src.replace(/[^\/]*$/,''):'/envelope-intro/';
+  var once=cs&&cs.dataset.once==='session', KEY='ei-seen';
+  var sleep=function(ms){return new Promise(function(r){setTimeout(r,ms)})};
+  var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function mount(){
+    if(document.querySelector('.ei-root'))return;
+    try{if(once&&sessionStorage.getItem(KEY))return;}catch(e){}
+    var A=base+'assets/';
+    var root=document.createElement('div');root.className='ei-root';root.setAttribute('role','dialog');root.setAttribute('aria-label','Thiệp mời Lưu Sắc Kim Hoàng');
+    root.innerHTML=
+     '<button class="ei-skip" type="button">Bỏ qua · Skip</button>'+
+     '<div class="ei-stage"><div class="ei-env">'+
+      '<div class="ei-liner"></div>'+
+      '<div class="ei-card"><p><small>Thiệp mời · Invitation</small><b>Tranh dân gian Việt Nam</b></p><img src="'+A+'invitation-logo.jpg" alt="Lưu Sắc Kim Hoàng"></div>'+
+      '<img class="ei-body" src="'+A+'envelope-body.webp" alt="" draggable="false">'+
+      '<div class="ei-flap"><div class="ei-face"><img src="'+A+'envelope-flap.webp" alt="" draggable="false"></div><div class="ei-face ei-k"></div></div>'+
+      '<button class="ei-seal" type="button" aria-label="Mở thiệp / Open invitation"><img src="'+A+'envelope-seal.webp" alt="Dấu triện Lưu Sắc Kim Hoàng" draggable="false"></button>'+
+     '</div>'+
+     '<div class="ei-hint"><b>Chạm vào dấu triện để mở thiệp</b><span>Touch the seal to open the invitation</span></div></div>';
+    document.body.appendChild(root);
+    var de=document.documentElement,prev=de.style.overflow;de.style.overflow='hidden';
+    var env=root.querySelector('.ei-env'),flap=root.querySelector('.ei-flap'),seal=root.querySelector('.ei-seal'),stage=root.querySelector('.ei-stage');
+    var state='idle',skip=false;
+    function enter(){
+      if(state==='gone')return;state='gone';
+      try{if(once)sessionStorage.setItem(KEY,'1');}catch(e){}
+      root.classList.add('ei-leave');
+      window.scrollTo(0,0);
+      setTimeout(function(){root.remove();de.style.overflow=prev;
+        try{window.dispatchEvent(new CustomEvent('invitation:opened'));}catch(e){}
+        if(typeof window.onInvitationOpened==='function')window.onInvitationOpened();},reduce?50:1100);
+    }
+    function burst(){
+      var s=seal.getBoundingClientRect(),e=env.getBoundingClientRect();
+      for(var i=0;i<22;i++){var d=document.createElement('i');d.className='ei-sp';
+        d.style.left=(s.left+s.width/2-e.left)+'px';d.style.top=(s.top+s.height/2-e.top)+'px';env.appendChild(d);
+        var a=i/22*6.283+Math.random()*.4,r=70+Math.random()*120;
+        (function(d){d.animate([{transform:'translate(0,0) scale(1)',opacity:1},{transform:'translate('+Math.cos(a)*r+'px,'+Math.sin(a)*r+'px) scale(0)',opacity:0}],
+          {duration:650+Math.random()*350,easing:'cubic-bezier(.2,.7,.3,1)'}).onfinish=function(){d.remove()};})(d);}
+    }
+    async function open(){
+      if(state!=='idle')return;state='opening';
+      if(reduce){root.classList.add('ei-opened');return enter();}
+      burst();var T='translate(-50%,-50%) ';
+      await seal.animate([{transform:T+'scale(1)',opacity:1},{transform:T+'scale(1.18) rotate(-7deg)',opacity:1,offset:.35},{transform:T+'scale(.2) rotate(28deg)',opacity:0}],{duration:520,fill:'forwards'}).finished;
+      seal.style.visibility='hidden';root.classList.add('ei-opened');
+      flap.classList.add('ei-open');await sleep(430);flap.classList.add('ei-behind');await sleep(520);
+      env.classList.add('ei-up');await sleep(950);
+      state='opened';
+      await sleep(1100);          /* cho người xem ngắm thiệp một nhịp */
+      if(state==='opened')enter();
+    }
+    seal.addEventListener('click',open);
+    root.addEventListener('click',function(e){if(state==='opened')enter();});
+    root.querySelector('.ei-skip').addEventListener('click',function(e){e.stopPropagation();enter();});
+    document.addEventListener('keydown',function onk(e){if(!document.body.contains(root)){document.removeEventListener('keydown',onk);return;}
+      if(e.key==='Escape')enter();});
+    seal.focus({preventScroll:true});
+  }
+  window.showEnvelopeIntro=mount;
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount);else mount();
+})();

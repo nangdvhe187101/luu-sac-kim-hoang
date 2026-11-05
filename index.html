@@ -7,47 +7,11 @@
   <meta name="description" content="Thiệp mời trực tuyến cao cấp tôn vinh dòng tranh dân gian Kim Hoàng, kết hợp phong thư 3D, hành trình lịch sử song ngữ Việt - Anh, album ảnh tư liệu và sổ lưu bút chúc mừng.">
   <link rel="preload" href="assets/fonts/DFVN-Bropella.otf" as="font" type="font/otf" crossorigin>
   <link rel="preload" href="assets/fonts/ASAP-REGULAR.TTF" as="font" type="font/ttf" crossorigin>
-  <link rel="preload" href="assets/envelope/envelope-body.webp" as="image" type="image/webp">
-  <link rel="preload" href="assets/envelope/envelope-flap.webp" as="image" type="image/webp">
-  <link rel="preload" href="assets/envelope/envelope-seal.webp" as="image" type="image/webp">
-  <link rel="preload" href="assets/envelope/invitation-logo.jpg" as="image" type="image/jpeg">
-  <link rel="stylesheet" href="styles.css?v=env2">
+  <link rel="stylesheet" href="styles.css?v=env3">
+  <link rel="stylesheet" href="/envelope-intro/envelope-intro.css">
   <script src="https://unpkg.com/lucide@0.469.0" defer></script>
 </head>
 <body class="cover-locked">
-
-  <div class="cover-gate" id="cover-gate" role="dialog" aria-modal="true" aria-label="Bìa thiệp mời">
-    <div class="cover-door cover-door--left"></div>
-    <div class="cover-door cover-door--right"></div>
-    <img src="assets/pptx-extracted/ppt/media/image49.png" alt="" aria-hidden="true" class="cover-ornament cover-ornament--cloud-top">
-    <img src="assets/pptx-extracted/ppt/media/image49.png" alt="" aria-hidden="true" class="cover-ornament cover-ornament--cloud-bottom">
-    <div class="cover-envelope-stage">
-      <p class="cover-pretitle">
-        <span data-lang="vi">Thiệp Mời Trực Tuyến • Tranh Dân Gian Việt Nam</span>
-        <span data-lang="en">Online Invitation • Vietnamese Folk Paintings</span>
-      </p>
-      <div class="cover-envelope" id="cover-envelope" role="button" tabindex="0" aria-label="Mở thiệp Lưu Sắc Kim Hoàng">
-        <div class="cover-envelope-back"></div>
-        <div class="cover-letter-pocket">
-          <div class="cover-letter-card">
-            <img src="assets/envelope/invitation-logo.jpg" alt="Lưu Sắc Kim Hoàng" class="cover-letter-logo">
-          </div>
-        </div>
-        <img src="assets/envelope/envelope-body.webp" alt="Phong thư Lưu Sắc Kim Hoàng" class="cover-envelope-body">
-        <div class="cover-envelope-flap-wrap">
-          <img src="assets/envelope/envelope-flap.webp" alt="" aria-hidden="true" class="cover-envelope-flap">
-        </div>
-        <button class="cover-envelope-seal-btn" id="cover-open-btn" type="button" aria-label="Mở thiệp">
-          <span class="cover-seal-glow" aria-hidden="true"></span>
-          <img src="assets/envelope/envelope-seal.webp" alt="Ấn triện Lưu Sắc Kim Hoàng" class="cover-envelope-seal">
-        </button>
-      </div>
-      <p class="cover-prompt">
-        <span data-lang="vi">Nhấn vào ấn triện để mở thiệp</span>
-        <span data-lang="en">Click the wax seal to open the invitation</span>
-      </p>
-    </div>
-  </div>
 
   <header class="site-header">
     <a href="#" class="brand-wrapper">
@@ -981,6 +945,7 @@
     </button>
   </div>
 
-  <script src="client.js?v=env1"></script>
+  <script src="/envelope-intro/envelope-intro.js" defer></script>
+  <script src="client.js?v=env3"></script>
 </body>
 </html>
