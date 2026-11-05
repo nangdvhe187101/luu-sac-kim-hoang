@@ -906,14 +906,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function loadWishes() {
     try {
-      const res = await fetch('/api/wishes', { headers: { Accept: 'application/json' } });
-      if (!res.ok) return;
-      const list = await res.json();
-      
-      list.slice().reverse().forEach((w) => appendWishToWall(w.name, w.wish, true));
-    } catch (e) {
-      
-    }
+      const stored = JSON.parse(localStorage.getItem('kim_hoang_wishes') || '[]');
+      if (Array.isArray(stored)) {
+        stored.slice().reverse().forEach((w) => appendWishToWall(w.name, w.wish, false));
+      }
+    } catch (e) {}
   }
 
   function appendWishToWall(name, wish, isNew = true) {
@@ -973,23 +970,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (submitBtn) submitBtn.disabled = true;
       try {
-        const res = await fetch('/api/wishes', {
+        const scriptUrl = 'https://script.google.com/macros/s/AKfycbxEBqRF5o1O50-HCIZUE6YuHrw6rCO5o-R7id8-Lf7HOpZW2AAqO9jfb_98q34yWE1ocg/exec';
+        const res = await fetch(scriptUrl, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, email, wish }),
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ token: 'aB3k9XmQ7vP1wZ5rN8tY2uL4', name, email, wish }),
         });
         const data = await res.json().catch(() => ({}));
 
-        if (!res.ok) {
+        if (!res.ok || (data && data.ok === false)) {
           showToast(data.error || 'Chưa gửi được lời chúc, vui lòng thử lại.');
           return;
         }
 
-        appendWishToWall(data.name, data.wish, true);
+        try {
+          const stored = JSON.parse(localStorage.getItem('kim_hoang_wishes') || '[]');
+          stored.push({ name, wish });
+          localStorage.setItem('kim_hoang_wishes', JSON.stringify(stored));
+        } catch (e) {}
+
+        appendWishToWall(name, wish, true);
         guestbookForm.reset();
         showToast('Cảm ơn bạn! Lời chúc đã được gửi đến Lưu Sắc Kim Hoàng.');
       } catch (err) {
-        showToast('Không kết nối được máy chủ. Hãy chạy "node server.js" rồi mở trang qua địa chỉ của server.');
+        showToast('Chưa gửi được lời chúc, vui lòng kiểm tra kết nối và thử lại.');
       } finally {
         if (submitBtn) submitBtn.disabled = false;
       }
