@@ -351,8 +351,7 @@ document.addEventListener('DOMContentLoaded', () => {
     },
   ];
 
-  const speedOptions = [1.25, 1.35, 1.5, 1.0];
-  let currentSpeedIdx = 1;
+  const PLAYBACK_SPEED = 1.25;
   let currentTrackIdx = 0;
   let userScrollPauseUntil = 0;
   let isAutoScrollStep = false;
@@ -362,16 +361,12 @@ document.addEventListener('DOMContentLoaded', () => {
   narrationAudio.preload = 'auto';
 
   function applyPlaybackSpeed() {
-    const rate = speedOptions[currentSpeedIdx];
-    narrationAudio.defaultPlaybackRate = rate;
-    narrationAudio.playbackRate = rate;
+    narrationAudio.defaultPlaybackRate = PLAYBACK_SPEED;
+    narrationAudio.playbackRate = PLAYBACK_SPEED;
     if ('preservesPitch' in narrationAudio) {
       narrationAudio.preservesPitch = true;
     } else if ('webkitPreservesPitch' in narrationAudio) {
       narrationAudio.webkitPreservesPitch = true;
-    }
-    if (dockSpeedBtn) {
-      dockSpeedBtn.textContent = `${rate}x`;
     }
   }
 
@@ -396,7 +391,7 @@ document.addEventListener('DOMContentLoaded', () => {
       narrationDock.classList.toggle('is-speaking', isPlaying);
     }
     if (dockPlayBtn) {
-      dockPlayBtn.innerHTML = `<i data-lucide="${isPlaying ? 'pause' : 'play'}"></i>`;
+      dockPlayBtn.innerHTML = `<i data-lucide="${isPlaying ? 'volume-2' : 'volume-x'}"></i>`;
       if (window.lucide) {
         window.lucide.createIcons({ attrs: {}, nameAttr: 'data-lucide', root: dockPlayBtn });
       }
@@ -420,15 +415,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const rect = seg.getBoundingClientRect();
         const segTop = rect.top + window.scrollY;
         const segHeight = rect.height;
-        const anchorOffset = Math.min(130, window.innerHeight * 0.18);
+        const anchorOffset = Math.min(200, window.innerHeight * 0.28);
         const progress = Math.min(1, Math.max(0, narrationAudio.currentTime / narrationAudio.duration));
-        const travel = Math.max(0, segHeight - window.innerHeight * 0.45);
+        const travel = Math.max(0, segHeight - window.innerHeight * 0.62);
         const targetY = Math.max(0, segTop - anchorOffset + travel * progress);
         const diff = targetY - window.scrollY;
 
         if (Math.abs(diff) > 1.5) {
           isAutoScrollStep = true;
-          const step = Math.abs(diff) > 500 ? diff * 0.08 : diff * 0.045;
+          const maxStep = Math.abs(diff) > 600 ? 3.2 : 0.85;
+          const step = Math.sign(diff) * Math.min(Math.abs(diff) * 0.022, maxStep);
           window.scrollTo(0, window.scrollY + step);
           isAutoScrollStep = false;
         }
@@ -516,13 +512,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (dockPlayBtn) {
     dockPlayBtn.addEventListener('click', toggleNarration);
-  }
-
-  if (dockSpeedBtn) {
-    dockSpeedBtn.addEventListener('click', () => {
-      currentSpeedIdx = (currentSpeedIdx + 1) % speedOptions.length;
-      applyPlaybackSpeed();
-    });
   }
 
   const coverGate = document.getElementById('cover-gate');
