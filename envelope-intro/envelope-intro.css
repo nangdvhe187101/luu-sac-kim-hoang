@@ -36,4 +36,7 @@
 .ei-hint b{display:block;font-weight:600;font-size:clamp(14px,2.3vw,18px);letter-spacing:.04em}
 .ei-hint span{font-size:clamp(11px,1.8vw,14px);opacity:.75;font-style:italic}
 .ei-opened .ei-hint{opacity:0}
+@media (max-width:768px) and (orientation:portrait){
+ .ei-root{--ei-w:min(90vw,52dvh,420px);background-size:cover;background-position:68% center}
+}
 @media (prefers-reduced-motion:reduce){.ei-flap,.ei-card,.ei-stage{transition-duration:.01s}.ei-seal::before{animation:none}.ei-env{animation-duration:.01s}}
