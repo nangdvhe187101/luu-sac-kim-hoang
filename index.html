@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lưu Sắc Kim Hoàng - Thiệp Mời Di Sản Trực Tuyến</title>
+  <meta name="description" content="Thiệp mời di sản trực tuyến cao cấp tôn vinh dòng tranh dân gian Kim Hoàng, kết hợp phong thư 3D, câu chuyện trăm năm kèm giọng kể thuyết minh, album ảnh tư liệu và sổ lưu bút chúc mừng.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600&display=swap">
+  <link rel="stylesheet" href="styles.css?v=resp1">
+  
+  <script src="https://unpkg.com/lucide@0.469.0" defer></script>
+</head>
+<body class="cover-locked">
+
+  
+  <div class="cover-gate" id="cover-gate" role="dialog" aria-modal="true" aria-label="Bìa thiệp mời">
+    <div class="cover-door cover-door--left"></div>
+    <div class="cover-door cover-door--right"></div>
+    <img src="assets/pptx-extracted/ppt/media/image45.png" alt="" aria-hidden="true" class="cover-ornament cover-ornament--medallion">
+    <img src="assets/pptx-extracted/ppt/media/image49.png" alt="" aria-hidden="true" class="cover-ornament cover-ornament--cloud-top">
+    <img src="assets/pptx-extracted/ppt/media/image49.png" alt="" aria-hidden="true" class="cover-ornament cover-ornament--cloud-bottom">
+    <div class="cover-content">
+      <span class="cover-pretitle">Thiệp mời di sản</span>
+      <img src="assets/artwork-full.jpg" alt="Hoạt cảnh tranh dân gian Kim Hoàng: nghệ nhân vẽ tranh, Thần Kê và các nhân vật dân gian" class="cover-art">
+      <p class="cover-subtitle">Tranh dân gian Việt Nam</p>
+      <button class="cover-open-btn" id="cover-open-btn" type="button">Mở thiệp</button>
+    </div>
+  </div>
+
+  
+  <canvas id="petals-canvas"></canvas>
+
+  
+  <header class="site-header">
+    <a href="#" class="brand-wrapper">
+      <img src="assets/logo-typography.png" alt="Logo Lưu Sắc Kim Hoàng" class="brand-logo-img">
+      <div class="brand-text-block">
+        <span class="brand-title">Lưu Sắc Kim Hoàng</span>
+        <span class="brand-subtitle">Tranh Dân Gian Việt Nam</span>
+      </div>
+    </a>
+
+    <nav class="site-nav" id="site-nav" aria-label="Điều hướng chính">
+      <a href="#storyline">Chuyện Trăm Năm</a>
+      <a href="#gallery">Album</a>
+      <a href="#guestbook">Lưu Bút</a>
+      <a href="#community">Đồng Hành</a>
+    </nav>
+
+    <div class="header-actions">
+      
+      <button class="icon-btn" id="quick-letter-btn" aria-label="Mở Thiệp Ngỏ" title="Đọc Thư Ngỏ">
+        <i data-lucide="mail-open"></i>
+      </button>
+      
+      <button class="icon-btn nav-toggle-btn" id="nav-toggle-btn" aria-label="Mở menu" aria-expanded="false" aria-controls="site-nav">
+        <i data-lucide="menu"></i>
+      </button>
+    </div>
+  </header>
+
+  
+  <div class="fixed-bg-kimhoang" aria-hidden="true">
+    <img src="assets/pptx-extracted/ppt/media/image1.png" alt="" class="fixed-bg-img">
+    <div class="fixed-bg-overlay"></div>
+    
+    <img src="assets/pptx-extracted/ppt/media/image50.png" alt="" class="fixed-bg-clouds">
+  </div>
+
+  
+  <section class="hero-card-section" id="hero">
+    
+    <div class="hero-center-card" data-scroll-reveal>
+      <div class="hero-card-body">
+        <span class="hero-pretitle">Di Sản Tranh Đỏ Thăng Long • Khởi Nguyên 1701</span>
+
+        <div class="hero-logo-block">
+          <img src="assets/logo-typography.png" alt="Lưu Sắc Kim Hoàng" class="hero-logo-img" loading="eager">
+        </div>
+
+        <h1 class="hero-tagline">“Chạm sắc son, lưu dấu người...”</h1>
+
+        <p class="hero-desc">
+          Ba trăm năm nốt đỏ Thăng Long — dòng tranh dân gian độc nhất vô nhị một thời vang bóng, nay trở về trong từng nét son tinh hoa.
+        </p>
+
+        
+        <button class="hero-seal-btn" id="envelope-card" type="button" aria-label="Nhấn để khai mở thiệp mời di sản">
+          <div class="hero-seal-inner">
+            <span class="hero-seal-symbol">金</span>
+            <span class="hero-seal-text">Khai Mở</span>
+          </div>
+          <span class="hero-seal-ring"></span>
+          <span class="hero-seal-ring hero-seal-ring--outer"></span>
+        </button>
+      </div>
+    </div>
+
+  </section>
+
+  
+  <div class="letter-modal-backdrop" id="letter-modal" role="dialog" aria-modal="true" aria-labelledby="letter-title">
+    <div class="letter-paper">
+      
+      <div class="letter-corner-ornament corner-tl"></div>
+      <div class="letter-corner-ornament corner-tr"></div>
+      <div class="letter-corner-ornament corner-bl"></div>
+      <div class="letter-corner-ornament corner-br"></div>
+
+      
+      <button class="letter-close-btn" id="letter-close-btn" aria-label="Đóng thiệp ngỏ">
+        <i data-lucide="x"></i>
+      </button>
+
+      <div class="letter-scroll">
+      <div class="letter-header">
+        <span class="letter-badge">Thư Ngỏ Kính Gửi Bạn Hữu</span>
+        <h2 class="letter-title" id="letter-title">Lưu Sắc Kim Hoàng</h2>
+        <p class="letter-subtitle">Trân trọng kính mời quý bạn cùng chứng kiến ngày hội ngộ của sắc son di sản</p>
+      </div>
+
+      <div class="letter-body">
+        <p>
+          Bạn có biết, từng có một sắc đỏ rực rỡ của đất Thăng Long đã từng nhuộm thắm khắp các làng quê xứ Bắc mỗi độ Tết đến xuân về? Đó là sắc đỏ của <strong>Tranh dân gian Kim Hoàng</strong> — dòng tranh độc nhất vô nhị được in vẽ trên nền giấy "tàu vang" đượm hồn đất mẹ.
+        </p>
+        <div class="letter-highlight-text">
+          “Chẳng ngờ, cơn đại hồng thủy năm 1915 đã cuốn phăng kho mộc bản, đẩy dòng tranh vào giấc ngủ dài gần trọn một thế kỷ...”
+        </div>
+        <p>
+          Tưởng chừng đã vĩnh viễn hóa thành tàn tro khi những ván in cổ cuối cùng bị chẻ làm củi đun, nhưng ngọn lửa son chưa bao giờ tắt. Sau gần 100 năm phủ bụi thời gian, những nhà nghiên cứu, nghệ nhân và người trẻ yêu văn hóa đã cùng nhau lật lại từng mảnh ký ức, hòa lại sắc son, đục lại từng thớ gỗ thị để đưa nốt đỏ trở về với cuộc sống hôm nay.
+        </p>
+        <p>
+          Bức thiệp này được gửi đến bạn như một nhịp cầu hội ngộ giữa ngàn năm xưa và hôm nay. Kính mời bạn thong thả lắng nghe giọng kể truyền cảm, chiêm ngưỡng toàn bộ những thước ảnh tư liệu quý báu và gửi lại đôi dòng chúc phúc cho di sản trường tồn.
+        </p>
+
+        <div class="letter-signature-block">
+          <div class="signature-seal">
+            LƯU SẮC<br>KIM HOÀNG
+          </div>
+          <div class="letter-signature-text">
+            Trân trọng từ những người gìn giữ nốt đỏ,
+            <strong>Dự Án Lưu Sắc Kim Hoàng</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="letter-actions">
+        <button class="primary-cta-btn" id="start-journey-btn">
+          <span>Khai Mở Chuyện Trăm Năm</span>
+          <i data-lucide="arrow-down"></i>
+        </button>
+        <p class="letter-actions-note">Giọng kể thuyết minh sẽ tự phát khi bạn bắt đầu. Bạn có thể tạm dừng bất cứ lúc nào ở thanh phía dưới.</p>
+      </div>
+      </div>
+    </div>
+  </div>
+
+  
+  <section class="story-section" id="storyline" style="position: relative;">
+    
+    <img src="assets/pptx-extracted/ppt/media/image49.png" class="section-ornament section-ornament--top-left" alt="" aria-hidden="true" loading="lazy">
+    <img src="assets/pptx-extracted/ppt/media/image49.png" class="section-ornament section-ornament--top-right" alt="" aria-hidden="true" loading="lazy">
+
+    <div class="section-intro-header" data-scroll-reveal>
+      <span class="section-pretitle">Ký Ức & Hành Trình Phục Sinh</span>
+      <h2 class="section-main-title">Chuyện Trăm Năm Của Sắc Đỏ</h2>
+      <div class="section-divider"></div>
+      <p class="section-lead">
+        Bảy chặng đường của dòng tranh Kim Hoàng, từ phường tranh năm 1701 đến những nét son hồi sinh hôm nay
+      </p>
+    </div>
+
+    <div class="timeline-container">
+      <div class="timeline-line"></div>
+
+      
+      <article class="story-node" data-scroll-reveal id="chapter-1" data-chapter-index="0">
+        <div class="node-year-badge">
+          <i data-lucide="landmark" style="width: 15px; height: 15px;"></i>
+          <span>Năm 1701 • Thời Chính Hòa Thứ 22</span>
+        </div>
+        <h3 class="node-title">Khởi Sắc: Hai Dòng Họ Mở Phường Tranh</h3>
+        <p class="node-text">
+          Vào năm Chính Hòa thứ 22 (1701), dân làng Kim Bảng và Hoàng Bảng từ Thanh Hóa di cư ra Bắc, nhập thành làng Kim Hoàng ở phía tây thành Thăng Long xưa (nay thuộc xã Sơn Đồng, Hà Nội). Nhận thấy tranh Đông Hồ chỉ đủ cho mạn Hà Bắc, Hải Dương, còn tranh Hàng Trống lại quá đắt đỏ so với túi tiền người nông dân, hai dòng họ Nguyễn Sỹ và Nguyễn Thế đã quyết tâm sáng tạo một dòng tranh mới kết hợp kỹ thuật tinh hoa của cả hai nơi, lập nên một “phường tranh” thu hút cả làng vào nghề.
+        </p>
+
+        
+        <figure class="node-image-figure" data-scroll-reveal>
+          <img src="assets/pdf_images/extracted_img_01.jpg" alt="Tết Hà Nội 1896" loading="lazy">
+          <figcaption class="node-image-caption">
+            <i data-lucide="camera" style="width: 14px; height: 14px; color: var(--color-gold-light);"></i>
+            <span>Không khí phiên chợ Tết Hà Nội 1896, nơi tranh Kim Hoàng được bày bán tấp nập (Ảnh: Andres Salles).</span>
+          </figcaption>
+        </figure>
+
+        <p class="node-text">
+          Hàng năm vào rằm tháng Giêng, làng bắt đầu vào vụ in tranh. Đến rằm tháng Chạp, người dân quẩy tranh đi khắp các phiên chợ vùng ven như chợ Sấu Giá, Sơn Đồng, Chùa Thầy, Chợ Canh... Những năm phát đạt, gánh tranh bán về nặng trĩu tiền đồng Tự Đức.
+        </p>
+      </article>
+
+      
+      <div class="story-divider" aria-hidden="true">
+        <img src="assets/pptx-extracted/ppt/media/image52.png" alt="" loading="lazy">
+      </div>
+
+      
+      <article class="story-node" data-scroll-reveal id="chapter-2" data-chapter-index="1">
+        <div class="node-year-badge">
+          <i data-lucide="heart" style="width: 15px; height: 15px;"></i>
+          <span>Ký Ức Nhân Chứng • Gánh Tranh Của Cha</span>
+        </div>
+        <h3 class="node-title">Ký Ức Gánh Tranh Ngày Tết</h3>
+        <div class="node-quote-box">
+          <p>
+            “Chẳng là cụ thân sinh tôi làm nghề buôn tranh, cứ Tết đến lại đón hàng mang bán khắp vùng. Đều đặn từ chập tối, cụ đến những mối quen lấy tranh, ràng buộc cho kỹ rồi sớm sau vào các chợ bán cho bà con. Ngày đó việc buôn bán đơn sơ mà vui lắm. Tranh Kim Hoàng là thứ không thể thiếu trong các gia đình dịp Tết nên hàng lấy ngày nào, cụ tôi bán hết ngày đó. Chiều về gánh trên vai cha nhẹ bẫng, mấy anh em tôi hớn hở chạy theo, đòi cha cho đu bám dây quang…”
+          </p>
+          <span class="quote-author">— Cụ Trần Sơn Phương (Hậu duệ người làng tranh Kim Hoàng hồi tưởng)</span>
+        </div>
+      </article>
+
+      
+      <div class="story-divider" aria-hidden="true">
+        <img src="assets/pptx-extracted/ppt/media/image52.png" alt="" loading="lazy">
+      </div>
+
+      
+      <article class="story-node" data-scroll-reveal id="chapter-3" data-chapter-index="2">
+        <div class="node-year-badge node-year-badge--loss">
+          <i data-lucide="cloud-rain" style="width: 15px; height: 15px;"></i>
+          <span>Năm 1915 - 1950s • Đại Hạn Vỡ Đê Liên Mạc</span>
+        </div>
+        <h3 class="node-title">Vết Chìm: Nước Lũ Cuốn Trôi & Tro Tàn Ván In</h3>
+        <p class="node-text">
+          Đến năm Ất Mão đời Duy Tân (1915), xảy ra trận lụt lớn do vỡ đê Liên Mạc đã làm ngập cả một vùng phía Tây Hà Nội, cuốn trôi sạch kho ván của phường tranh Kim Hoàng. Nghề làm tranh từ đó suy giảm nặng nề.
+        </p>
+
+        
+        <figure class="node-image-figure" data-scroll-reveal>
+          <img src="assets/pdf_images/extracted_img_02.jpg" alt="Tư liệu 1945" loading="lazy">
+          <figcaption class="node-image-caption">
+            <i data-lucide="camera" style="width: 14px; height: 14px; color: var(--color-gold-light);"></i>
+            <span>Bối cảnh lịch sử 1945 đầy biến động khiến làng tranh rã đám (Tư liệu TTXVN).</span>
+          </figcaption>
+        </figure>
+
+        <div class="node-quote-box">
+          <p>
+            “Đến năm 1945, chiến tranh và nạn đói khiến các ván in còn lại đành bán đi. Cho đến khoảng cuối những năm 50 của thế kỷ trước, phong trào chống mê tín dị đoan đã dẫn đến việc các ván in bị chẻ làm củi đun...”
+          </p>
+          <span class="quote-author">— Cụ Trần Ất (Cụ ông cao tuổi nhất làng nhớ lại)</span>
+        </div>
+        <p class="node-text">
+          Cứ thế, Kim Hoàng mất hẳn một dòng tranh dân gian rực rỡ, tưởng chừng đã vĩnh viễn bị bụi thời gian chôn vùi.
+        </p>
+      </article>
+
+      
+      <div class="story-divider" aria-hidden="true">
+        <img src="assets/pptx-extracted/ppt/media/image52.png" alt="" loading="lazy">
+      </div>
+
+      
+      <article class="story-node" data-scroll-reveal id="chapter-4" data-chapter-index="3">
+        <div class="node-year-badge">
+          <i data-lucide="book-open" style="width: 15px; height: 15px;"></i>
+          <span>Năm 1960 - 2011 • Manh Mối Từ Paris</span>
+        </div>
+        <h3 class="node-title">Tia Sáng Paris: 58 Bức Tranh Màu Định Mệnh</h3>
+        <p class="node-text">
+          Tưởng chừng số phận dòng tranh đã bị bỏ quên, nhưng nhà nghiên cứu người Pháp Maurice Durand đã từng sưu tầm tranh thờ và tranh Tết ở Bắc Bộ, lưu trữ tại Viện Viễn Đông Bác Cổ (EFEO). Năm 1960, cuốn sách <em>L’imagerie populaire Vietnamienne</em> của ông được xuất bản tại Paris.
+        </p>
+
+        
+        <div class="node-image-grid">
+          <figure class="node-image-figure node-image-figure--grid">
+            <img src="assets/pdf_images/extracted_img_03.jpg" alt="Sách Maurice Durand bản gốc" loading="lazy">
+            <figcaption class="node-image-caption">Sách của Maurice Durand (1960).</figcaption>
+          </figure>
+          <figure class="node-image-figure node-image-figure--grid">
+            <img src="assets/pdf_images/extracted_img_04.jpg" alt="Sách Maurice Durand tái bản màu" loading="lazy">
+            <figcaption class="node-image-caption">Tái bản màu năm 2011.</figcaption>
+          </figure>
+        </div>
+
+        <p class="node-text">
+          Năm 2011, khi cuốn sách được tái bản màu, các nhà nghiên cứu giám định sắc đỏ cam đặc trưng và xác nhận có tới <strong>58 bức tranh dân gian Kim Hoàng</strong>. Đây chính là nguồn tư liệu cốt lõi mở ra khả năng hồi sinh dòng tranh đã thất truyền.
+        </p>
+      </article>
+
+      
+      <div class="story-divider" aria-hidden="true">
+        <img src="assets/pptx-extracted/ppt/media/image52.png" alt="" loading="lazy">
+      </div>
+
+      
+      <article class="story-node" data-scroll-reveal id="chapter-5" data-chapter-index="4">
+        <div class="node-year-badge">
+          <i data-lucide="sparkles" style="width: 15px; height: 15px;"></i>
+          <span>Năm 2015 • Dự Án Phục Hồi Khởi Động</span>
+        </div>
+        <h3 class="node-title">Hành Trình Đến Làng Tìm Lại Nốt Son</h3>
+        <p class="node-text">
+          Không cam tâm để dòng tranh chỉ còn hiện hữu trên trang sách, năm 2015, Tiến sĩ Nguyễn Thị Thu Hòa (Giám đốc Bảo tàng Gốm sứ Hà Nội) đã về làng Kim Hoàng để trò chuyện với các bậc cao niên và khởi xướng dự án phục hồi dòng tranh.
+        </p>
+
+        
+        <div class="node-image-grid">
+          <figure class="node-image-figure node-image-figure--grid">
+            <img src="assets/pdf_images/extracted_img_05.jpg" alt="TS Nguyễn Thị Thu Hòa" loading="lazy">
+            <figcaption class="node-image-caption">TS. Thu Hòa trò chuyện với các cụ trong làng.</figcaption>
+          </figure>
+          <figure class="node-image-figure node-image-figure--grid">
+            <img src="assets/pdf_images/extracted_img_08.jpg" alt="So sánh màu tranh" loading="lazy">
+            <figcaption class="node-image-caption">Đối chiếu màu tranh thực tế với tư liệu Paris.</figcaption>
+          </figure>
+        </div>
+
+        <p class="node-text">
+          Nhóm nghiên cứu may mắn gặp được cụ Trần Thị Liên — người bán tranh cuối cùng vào năm 1947. Cụ cùng các bô lão trong làng đã cùng thống nhất: màu đỏ cam trên giấy xuyến chỉ chính là màu chuẩn xác nhất của tranh Kim Hoàng xưa.
+        </p>
+      </article>
+
+      
+      <div class="story-divider" aria-hidden="true">
+        <img src="assets/pptx-extracted/ppt/media/image52.png" alt="" loading="lazy">
+      </div>
+
+      
+      <article class="story-node" data-scroll-reveal id="chapter-6" data-chapter-index="5">
+        <div class="node-year-badge">
+          <i data-lucide="hammer" style="width: 15px; height: 15px;"></i>
+          <span>Kỹ Nghệ Gian Nan • 40 Loại Đục & 700 Tờ Giấy Dó</span>
+        </div>
+        <h3 class="node-title">Kỹ Nghệ Gian Truân: Mộc Bản & Nhuộm Giấy</h3>
+        <p class="node-text">
+          Dự án quy tụ các nghệ nhân tinh hoa: nghệ nhân Nguyễn Đăng Chế (Đông Hồ) truyền kinh nghiệm nhuộm giấy, nghệ nhân Nguyễn Đăng Tâm khắc ván, và nghệ nhân Lê Đình Nghiên (Hàng Trống) hướng dẫn tô màu thủ công.
+        </p>
+
+        
+        <div class="node-image-grid">
+          <figure class="node-image-figure node-image-figure--grid">
+            <img src="assets/pdf_images/extracted_img_09.jpg" alt="Mộc bản gỗ thị phục chế" loading="lazy">
+            <figcaption class="node-image-caption">Mộc bản gỗ thị của tranh đôi Thần Kê.</figcaption>
+          </figure>
+          <figure class="node-image-figure node-image-figure--grid">
+            <img src="assets/pdf_images/extracted_img_10.jpg" alt="Nhuộm và phơi giấy" loading="lazy">
+            <figcaption class="node-image-caption">Công đoạn nhuộm và phơi giấy xuyến chỉ.</figcaption>
+          </figure>
+        </div>
+
+        <p class="node-text">
+          Ban đầu thử nghiệm nhuộm giấy xuyến chỉ bị nhăn nhúm, nhóm đã làm <strong>hỏng hơn 700 tờ giấy dó</strong> trước khi tìm ra bí quyết. Người thợ dùng tới <strong>40 loại đục</strong> để khắc trên gỗ thị mềm dẻo, tạo ra những đường khắc tinh tế, đanh thép và nhỏ gọn đặc trưng.
+        </p>
+      </article>
+
+      
+      <div class="story-divider" aria-hidden="true">
+        <img src="assets/pptx-extracted/ppt/media/image52.png" alt="" loading="lazy">
+      </div>
+
+      
+      <article class="story-node" data-scroll-reveal id="chapter-7" data-chapter-index="6">
+        <div class="node-year-badge">
+          <i data-lucide="flame" style="width: 15px; height: 15px;"></i>
+          <span>Năm 2019 - 2026 • Nốt Đỏ Vươn Mình</span>
+        </div>
+        <h3 class="node-title">Nốt Đỏ Trở Lại Đời Sống Đương Đại</h3>
+        <p class="node-text">
+          Dự án đã phục dựng thành công <strong>33 mẫu tranh khắc ván và 19 mẫu tranh vẽ tay</strong>. Đáng tự hào nhất, nghệ nhân Đào Đình Chung (người làng Kim Hoàng) đã có thể tự nuôi sống mình bằng chính nghề làm tranh di sản từ năm 2019 mà không cần hỗ trợ tài chính.
+        </p>
+
+        
+        <div class="node-image-grid">
+          <figure class="node-image-figure node-image-figure--grid">
+            <img src="assets/pdf_images/extracted_img_15.jpg" alt="Nghệ nhân Đào Đình Chung" loading="lazy">
+            <figcaption class="node-image-caption">Nghệ nhân Đào Đình Chung miệt mài vẽ tranh.</figcaption>
+          </figure>
+          <figure class="node-image-figure node-image-figure--grid">
+            <img src="assets/pdf_images/extracted_img_17.jpg" alt="Triển lãm Nốt Đỏ Di Sản" loading="lazy">
+            <figcaption class="node-image-caption">Triển lãm Nốt Đỏ Di Sản của 84SPACE & sinh viên Báo chí.</figcaption>
+          </figure>
+        </div>
+
+        <p class="node-text">
+          Từ các festival văn hóa lớn đến các dự án thế hệ trẻ như <em>Chạm Sắc Họa Hình</em> và <em>Lưu Sắc Kim Hoàng</em>, dòng tranh đỏ đã chính thức hồi sinh rực rỡ sau gần một thế kỷ ngủ vùi!
+        </p>
+      </article>
+    </div>
+  </section>
+
+  
+  <section class="gallery-section" id="gallery" style="position: relative;">
+    
+    <img src="assets/pptx-extracted/ppt/media/image51.png" class="section-ornament section-ornament--bottom-center" alt="" aria-hidden="true" loading="lazy">
+
+    <div class="section-intro-header" data-scroll-reveal>
+      <span class="section-pretitle">Album Tranh Dân Gian</span>
+      <h2 class="section-main-title">Mười Hai Bức Tranh Dân Gian</h2>
+      <div class="section-divider"></div>
+      <p class="section-lead">
+        Nhấp vào mỗi bức tranh để xem ở kích thước lớn và đọc đôi dòng về hình tượng trong tranh
+      </p>
+    </div>
+
+    <div class="coverflow" id="coverflow">
+      <button class="coverflow-btn coverflow-prev" id="coverflow-prev" type="button" aria-label="Ảnh trước"><i data-lucide="chevron-left"></i></button>
+      <button class="coverflow-btn coverflow-next" id="coverflow-next" type="button" aria-label="Ảnh sau"><i data-lucide="chevron-right"></i></button>
+      <div class="gallery-grid" id="coverflow-track">
+      <div class="gallery-item" data-full-src="tranh/phuong-mua.jpeg" data-caption="Phượng Múa — chim phượng trong tư thế múa, biểu tượng của sự cao quý và điềm lành">
+        <div class="gallery-thumb-wrap">
+          <img src="tranh/phuong-mua.jpeg" alt="Tranh Phượng Múa" loading="lazy">
+          <span class="gallery-overlay-badge">Linh Điểu</span>
+        </div>
+        <div class="gallery-meta">
+          <h3 class="gallery-title">Phượng Múa</h3>
+          <p class="gallery-desc">Chim phượng sắc ngũ hành trong tư thế múa, tượng trưng cho sự cao quý, thái bình và điềm lành.</p>
+        </div>
+      </div>
+
+      <div class="gallery-item" data-full-src="tranh/ngua-vang.jpeg" data-caption="Ngựa Vàng — ngựa thần mang cờ và lọng, biểu tượng của sự thành đạt và thăng tiến">
+        <div class="gallery-thumb-wrap">
+          <img src="tranh/ngua-vang.jpeg" alt="Tranh Ngựa Vàng" loading="lazy">
+          <span class="gallery-overlay-badge">Mã Đáo Thành Công</span>
+        </div>
+        <div class="gallery-meta">
+          <h3 class="gallery-title">Ngựa Vàng</h3>
+          <p class="gallery-desc">Ngựa thần oai phong cùng cờ lọng, cầu chúc công danh hanh thông, vạn sự thành đạt.</p>
+        </div>
+      </div>
+
+      <div class="gallery-item" data-full-src="tranh/ga-trong-than-ke.jpeg" data-caption="Gà Trống Thần Kê — linh vật trấn trạch, xua đêm tối và đón ánh sáng">
+        <div class="gallery-thumb-wrap">
+          <img src="tranh/ga-trong-than-ke.jpeg" alt="Tranh Gà Trống Thần Kê" loading="lazy">
+          <span class="gallery-overlay-badge">Thần Kê</span>
+        </div>
+        <div class="gallery-meta">
+          <h3 class="gallery-title">Gà Trống Thần Kê</h3>
+          <p class="gallery-desc">Con gà trống năm sắc với nét khắc dày đặc, biểu tượng trấn trạch và cát tường.</p>
+        </div>
+      </div>
+
+      <div class="gallery-item" data-full-src="tranh/rong-vang.jpeg" data-caption="Rồng Vàng — rồng cuộn mình giữa mây ngũ sắc, biểu tượng thiêng liêng của mưa thuận gió hòa">
+        <div class="gallery-thumb-wrap">
+          <img src="tranh/rong-vang.jpeg" alt="Tranh Rồng Vàng" loading="lazy">
+          <span class="gallery-overlay-badge">Long</span>
+        </div>
+        <div class="gallery-meta">
+          <h3 class="gallery-title">Rồng Vàng</h3>
+          <p class="gallery-desc">Rồng cuộn thân giữa mây, tượng trưng cho quyền uy, mưa thuận gió hòa và mùa màng no đủ.</p>
+        </div>
+      </div>
+
+      <div class="gallery-item" data-full-src="tranh/vo-tuong.jpeg" data-caption="Võ Tướng — vị tướng cầm đao oai hùng, dùng để trấn cửa nhà và canh giữ bình an">
+        <div class="gallery-thumb-wrap">
+          <img src="tranh/vo-tuong.jpeg" alt="Tranh Võ Tướng" loading="lazy">
+          <span class="gallery-overlay-badge">Trấn Trạch</span>
+        </div>
+        <div class="gallery-meta">
+          <h3 class="gallery-title">Võ Tướng</h3>
+          <p class="gallery-desc">Võ tướng cầm đao, dáng vẻ uy nghiêm, thường được treo trấn cửa để giữ bình an cho gia môn.</p>
+        </div>
+      </div>
+
+      <div class="gallery-item" data-full-src="tranh/tien-loc-tien-tai.jpeg" data-caption="Tiến Lộc Tiến Tài — hai ông thần cầm hoa sen, cầu tài lộc và phúc thọ">
+        <div class="gallery-thumb-wrap">
+          <img src="tranh/tien-loc-tien-tai.jpeg" alt="Tranh Tiến Lộc Tiến Tài" loading="lazy">
+          <span class="gallery-overlay-badge">Tài Lộc</span>
+        </div>
+        <div class="gallery-meta">
+          <h3 class="gallery-title">Tiến Lộc Tiến Tài</h3>
+          <p class="gallery-desc">Đôi ông thần cầm hoa sen và quạt, cầu chúc tài lộc dồi dào, phúc thọ an khang.</p>
+        </div>
+      </div>
+
+      <div class="gallery-item" data-full-src="tranh/tre-em-hai-chuoi.jpeg" data-caption="Trẻ Em Hái Chuối — cảnh sinh hoạt làng quê với những em bé hái buồng chuối">
+        <div class="gallery-thumb-wrap">
+          <img src="tranh/tre-em-hai-chuoi.jpeg" alt="Tranh Trẻ Em Hái Chuối" loading="lazy">
+          <span class="gallery-overlay-badge">Sinh Hoạt</span>
+        </div>
+        <div class="gallery-meta">
+          <h3 class="gallery-title">Trẻ Em Hái Chuối</h3>
+          <p class="gallery-desc">Cảnh làng quê ngộ nghĩnh với những em bé hái buồng chuối, gợi không khí sum vầy.</p>
+        </div>
+      </div>
+
+      <div class="gallery-item" data-full-src="tranh/muc-dong-cuoi-trau.jpeg" data-caption="Mục Đồng Cưỡi Trâu — em bé thổi sáo trên lưng trâu, hình ảnh thanh bình của đồng quê">
+        <div class="gallery-thumb-wrap">
+          <img src="tranh/muc-dong-cuoi-trau.jpeg" alt="Tranh Mục Đồng Cưỡi Trâu" loading="lazy">
+          <span class="gallery-overlay-badge">Đồng Quê</span>
+        </div>
+        <div class="gallery-meta">
+          <h3 class="gallery-title">Mục Đồng Cưỡi Trâu</h3>
+          <p class="gallery-desc">Em bé cầm cành lá trên lưng trâu, hình ảnh thanh bình quen thuộc của làng quê Bắc Bộ.</p>
+        </div>
+      </div>
+
+      <div class="gallery-item" data-full-src="tranh/ngua-trang.jpeg" data-caption="Ngựa Trắng — bạn đôi của ngựa vàng, cùng bộ tranh ngựa thờ mang ý nghĩa thăng tiến">
+        <div class="gallery-thumb-wrap">
+          <img src="tranh/ngua-trang.jpeg" alt="Tranh Ngựa Trắng" loading="lazy">
+          <span class="gallery-overlay-badge">Mã Thờ</span>
+        </div>
+        <div class="gallery-meta">
+          <h3 class="gallery-title">Ngựa Trắng</h3>
+          <p class="gallery-desc">Bạn đôi của ngựa vàng trong bộ tranh ngựa thờ, cùng cầu chúc công danh rộng mở.</p>
+        </div>
+      </div>
+
+      <div class="gallery-item" data-full-src="tranh/ho-me-con.jpeg" data-caption="Hổ Mẹ Con — hổ mẹ cùng hổ con, biểu tượng sức mạnh và sự che chở">
+        <div class="gallery-thumb-wrap">
+          <img src="tranh/ho-me-con.jpeg" alt="Tranh Hổ Mẹ Con" loading="lazy">
+          <span class="gallery-overlay-badge">Hổ</span>
+        </div>
+        <div class="gallery-meta">
+          <h3 class="gallery-title">Hổ Mẹ Con</h3>
+          <p class="gallery-desc">Hổ mẹ dắt hổ con, tượng trưng cho sức mạnh, sự che chở và tình mẫu tử.</p>
+        </div>
+      </div>
+
+      <div class="gallery-item" data-full-src="tranh/nguoi-cuoi-rong.jpeg" data-caption="Người Cưỡi Rồng — người cưỡi rồng xanh giữa mây ngũ sắc, gợi chuyện thần tiên">
+        <div class="gallery-thumb-wrap">
+          <img src="tranh/nguoi-cuoi-rong.jpeg" alt="Tranh Người Cưỡi Rồng" loading="lazy">
+          <span class="gallery-overlay-badge">Thần Tiên</span>
+        </div>
+        <div class="gallery-meta">
+          <h3 class="gallery-title">Người Cưỡi Rồng</h3>
+          <p class="gallery-desc">Nhân vật cưỡi rồng xanh giữa mây ngũ sắc, gợi tích xưa về cõi thần tiên.</p>
+        </div>
+      </div>
+
+      <div class="gallery-item" data-full-src="tranh/ga-trong-cat-tuong.jpeg" data-caption="Gà Trống Cát Tường — gà trống tô nét mảnh, sắc ấm, biểu tượng năm đức tính của người quân tử">
+        <div class="gallery-thumb-wrap">
+          <img src="tranh/ga-trong-cat-tuong.jpeg" alt="Tranh Gà Trống Cát Tường" loading="lazy">
+          <span class="gallery-overlay-badge">Cát Tường</span>
+        </div>
+        <div class="gallery-meta">
+          <h3 class="gallery-title">Gà Trống Cát Tường</h3>
+          <p class="gallery-desc">Gà trống nét mảnh, sắc ấm, tượng trưng cho năm đức tính văn, võ, dũng, nhân, tín.</p>
+        </div>
+      </div>
+      </div>
+    </div>
+    <p class="coverflow-caption" id="coverflow-caption" aria-live="polite"></p>
+    <p class="coverflow-counter" id="coverflow-counter" aria-live="polite"></p>
+  </section>
+
+  
+  <div class="lightbox-modal" id="lightbox-modal" role="dialog" aria-modal="true" aria-label="Xem ảnh phóng to" aria-hidden="true">
+    <button class="lightbox-close-btn" id="lightbox-close-btn" aria-label="Đóng ảnh phóng to">
+      <i data-lucide="x"></i>
+    </button>
+    <button class="lightbox-nav-btn lightbox-prev-btn" id="lightbox-prev-btn" aria-label="Ảnh trước">
+      <i data-lucide="chevron-left"></i>
+    </button>
+    <button class="lightbox-nav-btn lightbox-next-btn" id="lightbox-next-btn" aria-label="Ảnh sau">
+      <i data-lucide="chevron-right"></i>
+    </button>
+    <div class="lightbox-container">
+      <img src="" alt="" class="lightbox-img" id="lightbox-img">
+      <p class="lightbox-caption" id="lightbox-caption"></p>
+      <p class="lightbox-counter" id="lightbox-counter" aria-live="polite"></p>
+    </div>
+  </div>
+
+  
+  <section class="guestbook-section" id="guestbook">
+    <div class="section-intro-header" data-scroll-reveal>
+      <span class="section-pretitle">Sổ Lưu Bút Di Sản</span>
+      <h2 class="section-main-title">Lời tri ân đến hành trình phục hồi dòng tranh dân gian Kim Hoàng</h2>
+      <div class="section-divider"></div>
+      <p class="section-lead">
+        Hãy để lại họ tên và đôi dòng cảm nghĩ để cùng tiếp lửa cho các nghệ nhân gìn giữ dòng tranh
+      </p>
+    </div>
+
+    <div class="guestbook-card">
+      <form class="guestbook-form" id="guestbook-form">
+        <div class="form-group">
+          <label for="guest-name" class="form-label">Họ & Tên của bạn / Bạn hữu</label>
+          <input type="text" id="guest-name" class="form-input" placeholder="Ví dụ: Nguyễn Văn An" maxlength="60" required>
+        </div>
+
+        <div class="form-group">
+          <label for="guest-email" class="form-label">Email của bạn</label>
+          <input type="email" id="guest-email" class="form-input" placeholder="Ví dụ: ban@email.com" maxlength="120" autocomplete="email" required>
+        </div>
+
+        <div class="form-group">
+          <label for="guest-wish" class="form-label">Lời chúc hoặc cảm nghĩ gửi đến dự án</label>
+          <textarea id="guest-wish" class="form-textarea" rows="4" placeholder="Viết lời chúc son tốt lành gửi đến làng tranh Kim Hoàng..." maxlength="500" required></textarea>
+        </div>
+
+        <button type="submit" class="primary-cta-btn" style="align-self: flex-start;">
+          <i data-lucide="send"></i>
+          <span>Gửi Lời Chúc Phúc</span>
+        </button>
+      </form>
+
+      <p class="guestbook-note">
+        Email chỉ để ban tổ chức liên hệ lại, không hiển thị công khai. Tên và lời nhắn của bạn sẽ xuất hiện trên bức tường lời chúc bên dưới.
+      </p>
+
+      
+      <div class="guestbook-wishes-wall" id="wishes-wall" aria-live="polite"></div>
+    </div>
+  </section>
+
+  
+  <footer class="footer-cta-section" id="community">
+    <div class="cta-content">
+      <h2 class="cta-heading">Cùng Viết Tiếp Giấc Mơ Di Sản</h2>
+      <p class="cta-text">
+        Dự án Lưu Sắc Kim Hoàng do thế hệ trẻ khởi xướng nhằm lan tỏa tình yêu di sản tranh dân gian đến cộng đồng. Nốt son của cha ông chỉ thực sự sống mãi khi có sự sẻ chia và nâng niu của bạn.
+      </p>
+
+      <div class="cta-buttons-group">
+        
+        <a href="https://www.facebook.com/profile.php?id=61595100294116" target="_blank" rel="noopener noreferrer" class="primary-cta-btn">
+          <i data-lucide="facebook"></i>
+          <span>Ghé Thăm Fanpage Dự Án</span>
+        </a>
+
+        
+        <button class="secondary-btn" id="download-blessing-btn">
+          <i data-lucide="download"></i>
+          <span>Nhận Lộc Đỏ Kim Hoàng</span>
+        </button>
+      </div>
+
+      <p class="footer-credit">
+        © 2026 Lưu Sắc Kim Hoàng • Thiệp Mời Di Sản Trực Tuyến<br>
+        Ảnh tư liệu: Andres Salles, TTXVN, các nghệ nhân và dự án Lưu Sắc Kim Hoàng
+      </p>
+    </div>
+  </footer>
+
+  <script src="app.js?v=sync1"></script>
+</body>
+</html>
