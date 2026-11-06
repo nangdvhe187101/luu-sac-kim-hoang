@@ -69,7 +69,6 @@
     root.addEventListener('click',function(e){if(state==='opened')enter();});
     document.addEventListener('keydown',function onk(e){if(!document.body.contains(root)){document.removeEventListener('keydown',onk);return;}
       if(e.key==='Escape')enter();});
-    seal.focus({preventScroll:true});
   }
   window.showEnvelopeIntro=mount;
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount);else mount();
