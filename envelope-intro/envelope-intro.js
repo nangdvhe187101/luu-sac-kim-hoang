@@ -9,14 +9,19 @@
     var A=base+'assets/';
     var root=document.createElement('div');root.className='ei-root';root.setAttribute('role','dialog');root.setAttribute('aria-label','Thiệp mời Lưu Sắc Kim Hoàng');
     root.innerHTML=
-     '<div class="ei-stage"><div class="ei-env">'+
-      '<div class="ei-liner"></div>'+
-      '<div class="ei-card"><p><small>Thiệp mời · Invitation</small><b>Tranh dân gian Việt Nam</b></p><img src="'+A+'invitation-logo.jpg" alt="Lưu Sắc Kim Hoàng"></div>'+
-      '<img class="ei-body" src="'+A+'envelope-body.webp" alt="" draggable="false">'+
-      '<div class="ei-flap"><div class="ei-face"><img src="'+A+'envelope-flap.webp" alt="" draggable="false"></div><div class="ei-face ei-k"></div></div>'+
-      '<button class="ei-seal" type="button" aria-label="Mở thiệp / Open invitation"><img src="'+A+'envelope-seal.webp" alt="Dấu triện Lưu Sắc Kim Hoàng" draggable="false"></button>'+
-     '</div>'+
-     '<div class="ei-hint"><b>Chạm vào dấu triện để mở thiệp</b><span>Touch the seal to open the invitation</span></div></div>';
+     '<img src="/assets/pptx-extracted/ppt/media/image49.png" alt="" aria-hidden="true" class="ei-cloud ei-cloud--top">'+
+     '<img src="/assets/pptx-extracted/ppt/media/image49.png" alt="" aria-hidden="true" class="ei-cloud ei-cloud--bottom">'+
+     '<div class="ei-stage">'+
+      '<p class="ei-pretitle">Thiệp Mời Trực Tuyến • Tranh Dân Gian Việt Nam</p>'+
+      '<div class="ei-env">'+
+       '<div class="ei-liner"></div>'+
+       '<div class="ei-card"><p><small>Thiệp mời · Invitation</small><b>Tranh dân gian Việt Nam</b></p><img src="'+A+'invitation-logo.jpg" alt="Lưu Sắc Kim Hoàng"></div>'+
+       '<img class="ei-body" src="'+A+'envelope-body.webp" alt="" draggable="false">'+
+       '<div class="ei-flap"><div class="ei-face"><img src="'+A+'envelope-flap.webp" alt="" draggable="false"></div><div class="ei-face ei-k"></div></div>'+
+       '<button class="ei-seal" type="button" aria-label="Mở thiệp / Open invitation"><img src="'+A+'envelope-seal.webp" alt="Dấu triện Lưu Sắc Kim Hoàng" draggable="false"></button>'+
+      '</div>'+
+      '<p class="ei-hint">Nhấn vào ấn triện để mở thiệp</p>'+
+     '</div>';
     document.body.appendChild(root);
     var de=document.documentElement,prev=de.style.overflow;de.style.overflow='hidden';
     var env=root.querySelector('.ei-env'),flap=root.querySelector('.ei-flap'),seal=root.querySelector('.ei-seal'),stage=root.querySelector('.ei-stage');
