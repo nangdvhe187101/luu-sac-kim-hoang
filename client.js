@@ -1038,14 +1038,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (guestbookForm) {
     const submitBtn = guestbookForm.querySelector('button[type="submit"]');
+    let lastWishSentAt = 0;
 
     guestbookForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const name = guestNameInput.value.trim();
-      const email = guestEmailInput.value.trim();
-      const wish = guestWishInput.value.trim();
+      const name = guestNameInput.value.trim().slice(0, 80);
+      const email = guestEmailInput.value.trim().slice(0, 120);
+      const wish = guestWishInput.value.trim().slice(0, 500);
 
       if (!name || !email || !wish) return;
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        showToast(
+          getSiteLang() === 'en'
+            ? 'Please enter a valid email address.'
+            : 'Vui lòng nhập địa chỉ email hợp lệ.'
+        );
+        return;
+      }
+      if (Date.now() - lastWishSentAt < 15000) {
+        showToast(
+          getSiteLang() === 'en'
+            ? 'Please wait a few seconds before sending another wish.'
+            : 'Vui lòng đợi ít giây trước khi gửi lời chúc tiếp theo.'
+        );
+        return;
+      }
 
       if (submitBtn) submitBtn.disabled = true;
       try {
@@ -1067,6 +1084,7 @@ document.addEventListener('DOMContentLoaded', () => {
           return;
         }
 
+        lastWishSentAt = Date.now();
         appendWishToWall(name, wish, true);
         guestbookForm.reset();
         showToast(

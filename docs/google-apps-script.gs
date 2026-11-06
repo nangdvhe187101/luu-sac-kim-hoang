@@ -25,7 +25,7 @@ function doGet() {
       .slice(0, 50);
     return reply({ ok: true, wishes: wishes });
   } catch (err) {
-    return reply({ ok: false, error: String(err), wishes: [] });
+    return reply({ ok: false, error: 'Không thể tải lời chúc.', wishes: [] });
   }
 }
 
@@ -34,6 +34,13 @@ function doPost(e) {
     const data = JSON.parse(e.postData.contents);
     const token = PropertiesService.getScriptProperties().getProperty('TOKEN');
     if (token && data.token !== token) return reply({ ok: false, error: 'unauthorized' });
+
+    const name = String(data.name || '').trim().slice(0, 80);
+    const email = String(data.email || '').trim().slice(0, 120);
+    const wish = String(data.wish || '').trim().slice(0, 500);
+    if (!name || !email || !wish || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return reply({ ok: false, error: 'Dữ liệu không hợp lệ.' });
+    }
 
     const lock = LockService.getScriptLock();
     lock.waitLock(10000);
@@ -44,19 +51,19 @@ function doPost(e) {
         sheet.setFrozenRows(1);
       }
       const when = Utilities.formatDate(new Date(), 'Asia/Ho_Chi_Minh', 'dd/MM/yyyy HH:mm:ss');
-      sheet.appendRow([when, safe(data.name), safe(data.email), safe(data.wish)]);
+      sheet.appendRow([when, safe(name), safe(email), safe(wish)]);
     } finally {
       lock.releaseLock();
     }
     return reply({ ok: true });
   } catch (err) {
-    return reply({ ok: false, error: String(err) });
+    return reply({ ok: false, error: 'Không thể lưu lời chúc.' });
   }
 }
 
 function safe(value) {
-  const text = String(value == null ? '' : value);
-  return /^[=+\-@]/.test(text) ? "'" + text : text;
+  const text = String(value == null ? '' : value).trim();
+  return /^[=+\-@\t\r\n]/.test(text) ? "'" + text : text;
 }
 
 function reply(obj) {
