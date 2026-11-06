@@ -1178,154 +1178,29 @@ document.addEventListener('DOMContentLoaded', () => {
   let lastBlessingIdx = -1;
   const downloadBtn = document.getElementById('download-blessing-btn');
 
-  async function generateBlessingCard() {
+  function assignNextRandomBlessing() {
+    if (!downloadBtn) return;
     let idx = Math.floor(Math.random() * blessingPaintings.length);
     if (blessingPaintings.length > 1 && idx === lastBlessingIdx) {
       idx = (idx + 1 + Math.floor(Math.random() * (blessingPaintings.length - 1))) % blessingPaintings.length;
     }
     lastBlessingIdx = idx;
     const item = blessingPaintings[idx];
+    const slug = item.src.split('/').pop().replace('.jpeg', '');
+    const fileName = `Loc-Do-Kim-Hoang-${slug}.png`;
+    downloadBtn.setAttribute('href', `/assets/loc-do/${fileName}`);
+    downloadBtn.setAttribute('download', fileName);
+  }
 
-    try {
-      await Promise.all([
-        document.fonts.load('bold 68px "DFVN Bropella"', 'LƯU SẮC KIM HOÀNG'),
-        document.fonts.load('italic 38px "Asap"', 'Chạm Sắc Son'),
-        document.fonts.load('bold 48px "DFVN Bropella"', item.title),
-        document.fonts.load('38px "Asap"', item.line1),
-      ]);
-    } catch (e) {}
-
-    const loadPainting = (src) =>
-      new Promise((resolve) => {
-        const img = new Image();
-        img.crossOrigin = 'anonymous';
-        img.onload = () => resolve(img);
-        img.onerror = () => resolve(null);
-        img.src = src;
-      });
-
-    const paintingImg = await loadPainting(item.src);
-
-    const offscreenCanvas = document.createElement('canvas');
-    offscreenCanvas.width = 1080;
-    offscreenCanvas.height = 1920;
-    const offCtx = offscreenCanvas.getContext('2d');
-
-    const rootStyle = getComputedStyle(document.documentElement);
-    const token = (name) => rootStyle.getPropertyValue(name).trim();
-
-    const gradient = offCtx.createLinearGradient(0, 0, 0, 1920);
-    gradient.addColorStop(0, token('--bg-1') || '#4a0607');
-    gradient.addColorStop(0.5, token('--bg-2') || '#6e0b0d');
-    gradient.addColorStop(1, token('--bg-3') || '#2e0304');
-    offCtx.fillStyle = gradient;
-    offCtx.fillRect(0, 0, 1080, 1920);
-
-    offCtx.strokeStyle = token('--color-gold') || '#d4a23a';
-    offCtx.lineWidth = 14;
-    offCtx.strokeRect(40, 40, 1000, 1840);
-    offCtx.lineWidth = 2;
-    offCtx.strokeRect(64, 64, 952, 1792);
-
-    offCtx.fillStyle = token('--color-gold-light') || '#ffd56b';
-    offCtx.textAlign = 'center';
-    offCtx.font = 'bold 68px "DFVN Bropella", "Asap", serif';
-    offCtx.fillText('LƯU SẮC KIM HOÀNG', 540, 210);
-
-    offCtx.fillStyle = token('--color-cream') || '#fff5e1';
-    offCtx.font = 'italic 38px "Asap", sans-serif';
-    offCtx.fillText('“Chạm Sắc Son, Lưu Dấu Người...”', 540, 290);
-
-    if (paintingImg && paintingImg.width && paintingImg.height) {
-      const maxW = 740;
-      const maxH = 840;
-      const scale = Math.min(maxW / paintingImg.width, maxH / paintingImg.height);
-      const drawW = Math.round(paintingImg.width * scale);
-      const drawH = Math.round(paintingImg.height * scale);
-      const drawX = Math.round((1080 - drawW) / 2);
-      const drawY = Math.round(350 + (maxH - drawH) / 2);
-
-      offCtx.fillStyle = 'rgba(20, 4, 4, 0.45)';
-      offCtx.fillRect(drawX - 18, drawY - 18, drawW + 36, drawH + 36);
-      offCtx.strokeStyle = token('--color-gold-light') || '#ffd56b';
-      offCtx.lineWidth = 6;
-      offCtx.strokeRect(drawX - 14, drawY - 14, drawW + 28, drawH + 28);
-      offCtx.drawImage(paintingImg, drawX, drawY, drawW, drawH);
-    }
-
-    offCtx.fillStyle = token('--color-gold-light') || '#ffd56b';
-    offCtx.font = 'bold 48px "DFVN Bropella", "Asap", serif';
-    offCtx.fillText(item.title, 540, 1340);
-
-    offCtx.fillStyle = token('--color-gold') || '#d4a23a';
-    offCtx.font = 'italic 34px "Asap", sans-serif';
-    offCtx.fillText(`Tranh dân gian Kim Hoàng: ${item.name}`, 540, 1410);
-
-    offCtx.fillStyle = token('--color-paper-warm') || '#f8e6c1';
-    offCtx.font = '38px "Asap", sans-serif';
-    offCtx.fillText(item.line1, 540, 1515);
-    offCtx.fillText(item.line2, 540, 1585);
-
-    offCtx.fillStyle = token('--color-gold-light') || '#ffd56b';
-    offCtx.font = '30px "Asap", sans-serif';
-    offCtx.fillText('Tranh sắc đỏ Kim Hoàng', 540, 1730);
-
-    const fileName = `Loc-Do-Kim-Hoang-${item.src.split('/').pop().replace('.jpeg', '')}.png`;
-
-    return new Promise((resolve) => {
-      offscreenCanvas.toBlob((blob) => {
-        resolve({ blob, fileName, item });
-      }, 'image/png');
+  if (downloadBtn) {
+    assignNextRandomBlessing();
+    downloadBtn.addEventListener('click', () => {
+      showToast(
+        getSiteLang() === 'en'
+          ? 'Downloading Kim Hoang Red Blessing (check your Downloads)!'
+          : 'Đang tải Lộc Đỏ Kim Hoàng về máy (kiểm tra mục Tệp tải về / Downloads)!'
+      );
+      setTimeout(assignNextRandomBlessing, 350);
     });
   }
-
-  async function triggerBlessingWorkflow() {
-    if (!downloadBtn) return;
-    downloadBtn.disabled = true;
-    downloadBtn.style.pointerEvents = 'none';
-    downloadBtn.style.opacity = '0.7';
-
-    try {
-      const { blob, fileName, item } = await generateBlessingCard();
-      const isMobile = /Android|iPhone|iPad|iPod|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || ('ontouchstart' in window);
-
-      if (isMobile && navigator.share) {
-        try {
-          const file = new File([blob], fileName, { type: 'image/png' });
-          if (!navigator.canShare || navigator.canShare({ files: [file] })) {
-            await navigator.share({
-              files: [file],
-              title: 'Lộc Đỏ Kim Hoàng - ' + item.name,
-            });
-            showToast(getSiteLang() === 'en' ? 'Downloaded Kim Hoang Red Blessing!' : 'Đã nhận Lộc Đỏ Kim Hoàng thành công!');
-            return;
-          }
-        } catch (e) {
-          if (e.name === 'AbortError') return;
-        }
-      }
-
-      const blobUrl = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.download = fileName;
-      link.href = blobUrl;
-      link.target = '_blank';
-      document.body.appendChild(link);
-      link.click();
-      setTimeout(() => {
-        link.remove();
-        URL.revokeObjectURL(blobUrl);
-      }, 3000);
-
-      showToast(getSiteLang() === 'en' ? 'Downloaded Kim Hoang Red Blessing!' : 'Đã tải Lộc Đỏ Kim Hoàng về máy!');
-    } catch (e) {
-      showToast(getSiteLang() === 'en' ? 'Could not download blessing. Please try again.' : 'Chưa tải được lộc đỏ, vui lòng thử lại.');
-    } finally {
-      downloadBtn.disabled = false;
-      downloadBtn.style.pointerEvents = '';
-      downloadBtn.style.opacity = '';
-    }
-  }
-
-  if (downloadBtn) downloadBtn.addEventListener('click', triggerBlessingWorkflow);
 });
