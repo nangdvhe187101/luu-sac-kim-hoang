@@ -9,6 +9,13 @@
     var A=base+'assets/';
     var root=document.createElement('div');root.className='ei-root';root.setAttribute('role','dialog');root.setAttribute('aria-label','Thiệp mời Lưu Sắc Kim Hoàng');
     root.innerHTML=
+     '<div class="ei-brand">'+
+      '<img src="/assets/logo-typography.png" alt="Logo Lưu Sắc Kim Hoàng" class="ei-brand-logo">'+
+      '<div class="ei-brand-text">'+
+       '<span class="ei-brand-title">Lưu Sắc Kim Hoàng</span>'+
+       '<span class="ei-brand-subtitle">Tranh Dân Gian Việt Nam</span>'+
+      '</div>'+
+     '</div>'+
      '<img src="/assets/pptx-extracted/ppt/media/image49.png" alt="" aria-hidden="true" class="ei-cloud ei-cloud--top">'+
      '<img src="/assets/pptx-extracted/ppt/media/image49.png" alt="" aria-hidden="true" class="ei-cloud ei-cloud--bottom">'+
      '<div class="ei-stage">'+
