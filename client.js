@@ -952,6 +952,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.key === 'Escape') {
       closeLightbox();
       if (letterModal && letterModal.classList.contains('is-visible')) closeLetter();
+      if (blessingModal && blessingModal.classList.contains('is-active')) closeBlessingModal();
     } else if (lightboxOpen && e.key === 'ArrowLeft') {
       showLightboxAt(lightboxIndex - 1);
     } else if (lightboxOpen && e.key === 'ArrowRight') {
@@ -1177,103 +1178,196 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let lastBlessingIdx = -1;
   const downloadBtn = document.getElementById('download-blessing-btn');
-  if (downloadBtn) {
-    downloadBtn.addEventListener('click', async () => {
-      let idx = Math.floor(Math.random() * blessingPaintings.length);
-      if (blessingPaintings.length > 1 && idx === lastBlessingIdx) {
-        idx = (idx + 1 + Math.floor(Math.random() * (blessingPaintings.length - 1))) % blessingPaintings.length;
-      }
-      lastBlessingIdx = idx;
-      const item = blessingPaintings[idx];
+  const blessingModal = document.getElementById('blessing-modal');
+  const blessingModalImg = document.getElementById('blessing-modal-img');
+  const blessingModalClose = document.getElementById('blessing-modal-close');
+  const blessingModalSaveBtn = document.getElementById('blessing-modal-save-btn');
+  const blessingModalRerollBtn = document.getElementById('blessing-modal-reroll-btn');
 
+  let currentBlessingBlob = null;
+  let currentBlessingFileName = '';
+  let currentBlessingItem = null;
+
+  async function generateBlessingCard() {
+    let idx = Math.floor(Math.random() * blessingPaintings.length);
+    if (blessingPaintings.length > 1 && idx === lastBlessingIdx) {
+      idx = (idx + 1 + Math.floor(Math.random() * (blessingPaintings.length - 1))) % blessingPaintings.length;
+    }
+    lastBlessingIdx = idx;
+    const item = blessingPaintings[idx];
+    currentBlessingItem = item;
+
+    try {
+      await Promise.all([
+        document.fonts.load('bold 68px "DFVN Bropella"', 'LƯU SẮC KIM HOÀNG'),
+        document.fonts.load('italic 38px "Asap"', 'Chạm Sắc Son'),
+        document.fonts.load('bold 48px "DFVN Bropella"', item.title),
+        document.fonts.load('38px "Asap"', item.line1),
+      ]);
+    } catch (e) {}
+
+    const loadPainting = (src) =>
+      new Promise((resolve) => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => resolve(img);
+        img.onerror = () => resolve(null);
+        img.src = src;
+      });
+
+    const paintingImg = await loadPainting(item.src);
+
+    const offscreenCanvas = document.createElement('canvas');
+    offscreenCanvas.width = 1080;
+    offscreenCanvas.height = 1920;
+    const offCtx = offscreenCanvas.getContext('2d');
+
+    const rootStyle = getComputedStyle(document.documentElement);
+    const token = (name) => rootStyle.getPropertyValue(name).trim();
+
+    const gradient = offCtx.createLinearGradient(0, 0, 0, 1920);
+    gradient.addColorStop(0, token('--bg-1') || '#4a0607');
+    gradient.addColorStop(0.5, token('--bg-2') || '#6e0b0d');
+    gradient.addColorStop(1, token('--bg-3') || '#2e0304');
+    offCtx.fillStyle = gradient;
+    offCtx.fillRect(0, 0, 1080, 1920);
+
+    offCtx.strokeStyle = token('--color-gold') || '#d4a23a';
+    offCtx.lineWidth = 14;
+    offCtx.strokeRect(40, 40, 1000, 1840);
+    offCtx.lineWidth = 2;
+    offCtx.strokeRect(64, 64, 952, 1792);
+
+    offCtx.fillStyle = token('--color-gold-light') || '#ffd56b';
+    offCtx.textAlign = 'center';
+    offCtx.font = 'bold 68px "DFVN Bropella", "Asap", serif';
+    offCtx.fillText('LƯU SẮC KIM HOÀNG', 540, 210);
+
+    offCtx.fillStyle = token('--color-cream') || '#fff5e1';
+    offCtx.font = 'italic 38px "Asap", sans-serif';
+    offCtx.fillText('“Chạm Sắc Son, Lưu Dấu Người...”', 540, 290);
+
+    if (paintingImg && paintingImg.width && paintingImg.height) {
+      const maxW = 740;
+      const maxH = 840;
+      const scale = Math.min(maxW / paintingImg.width, maxH / paintingImg.height);
+      const drawW = Math.round(paintingImg.width * scale);
+      const drawH = Math.round(paintingImg.height * scale);
+      const drawX = Math.round((1080 - drawW) / 2);
+      const drawY = Math.round(350 + (maxH - drawH) / 2);
+
+      offCtx.fillStyle = 'rgba(20, 4, 4, 0.45)';
+      offCtx.fillRect(drawX - 18, drawY - 18, drawW + 36, drawH + 36);
+      offCtx.strokeStyle = token('--color-gold-light') || '#ffd56b';
+      offCtx.lineWidth = 6;
+      offCtx.strokeRect(drawX - 14, drawY - 14, drawW + 28, drawH + 28);
+      offCtx.drawImage(paintingImg, drawX, drawY, drawW, drawH);
+    }
+
+    offCtx.fillStyle = token('--color-gold-light') || '#ffd56b';
+    offCtx.font = 'bold 48px "DFVN Bropella", "Asap", serif';
+    offCtx.fillText(item.title, 540, 1340);
+
+    offCtx.fillStyle = token('--color-gold') || '#d4a23a';
+    offCtx.font = 'italic 34px "Asap", sans-serif';
+    offCtx.fillText(`Tranh dân gian Kim Hoàng: ${item.name}`, 540, 1410);
+
+    offCtx.fillStyle = token('--color-paper-warm') || '#f8e6c1';
+    offCtx.font = '38px "Asap", sans-serif';
+    offCtx.fillText(item.line1, 540, 1515);
+    offCtx.fillText(item.line2, 540, 1585);
+
+    offCtx.fillStyle = token('--color-gold-light') || '#ffd56b';
+    offCtx.font = '30px "Asap", sans-serif';
+    offCtx.fillText('Tranh sắc đỏ Kim Hoàng', 540, 1730);
+
+    currentBlessingFileName = `Loc-Do-Kim-Hoang-${item.src.split('/').pop().replace('.jpeg', '')}.png`;
+
+    return new Promise((resolve) => {
+      offscreenCanvas.toBlob((blob) => {
+        currentBlessingBlob = blob;
+        resolve({ blob, dataUrl: offscreenCanvas.toDataURL('image/png') });
+      }, 'image/png');
+    });
+  }
+
+  async function saveOrShareBlessing() {
+    if (!currentBlessingBlob) return;
+    if (navigator.share) {
       try {
-        await Promise.all([
-          document.fonts.load('bold 68px "DFVN Bropella"', 'LƯU SẮC KIM HOÀNG'),
-          document.fonts.load('italic 38px "Asap"', 'Chạm Sắc Son'),
-          document.fonts.load('bold 48px "DFVN Bropella"', item.title),
-          document.fonts.load('38px "Asap"', item.line1),
-        ]);
-      } catch (e) {}
-
-      const loadPainting = (src) =>
-        new Promise((resolve) => {
-          const img = new Image();
-          img.crossOrigin = 'anonymous';
-          img.onload = () => resolve(img);
-          img.onerror = () => resolve(null);
-          img.src = src;
-        });
-
-      const paintingImg = await loadPainting(item.src);
-
-      const offscreenCanvas = document.createElement('canvas');
-      offscreenCanvas.width = 1080;
-      offscreenCanvas.height = 1920;
-      const offCtx = offscreenCanvas.getContext('2d');
-
-      const rootStyle = getComputedStyle(document.documentElement);
-      const token = (name) => rootStyle.getPropertyValue(name).trim();
-
-      const gradient = offCtx.createLinearGradient(0, 0, 0, 1920);
-      gradient.addColorStop(0, token('--bg-1') || '#4a0607');
-      gradient.addColorStop(0.5, token('--bg-2') || '#6e0b0d');
-      gradient.addColorStop(1, token('--bg-3') || '#2e0304');
-      offCtx.fillStyle = gradient;
-      offCtx.fillRect(0, 0, 1080, 1920);
-
-      offCtx.strokeStyle = token('--color-gold') || '#d4a23a';
-      offCtx.lineWidth = 14;
-      offCtx.strokeRect(40, 40, 1000, 1840);
-      offCtx.lineWidth = 2;
-      offCtx.strokeRect(64, 64, 952, 1792);
-
-      offCtx.fillStyle = token('--color-gold-light') || '#ffd56b';
-      offCtx.textAlign = 'center';
-      offCtx.font = 'bold 68px "DFVN Bropella", "Asap", serif';
-      offCtx.fillText('LƯU SẮC KIM HOÀNG', 540, 210);
-
-      offCtx.fillStyle = token('--color-cream') || '#fff5e1';
-      offCtx.font = 'italic 38px "Asap", sans-serif';
-      offCtx.fillText('“Chạm Sắc Son, Lưu Dấu Người...”', 540, 290);
-
-      if (paintingImg && paintingImg.width && paintingImg.height) {
-        const maxW = 740;
-        const maxH = 840;
-        const scale = Math.min(maxW / paintingImg.width, maxH / paintingImg.height);
-        const drawW = Math.round(paintingImg.width * scale);
-        const drawH = Math.round(paintingImg.height * scale);
-        const drawX = Math.round((1080 - drawW) / 2);
-        const drawY = Math.round(350 + (maxH - drawH) / 2);
-
-        offCtx.fillStyle = 'rgba(20, 4, 4, 0.45)';
-        offCtx.fillRect(drawX - 18, drawY - 18, drawW + 36, drawH + 36);
-        offCtx.strokeStyle = token('--color-gold-light') || '#ffd56b';
-        offCtx.lineWidth = 6;
-        offCtx.strokeRect(drawX - 14, drawY - 14, drawW + 28, drawH + 28);
-        offCtx.drawImage(paintingImg, drawX, drawY, drawW, drawH);
+        const file = new File([currentBlessingBlob], currentBlessingFileName, { type: 'image/png' });
+        if (!navigator.canShare || navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            files: [file],
+            title: 'Lộc Đỏ Kim Hoàng - ' + (currentBlessingItem ? currentBlessingItem.name : ''),
+          });
+          return;
+        }
+      } catch (err) {
+        if (err.name === 'AbortError') return;
       }
+    }
+    const blobUrl = URL.createObjectURL(currentBlessingBlob);
+    const link = document.createElement('a');
+    link.download = currentBlessingFileName;
+    link.href = blobUrl;
+    document.body.appendChild(link);
+    link.click();
+    setTimeout(() => {
+      link.remove();
+      URL.revokeObjectURL(blobUrl);
+    }, 1200);
+  }
 
-      offCtx.fillStyle = token('--color-gold-light') || '#ffd56b';
-      offCtx.font = 'bold 48px "DFVN Bropella", "Asap", serif';
-      offCtx.fillText(item.title, 540, 1340);
+  function closeBlessingModal() {
+    if (!blessingModal) return;
+    blessingModal.classList.remove('is-active');
+    blessingModal.setAttribute('aria-hidden', 'true');
+  }
 
-      offCtx.fillStyle = token('--color-gold') || '#d4a23a';
-      offCtx.font = 'italic 34px "Asap", sans-serif';
-      offCtx.fillText(`Tranh dân gian Kim Hoàng: ${item.name}`, 540, 1410);
+  async function triggerBlessingWorkflow() {
+    if (downloadBtn) {
+      downloadBtn.style.pointerEvents = 'none';
+      downloadBtn.style.opacity = '0.7';
+    }
+    try {
+      const { dataUrl } = await generateBlessingCard();
+      if (blessingModal && blessingModalImg) {
+        blessingModalImg.src = dataUrl;
+        blessingModal.classList.add('is-active');
+        blessingModal.setAttribute('aria-hidden', 'false');
+      }
+      const isMobile = /Android|iPhone|iPad|iPod|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || ('ontouchstart' in window);
+      if (isMobile && navigator.share && currentBlessingBlob) {
+        try {
+          const file = new File([currentBlessingBlob], currentBlessingFileName, { type: 'image/png' });
+          if (!navigator.canShare || navigator.canShare({ files: [file] })) {
+            await navigator.share({
+              files: [file],
+              title: 'Lộc Đỏ Kim Hoàng - ' + (currentBlessingItem ? currentBlessingItem.name : ''),
+            });
+          }
+        } catch (e) {}
+      } else if (!isMobile) {
+        saveOrShareBlessing();
+      }
+    } catch (e) {
+      showToast(getSiteLang() === 'en' ? 'Could not generate blessing. Please try again.' : 'Chưa thỉnh được lộc, vui lòng thử lại.');
+    } finally {
+      if (downloadBtn) {
+        downloadBtn.style.pointerEvents = '';
+        downloadBtn.style.opacity = '';
+      }
+    }
+  }
 
-      offCtx.fillStyle = token('--color-paper-warm') || '#f8e6c1';
-      offCtx.font = '38px "Asap", sans-serif';
-      offCtx.fillText(item.line1, 540, 1515);
-      offCtx.fillText(item.line2, 540, 1585);
-
-      offCtx.fillStyle = token('--color-gold-light') || '#ffd56b';
-      offCtx.font = '30px "Asap", sans-serif';
-      offCtx.fillText('Tranh sắc đỏ Kim Hoàng', 540, 1730);
-
-      const link = document.createElement('a');
-      link.download = `Loc-Do-Kim-Hoang-${item.src.split('/').pop().replace('.jpeg', '')}.png`;
-      link.href = offscreenCanvas.toDataURL('image/png');
-      link.click();
+  if (downloadBtn) downloadBtn.addEventListener('click', triggerBlessingWorkflow);
+  if (blessingModalSaveBtn) blessingModalSaveBtn.addEventListener('click', saveOrShareBlessing);
+  if (blessingModalRerollBtn) blessingModalRerollBtn.addEventListener('click', triggerBlessingWorkflow);
+  if (blessingModalClose) blessingModalClose.addEventListener('click', closeBlessingModal);
+  if (blessingModal) {
+    blessingModal.addEventListener('click', (e) => {
+      if (e.target === blessingModal) closeBlessingModal();
     });
   }
 });
