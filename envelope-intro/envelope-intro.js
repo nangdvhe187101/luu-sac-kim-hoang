@@ -15,7 +15,7 @@
       '<p class="ei-pretitle">Thiệp Mời Trực Tuyến • Tranh Dân Gian Việt Nam</p>'+
       '<div class="ei-env">'+
        '<div class="ei-liner"></div>'+
-       '<div class="ei-card"><p><small>Thiệp mời · Invitation</small><b>Tranh dân gian Việt Nam</b></p><img src="'+A+'invitation-logo.jpg" alt="Lưu Sắc Kim Hoàng"></div>'+
+       '<div class="ei-card"><p><b>Hành Trình Sắc Đỏ</b></p><img src="'+A+'invitation-logo.jpg" alt="Lưu Sắc Kim Hoàng"></div>'+
        '<img class="ei-body" src="'+A+'envelope-body.webp" alt="" draggable="false">'+
        '<div class="ei-flap"><div class="ei-face"><img src="'+A+'envelope-flap.webp" alt="" draggable="false"></div><div class="ei-face ei-k"></div></div>'+
        '<button class="ei-seal" type="button" aria-label="Mở thiệp / Open invitation"><img src="'+A+'envelope-seal.webp" alt="Dấu triện Lưu Sắc Kim Hoàng" draggable="false"></button>'+
