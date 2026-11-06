@@ -518,7 +518,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  function startNarrationAt(trackIndex, forceFollow = true) {
+  function startNarrationAt(trackIndex, forceFollow = true, jumpImmediate = true) {
     if (trackIndex < 0 || trackIndex >= narrationTracks.length) return;
     currentTrackIdx = trackIndex;
     const track = narrationTracks[currentTrackIdx];
@@ -526,9 +526,16 @@ document.addEventListener('DOMContentLoaded', () => {
     if (forceFollow) {
       autoFollowEnabled = true;
       userScrollPauseUntil = 0;
-      jumpToSegmentStart(currentTrackIdx);
+      if (jumpImmediate) {
+        jumpToSegmentStart(currentTrackIdx);
+      } else {
+        autoScrollY = window.scrollY;
+        lastFrameTs = performance.now();
+      }
     } else if (autoFollowEnabled && !isUserInteractingWithForm() && !isOutsideActiveSegment()) {
-      jumpToSegmentStart(currentTrackIdx);
+      if (jumpImmediate) {
+        jumpToSegmentStart(currentTrackIdx);
+      }
     }
 
     const wantedSrc = new URL(track.src, window.location.href).href;
@@ -641,6 +648,7 @@ document.addEventListener('DOMContentLoaded', () => {
     dockPlayBtn.addEventListener('click', toggleNarration);
   }
 
+  const SILENT_WAV = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
   let audioPrimed = false;
   let invitationHandled = false;
 
@@ -648,22 +656,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if (audioPrimed) return;
     audioPrimed = true;
     playChimeSound();
-    const firstTrack = narrationTracks[0];
-    if (firstTrack) {
-      narrationAudio.src = firstTrack.src;
-      narrationAudio.muted = true;
-      narrationAudio.play().then(() => {
-        narrationAudio.pause();
-        narrationAudio.currentTime = 0;
-        narrationAudio.muted = false;
-      }).catch(() => {
-        narrationAudio.muted = false;
-      });
-    }
+    narrationAudio.src = SILENT_WAV;
+    narrationAudio.play().then(() => {
+      narrationAudio.pause();
+    }).catch(() => {});
   }
 
   document.addEventListener('click', (e) => {
-    if (e.target.closest('.ei-seal, .ei-skip')) {
+    if (e.target.closest('.ei-seal')) {
       primeNarrationOnGesture();
     }
   }, true);
@@ -672,8 +672,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (invitationHandled) return;
     invitationHandled = true;
     document.body.classList.remove('cover-locked');
-    window.scrollTo({ top: 0, behavior: 'instant' });
-    startNarrationAt(0, true);
+    startNarrationAt(0, true, false);
   }
 
   window.onInvitationOpened = handleInvitationOpened;

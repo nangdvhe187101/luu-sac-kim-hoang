@@ -29,11 +29,21 @@
     function enter(){
       if(state==='gone')return;state='gone';
       try{if(once)sessionStorage.setItem(KEY,'1');}catch(e){}
-      root.classList.add('ei-leave');
+      de.style.overflow=prev;
+      document.body.classList.remove('cover-locked');
       window.scrollTo(0,0);
-      setTimeout(function(){root.remove();de.style.overflow=prev;
-        try{window.dispatchEvent(new CustomEvent('invitation:opened'));}catch(e){}
-        if(typeof window.onInvitationOpened==='function')window.onInvitationOpened();},reduce?50:1100);
+      requestAnimationFrame(function(){
+        requestAnimationFrame(function(){
+          root.classList.add('ei-leave');
+          setTimeout(function(){
+            root.remove();
+            setTimeout(function(){
+              try{window.dispatchEvent(new CustomEvent('invitation:opened'));}catch(e){}
+              if(typeof window.onInvitationOpened==='function')window.onInvitationOpened();
+            },180);
+          },reduce?40:780);
+        });
+      });
     }
     function burst(){
       var s=seal.getBoundingClientRect(),e=env.getBoundingClientRect();
