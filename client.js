@@ -982,10 +982,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const data = await res.json().catch(() => null);
       const list = Array.isArray(data) ? data : (data && Array.isArray(data.wishes) ? data.wishes : []);
       wishesWall.innerHTML = '';
-      list.forEach((w) => {
-        if (w && w.name && w.wish) {
-          appendWishToWall(w.name, w.wish, false);
-        }
+      const valid = list.filter((w) => w && w.name && w.wish).slice(0, 5);
+      valid.forEach((w) => {
+        appendWishToWall(w.name, w.wish, false);
       });
     } catch (e) {}
   }
@@ -1004,6 +1003,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (isNew) {
       wishesWall.prepend(wishEl);
+      while (wishesWall.children.length > 5) {
+        wishesWall.lastElementChild.remove();
+      }
     } else {
       wishesWall.appendChild(wishEl);
     }
@@ -1266,7 +1268,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       offCtx.fillStyle = token('--color-gold-light') || '#ffd56b';
       offCtx.font = '30px "Asap", sans-serif';
-      offCtx.fillText('Tranh Đỏ Thăng Long Ngàn Năm', 540, 1730);
+      offCtx.fillText('Tranh sắc đỏ Kim Hoàng', 540, 1730);
 
       const link = document.createElement('a');
       link.download = `Loc-Do-Kim-Hoang-${item.src.split('/').pop().replace('.jpeg', '')}.png`;
