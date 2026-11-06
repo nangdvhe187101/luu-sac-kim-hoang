@@ -1939,8 +1939,10 @@ html[data-site-lang="en"] .lang-opt--en {
   border: none;
   padding: 0;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 0.75rem;
   z-index: 150;
   transition: opacity 0.3s ease, transform 0.3s ease;
 }
@@ -1957,7 +1959,7 @@ html[data-site-lang="en"] .lang-opt--en {
   justify-content: center;
   cursor: pointer;
   outline: none;
-  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease, opacity 0.25s ease;
   box-shadow: 0 8px 24px rgba(var(--bg-deep-rgb), 0.75), 0 0 16px rgba(var(--gold-rgb), 0.35);
 }
 
@@ -1969,7 +1971,8 @@ html[data-site-lang="en"] .lang-opt--en {
   outline: none;
 }
 
-.narration-dock.is-speaking .dock-play-btn {
+.narration-dock.is-speaking #dock-play-btn,
+.narration-dock.is-bgm-playing #dock-bgm-btn {
   animation: pulseGlow 2.4s infinite ease-in-out;
 }
 

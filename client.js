@@ -282,8 +282,45 @@ document.addEventListener('DOMContentLoaded', () => {
   const narrationSegments = Array.from(document.querySelectorAll('.narration-segment'));
   const narrationDock = document.getElementById('narration-dock');
   const dockPlayBtn = document.getElementById('dock-play-btn');
+  const dockBgmBtn = document.getElementById('dock-bgm-btn');
   const dockStatus = document.getElementById('dock-status');
   const dockSpeedBtn = document.getElementById('dock-speed-btn');
+
+  const BGM_VOL_NORMAL = 0.38;
+  const BGM_VOL_DUCKED = 0.12;
+  const bgmAudio = new Audio('assets/audio/nhac-nen.m4a');
+  bgmAudio.loop = true;
+  bgmAudio.preload = 'auto';
+  bgmAudio.volume = BGM_VOL_NORMAL;
+  let bgmUserMuted = false;
+  let bgmFadeRaf = null;
+
+  function fadeBgmVolume(targetVol, durationMs = 450) {
+    if (bgmFadeRaf) cancelAnimationFrame(bgmFadeRaf);
+    const startVol = bgmAudio.volume;
+    const diff = targetVol - startVol;
+    if (Math.abs(diff) < 0.005 || durationMs <= 0) {
+      bgmAudio.volume = Math.max(0, Math.min(1, targetVol));
+      return;
+    }
+    const startTime = performance.now();
+    function step(now) {
+      const t = Math.min(1, (now - startTime) / durationMs);
+      const eased = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+      bgmAudio.volume = Math.max(0, Math.min(1, startVol + diff * eased));
+      if (t < 1) {
+        bgmFadeRaf = requestAnimationFrame(step);
+      } else {
+        bgmFadeRaf = null;
+      }
+    }
+    bgmFadeRaf = requestAnimationFrame(step);
+  }
+
+  function syncBgmDucking() {
+    const isSpeaking = !narrationAudio.paused && !narrationAudio.ended;
+    fadeBgmVolume(isSpeaking ? BGM_VOL_DUCKED : BGM_VOL_NORMAL, 480);
+  }
 
   const narrationTracks = [
     {
@@ -412,17 +449,25 @@ document.addEventListener('DOMContentLoaded', () => {
   function updateDockUI() {
     const track = narrationTracks[currentTrackIdx] || narrationTracks[0];
     const isPlaying = !narrationAudio.paused && !narrationAudio.ended;
+    const isBgmPlaying = !bgmAudio.paused && !bgmAudio.ended && !bgmUserMuted;
     const isEn = document.documentElement.getAttribute('data-site-lang') === 'en';
     if (dockStatus && track) {
       dockStatus.textContent = isEn ? track.labelEn : track.labelVi;
     }
     if (narrationDock) {
       narrationDock.classList.toggle('is-speaking', isPlaying);
+      narrationDock.classList.toggle('is-bgm-playing', isBgmPlaying);
     }
     if (dockPlayBtn) {
       dockPlayBtn.innerHTML = `<i data-lucide="${isPlaying ? 'volume-2' : 'volume-x'}"></i>`;
       if (window.lucide) {
         window.lucide.createIcons({ attrs: {}, nameAttr: 'data-lucide', root: dockPlayBtn });
+      }
+    }
+    if (dockBgmBtn) {
+      dockBgmBtn.innerHTML = `<i data-lucide="${isBgmPlaying ? 'music' : 'music-off'}"></i>`;
+      if (window.lucide) {
+        window.lucide.createIcons({ attrs: {}, nameAttr: 'data-lucide', root: dockBgmBtn });
       }
     }
   }
@@ -584,6 +629,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   narrationAudio.addEventListener('play', () => {
     applyPlaybackSpeed();
+    syncBgmDucking();
     updateDockUI();
     if (!autoScrollRaf) {
       autoScrollRaf = requestAnimationFrame(stepAutoScroll);
@@ -591,6 +637,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   narrationAudio.addEventListener('pause', () => {
+    syncBgmDucking();
     updateDockUI();
   });
 
@@ -598,9 +645,25 @@ document.addEventListener('DOMContentLoaded', () => {
     if (currentTrackIdx + 1 < narrationTracks.length) {
       startNarrationAt(currentTrackIdx + 1, false);
     } else {
+      syncBgmDucking();
       updateDockUI();
     }
   });
+
+  bgmAudio.addEventListener('play', updateDockUI);
+  bgmAudio.addEventListener('pause', updateDockUI);
+
+  function toggleBgm() {
+    if (bgmAudio.paused || bgmUserMuted) {
+      bgmUserMuted = false;
+      syncBgmDucking();
+      bgmAudio.play().then(updateDockUI).catch(updateDockUI);
+    } else {
+      bgmUserMuted = true;
+      bgmAudio.pause();
+      updateDockUI();
+    }
+  }
 
   const handleManualUserScroll = () => {
     if (isAutoScrollStep) return;
@@ -647,6 +710,9 @@ document.addEventListener('DOMContentLoaded', () => {
   if (dockPlayBtn) {
     dockPlayBtn.addEventListener('click', toggleNarration);
   }
+  if (dockBgmBtn) {
+    dockBgmBtn.addEventListener('click', toggleBgm);
+  }
 
   const SILENT_WAV = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
   let audioPrimed = false;
@@ -656,6 +722,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (audioPrimed) return;
     audioPrimed = true;
     playChimeSound();
+    if (!bgmUserMuted) {
+      bgmAudio.volume = BGM_VOL_NORMAL;
+      bgmAudio.play().then(updateDockUI).catch(() => {});
+    }
     narrationAudio.src = SILENT_WAV;
     narrationAudio.play().then(() => {
       narrationAudio.pause();
@@ -672,6 +742,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (invitationHandled) return;
     invitationHandled = true;
     document.body.classList.remove('cover-locked');
+    if (!bgmUserMuted && bgmAudio.paused) {
+      bgmAudio.play().then(updateDockUI).catch(() => {});
+    }
     startNarrationAt(0, true, false);
   }
 
