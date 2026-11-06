@@ -362,7 +362,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let lastFrameTs = 0;
 
   const narrationAudio = new Audio();
-  narrationAudio.preload = 'auto';
+  narrationAudio.preload = 'metadata';
 
   function isUserInteractingWithForm() {
     const active = document.activeElement;
