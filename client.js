@@ -952,7 +952,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.key === 'Escape') {
       closeLightbox();
       if (letterModal && letterModal.classList.contains('is-visible')) closeLetter();
-      if (blessingModal && blessingModal.classList.contains('is-active')) closeBlessingModal();
     } else if (lightboxOpen && e.key === 'ArrowLeft') {
       showLightboxAt(lightboxIndex - 1);
     } else if (lightboxOpen && e.key === 'ArrowRight') {
@@ -1178,15 +1177,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let lastBlessingIdx = -1;
   const downloadBtn = document.getElementById('download-blessing-btn');
-  const blessingModal = document.getElementById('blessing-modal');
-  const blessingModalImg = document.getElementById('blessing-modal-img');
-  const blessingModalClose = document.getElementById('blessing-modal-close');
-  const blessingModalSaveBtn = document.getElementById('blessing-modal-save-btn');
-  const blessingModalRerollBtn = document.getElementById('blessing-modal-reroll-btn');
-
-  let currentBlessingBlob = null;
-  let currentBlessingFileName = '';
-  let currentBlessingItem = null;
 
   async function generateBlessingCard() {
     let idx = Math.floor(Math.random() * blessingPaintings.length);
@@ -1195,7 +1185,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     lastBlessingIdx = idx;
     const item = blessingPaintings[idx];
-    currentBlessingItem = item;
 
     try {
       await Promise.all([
@@ -1281,93 +1270,62 @@ document.addEventListener('DOMContentLoaded', () => {
     offCtx.font = '30px "Asap", sans-serif';
     offCtx.fillText('Tranh sắc đỏ Kim Hoàng', 540, 1730);
 
-    currentBlessingFileName = `Loc-Do-Kim-Hoang-${item.src.split('/').pop().replace('.jpeg', '')}.png`;
+    const fileName = `Loc-Do-Kim-Hoang-${item.src.split('/').pop().replace('.jpeg', '')}.png`;
 
     return new Promise((resolve) => {
       offscreenCanvas.toBlob((blob) => {
-        currentBlessingBlob = blob;
-        resolve({ blob, dataUrl: offscreenCanvas.toDataURL('image/png') });
+        resolve({ blob, fileName, item });
       }, 'image/png');
     });
   }
 
-  async function saveOrShareBlessing() {
-    if (!currentBlessingBlob) return;
-    if (navigator.share) {
-      try {
-        const file = new File([currentBlessingBlob], currentBlessingFileName, { type: 'image/png' });
-        if (!navigator.canShare || navigator.canShare({ files: [file] })) {
-          await navigator.share({
-            files: [file],
-            title: 'Lộc Đỏ Kim Hoàng - ' + (currentBlessingItem ? currentBlessingItem.name : ''),
-          });
-          return;
-        }
-      } catch (err) {
-        if (err.name === 'AbortError') return;
-      }
-    }
-    const blobUrl = URL.createObjectURL(currentBlessingBlob);
-    const link = document.createElement('a');
-    link.download = currentBlessingFileName;
-    link.href = blobUrl;
-    document.body.appendChild(link);
-    link.click();
-    setTimeout(() => {
-      link.remove();
-      URL.revokeObjectURL(blobUrl);
-    }, 1200);
-  }
-
-  function closeBlessingModal() {
-    if (!blessingModal) return;
-    blessingModal.classList.remove('is-active');
-    blessingModal.setAttribute('aria-hidden', 'true');
-  }
-
   async function triggerBlessingWorkflow() {
-    if (downloadBtn) {
-      downloadBtn.style.pointerEvents = 'none';
-      downloadBtn.style.opacity = '0.7';
-    }
+    if (!downloadBtn) return;
+    downloadBtn.disabled = true;
+    downloadBtn.style.pointerEvents = 'none';
+    downloadBtn.style.opacity = '0.7';
+
     try {
-      const { dataUrl } = await generateBlessingCard();
-      if (blessingModal && blessingModalImg) {
-        blessingModalImg.src = dataUrl;
-        blessingModal.classList.add('is-active');
-        blessingModal.setAttribute('aria-hidden', 'false');
-      }
+      const { blob, fileName, item } = await generateBlessingCard();
       const isMobile = /Android|iPhone|iPad|iPod|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || ('ontouchstart' in window);
-      if (isMobile && navigator.share && currentBlessingBlob) {
+
+      if (isMobile && navigator.share) {
         try {
-          const file = new File([currentBlessingBlob], currentBlessingFileName, { type: 'image/png' });
+          const file = new File([blob], fileName, { type: 'image/png' });
           if (!navigator.canShare || navigator.canShare({ files: [file] })) {
             await navigator.share({
               files: [file],
-              title: 'Lộc Đỏ Kim Hoàng - ' + (currentBlessingItem ? currentBlessingItem.name : ''),
+              title: 'Lộc Đỏ Kim Hoàng - ' + item.name,
             });
+            showToast(getSiteLang() === 'en' ? 'Downloaded Kim Hoang Red Blessing!' : 'Đã nhận Lộc Đỏ Kim Hoàng thành công!');
+            return;
           }
-        } catch (e) {}
-      } else if (!isMobile) {
-        saveOrShareBlessing();
+        } catch (e) {
+          if (e.name === 'AbortError') return;
+        }
       }
+
+      const blobUrl = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.download = fileName;
+      link.href = blobUrl;
+      link.target = '_blank';
+      document.body.appendChild(link);
+      link.click();
+      setTimeout(() => {
+        link.remove();
+        URL.revokeObjectURL(blobUrl);
+      }, 3000);
+
+      showToast(getSiteLang() === 'en' ? 'Downloaded Kim Hoang Red Blessing!' : 'Đã tải Lộc Đỏ Kim Hoàng về máy!');
     } catch (e) {
-      showToast(getSiteLang() === 'en' ? 'Could not generate blessing. Please try again.' : 'Chưa thỉnh được lộc, vui lòng thử lại.');
+      showToast(getSiteLang() === 'en' ? 'Could not download blessing. Please try again.' : 'Chưa tải được lộc đỏ, vui lòng thử lại.');
     } finally {
-      if (downloadBtn) {
-        downloadBtn.style.pointerEvents = '';
-        downloadBtn.style.opacity = '';
-      }
+      downloadBtn.disabled = false;
+      downloadBtn.style.pointerEvents = '';
+      downloadBtn.style.opacity = '';
     }
   }
 
   if (downloadBtn) downloadBtn.addEventListener('click', triggerBlessingWorkflow);
-  if (blessingModalSaveBtn) blessingModalSaveBtn.addEventListener('click', saveOrShareBlessing);
-  if (blessingModalRerollBtn) blessingModalRerollBtn.addEventListener('click', triggerBlessingWorkflow);
-  if (blessingModalClose) blessingModalClose.addEventListener('click', closeBlessingModal);
-  if (blessingModal) {
-    blessingModal.addEventListener('click', (e) => {
-      if (e.target === blessingModal) closeBlessingModal();
-    });
-  }
 });
