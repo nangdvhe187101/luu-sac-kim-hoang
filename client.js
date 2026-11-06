@@ -286,40 +286,22 @@ document.addEventListener('DOMContentLoaded', () => {
   const dockStatus = document.getElementById('dock-status');
   const dockSpeedBtn = document.getElementById('dock-speed-btn');
 
-  const BGM_VOL_NORMAL = 0.38;
-  const BGM_VOL_DUCKED = 0.12;
-  const bgmAudio = new Audio('assets/audio/nhac-nen.m4a');
+  const BGM_VOL_NORMAL = 0.24;
+  const BGM_VOL_DUCKED = 0.24;
+  const bgmAudio = new Audio('assets/audio/nhac-nen.m4a?v=2');
   bgmAudio.loop = true;
   bgmAudio.preload = 'auto';
   bgmAudio.volume = BGM_VOL_NORMAL;
   let bgmUserMuted = false;
   let bgmFadeRaf = null;
 
-  function fadeBgmVolume(targetVol, durationMs = 450) {
+  function fadeBgmVolume(targetVol) {
     if (bgmFadeRaf) cancelAnimationFrame(bgmFadeRaf);
-    const startVol = bgmAudio.volume;
-    const diff = targetVol - startVol;
-    if (Math.abs(diff) < 0.005 || durationMs <= 0) {
-      bgmAudio.volume = Math.max(0, Math.min(1, targetVol));
-      return;
-    }
-    const startTime = performance.now();
-    function step(now) {
-      const t = Math.min(1, (now - startTime) / durationMs);
-      const eased = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
-      bgmAudio.volume = Math.max(0, Math.min(1, startVol + diff * eased));
-      if (t < 1) {
-        bgmFadeRaf = requestAnimationFrame(step);
-      } else {
-        bgmFadeRaf = null;
-      }
-    }
-    bgmFadeRaf = requestAnimationFrame(step);
+    bgmAudio.volume = Math.max(0, Math.min(1, targetVol));
   }
 
   function syncBgmDucking() {
-    const isSpeaking = !narrationAudio.paused && !narrationAudio.ended;
-    fadeBgmVolume(isSpeaking ? BGM_VOL_DUCKED : BGM_VOL_NORMAL, 480);
+    bgmAudio.volume = BGM_VOL_DUCKED;
   }
 
   const narrationTracks = [
