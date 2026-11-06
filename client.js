@@ -964,7 +964,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const guestEmailInput = document.getElementById('guest-email');
   const guestWishInput = document.getElementById('guest-wish');
   const wishesWall = document.getElementById('wishes-wall');
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxEBqRF5o1O50-HCIZUE6YuHrw6rCO5o-R7id8-Lf7HOpZW2AAqO9jfb_98q34yWE1ocg/exec';
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzozjBIlShGF93PzOQT12MzwF2GOMXAZ7L2sWMTQJo2JggcRtR1myYlBgducdV5qonGOA/exec';
   const SCRIPT_TOKEN = 'aB3k9XmQ7vP1wZ5rN8tY2uL4';
 
   try {
