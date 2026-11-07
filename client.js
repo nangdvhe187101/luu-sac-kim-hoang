@@ -286,9 +286,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const dockStatus = document.getElementById('dock-status');
   const dockSpeedBtn = document.getElementById('dock-speed-btn');
 
-  const BGM_VOL_NORMAL = 0.16;
-  const BGM_VOL_DUCKED = 0.16;
-  const bgmAudio = new Audio('assets/audio/nhac-nen.m4a?v=3');
+  const BGM_VOL_NORMAL = 0.20;
+  const BGM_VOL_DUCKED = 0.20;
+  const bgmAudio = new Audio('assets/audio/nhac-nen.m4a?v=4');
   bgmAudio.loop = true;
   bgmAudio.preload = 'auto';
   bgmAudio.volume = BGM_VOL_NORMAL;
