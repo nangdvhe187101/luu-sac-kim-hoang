@@ -474,7 +474,9 @@ document.addEventListener('DOMContentLoaded', () => {
     return startY + (endY - startY) * progress;
   }
 
-  function jumpToSegmentStart(trackIndex) {
+  let narrationStarted = false;
+
+  function jumpToSegmentStart(trackIndex, smooth = false) {
     const seg = narrationSegments[trackIndex];
     if (!seg) return;
     const rect = seg.getBoundingClientRect();
@@ -483,7 +485,7 @@ document.addEventListener('DOMContentLoaded', () => {
     autoScrollY = startY;
     lastFrameTs = performance.now();
     isAutoScrollStep = true;
-    window.scrollTo({ top: startY, behavior: 'instant' });
+    window.scrollTo({ top: startY, behavior: smooth ? 'smooth' : 'instant' });
     isAutoScrollStep = false;
   }
 
@@ -547,22 +549,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function startNarrationAt(trackIndex, forceFollow = true, jumpImmediate = true) {
     if (trackIndex < 0 || trackIndex >= narrationTracks.length) return;
+    narrationStarted = true;
     currentTrackIdx = trackIndex;
     const track = narrationTracks[currentTrackIdx];
     updateActiveChapterVisual(track.chapterIndex);
     if (forceFollow) {
       autoFollowEnabled = true;
       userScrollPauseUntil = 0;
-      if (jumpImmediate) {
-        jumpToSegmentStart(currentTrackIdx);
-      } else {
-        autoScrollY = window.scrollY;
-        lastFrameTs = performance.now();
-      }
+      jumpToSegmentStart(currentTrackIdx, !jumpImmediate);
     } else if (autoFollowEnabled && !isUserInteractingWithForm() && !isOutsideActiveSegment()) {
-      if (jumpImmediate) {
-        jumpToSegmentStart(currentTrackIdx);
-      }
+      jumpToSegmentStart(currentTrackIdx, !jumpImmediate);
     }
 
     const wantedSrc = new URL(track.src, window.location.href).href;
@@ -586,15 +582,16 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function toggleNarration() {
-    if (!narrationAudio.src) {
-      startNarrationAt(currentTrackIdx, true);
+    if (!narrationStarted || !narrationAudio.src || narrationAudio.src.startsWith('data:')) {
+      startNarrationAt(0, true, false);
       return;
     }
     if (narrationAudio.paused) {
       userScrollPauseUntil = 0;
-      if (!isUserInteractingWithForm() && !isOutsideActiveSegment()) {
+      if (!isUserInteractingWithForm()) {
         autoFollowEnabled = true;
       }
+      jumpToSegmentStart(currentTrackIdx, true);
       applyPlaybackSpeed();
       narrationAudio.play().then(() => {
         applyPlaybackSpeed();
@@ -727,7 +724,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!bgmUserMuted && bgmAudio.paused) {
       bgmAudio.play().then(updateDockUI).catch(() => {});
     }
-    startNarrationAt(0, true, false);
+    updateDockUI();
   }
 
   window.onInvitationOpened = handleInvitationOpened;
