@@ -532,15 +532,25 @@ document.addEventListener('DOMContentLoaded', () => {
           isAutoScrollStep = false;
         }
       } else if (slowAutoScrollActive) {
-        const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
-        if (autoScrollY >= maxScroll - 5) {
+        const ch7 = document.getElementById('chapter-7');
+        let maxScroll;
+        if (ch7) {
+          const ch7Rect = ch7.getBoundingClientRect();
+          maxScroll = Math.max(0, ch7Rect.bottom + window.scrollY - window.innerHeight + 30);
+        } else {
+          maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+        }
+        if (autoScrollY >= maxScroll - 2) {
           slowAutoScrollActive = false;
         } else {
           if (Math.abs(window.scrollY - autoScrollY) > 60) {
             autoScrollY = window.scrollY;
           }
           autoScrollY += dt * 0.038;
-          if (autoScrollY > maxScroll) autoScrollY = maxScroll;
+          if (autoScrollY >= maxScroll) {
+            autoScrollY = maxScroll;
+            slowAutoScrollActive = false;
+          }
           isAutoScrollStep = true;
           window.scrollTo({ top: autoScrollY, behavior: 'instant' });
           isAutoScrollStep = false;
@@ -688,7 +698,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
     } else {
-      if (!isUserInteractingWithForm()) {
+      const ch7 = document.getElementById('chapter-7');
+      if (ch7) {
+        const ch7Rect = ch7.getBoundingClientRect();
+        const maxScroll = ch7Rect.bottom + window.scrollY - window.innerHeight + 30;
+        if (window.scrollY >= maxScroll) {
+          slowAutoScrollActive = false;
+        }
+      }
+      if (!isUserInteractingWithForm() && slowAutoScrollActive) {
         autoFollowEnabled = true;
       }
     }
