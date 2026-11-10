@@ -475,6 +475,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   let narrationStarted = false;
+  let slowAutoScrollActive = false;
 
   function jumpToSegmentStart(trackIndex, smooth = false) {
     const seg = narrationSegments[trackIndex];
@@ -490,10 +491,16 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function stepAutoScroll(ts) {
-    if (narrationAudio.paused || narrationAudio.ended || document.hidden) {
+    if (document.hidden) {
       autoScrollRaf = null;
       return;
     }
+    const isNarrationPlaying = !narrationAudio.paused && !narrationAudio.ended && narrationAudio.duration > 0;
+    if (!isNarrationPlaying && !slowAutoScrollActive) {
+      autoScrollRaf = null;
+      return;
+    }
+
     const now = typeof ts === 'number' ? ts : performance.now();
     const dt = lastFrameTs > 0 ? Math.min(64, Math.max(1, now - lastFrameTs)) : 16.67;
     lastFrameTs = now;
@@ -510,18 +517,34 @@ document.addEventListener('DOMContentLoaded', () => {
       isUserInteractingWithForm() ||
       now <= userScrollPauseUntil;
 
-    if (!suspended && narrationAudio.duration > 0) {
-      const targetY = computeSegmentTargetY(currentTrackIdx);
-      if (Math.abs(window.scrollY - autoScrollY) > 60) {
-        autoScrollY = window.scrollY;
-      }
-      const diff = targetY - autoScrollY;
-      if (Math.abs(diff) > 0.4) {
-        const alpha = 1 - Math.exp(-dt / 140);
-        autoScrollY += diff * alpha;
-        isAutoScrollStep = true;
-        window.scrollTo({ top: autoScrollY, behavior: 'instant' });
-        isAutoScrollStep = false;
+    if (!suspended) {
+      if (isNarrationPlaying) {
+        const targetY = computeSegmentTargetY(currentTrackIdx);
+        if (Math.abs(window.scrollY - autoScrollY) > 60) {
+          autoScrollY = window.scrollY;
+        }
+        const diff = targetY - autoScrollY;
+        if (Math.abs(diff) > 0.4) {
+          const alpha = 1 - Math.exp(-dt / 140);
+          autoScrollY += diff * alpha;
+          isAutoScrollStep = true;
+          window.scrollTo({ top: autoScrollY, behavior: 'instant' });
+          isAutoScrollStep = false;
+        }
+      } else if (slowAutoScrollActive) {
+        const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+        if (autoScrollY >= maxScroll - 5) {
+          slowAutoScrollActive = false;
+        } else {
+          if (Math.abs(window.scrollY - autoScrollY) > 60) {
+            autoScrollY = window.scrollY;
+          }
+          autoScrollY += dt * 0.038;
+          if (autoScrollY > maxScroll) autoScrollY = maxScroll;
+          isAutoScrollStep = true;
+          window.scrollTo({ top: autoScrollY, behavior: 'instant' });
+          isAutoScrollStep = false;
+        }
       }
     } else {
       autoScrollY = window.scrollY;
@@ -530,9 +553,10 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   document.addEventListener('visibilitychange', () => {
-    if (!document.hidden && !narrationAudio.paused && !narrationAudio.ended) {
+    const isNarrationPlaying = !narrationAudio.paused && !narrationAudio.ended && narrationAudio.duration > 0;
+    if (!document.hidden && (isNarrationPlaying || slowAutoScrollActive)) {
       lastFrameTs = performance.now();
-      if (autoFollowEnabled && !isUserInteractingWithForm() && !isOutsideActiveSegment()) {
+      if (isNarrationPlaying && autoFollowEnabled && !isUserInteractingWithForm() && !isOutsideActiveSegment()) {
         const targetY = computeSegmentTargetY(currentTrackIdx);
         autoScrollY = targetY;
         isAutoScrollStep = true;
@@ -550,6 +574,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function startNarrationAt(trackIndex, forceFollow = true, jumpImmediate = true) {
     if (trackIndex < 0 || trackIndex >= narrationTracks.length) return;
     narrationStarted = true;
+    slowAutoScrollActive = false;
     currentTrackIdx = trackIndex;
     const track = narrationTracks[currentTrackIdx];
     updateActiveChapterVisual(track.chapterIndex);
@@ -583,11 +608,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function toggleNarration() {
     if (!narrationStarted || !narrationAudio.src || narrationAudio.src.startsWith('data:')) {
+      slowAutoScrollActive = false;
       startNarrationAt(0, true, false);
       return;
     }
     if (narrationAudio.paused) {
       userScrollPauseUntil = 0;
+      slowAutoScrollActive = false;
       if (!isUserInteractingWithForm()) {
         autoFollowEnabled = true;
       }
@@ -602,6 +629,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }).catch(() => {});
     } else {
       narrationAudio.pause();
+      slowAutoScrollActive = false;
       updateDockUI();
     }
   }
@@ -648,13 +676,19 @@ document.addEventListener('DOMContentLoaded', () => {
     if (isAutoScrollStep) return;
     userScrollPauseUntil = performance.now() + 4500;
     autoScrollY = window.scrollY;
-    if (isOutsideActiveSegment()) {
-      autoFollowEnabled = false;
-    } else {
-      const targetY = computeSegmentTargetY(currentTrackIdx);
-      if (Math.abs(window.scrollY - targetY) > window.innerHeight * 0.5) {
+    if (narrationStarted && !narrationAudio.paused) {
+      if (isOutsideActiveSegment()) {
         autoFollowEnabled = false;
-      } else if (!isUserInteractingWithForm()) {
+      } else {
+        const targetY = computeSegmentTargetY(currentTrackIdx);
+        if (Math.abs(window.scrollY - targetY) > window.innerHeight * 0.5) {
+          autoFollowEnabled = false;
+        } else if (!isUserInteractingWithForm()) {
+          autoFollowEnabled = true;
+        }
+      }
+    } else {
+      if (!isUserInteractingWithForm()) {
         autoFollowEnabled = true;
       }
     }
@@ -724,6 +758,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!bgmUserMuted && bgmAudio.paused) {
       bgmAudio.play().then(updateDockUI).catch(() => {});
     }
+    slowAutoScrollActive = true;
+    autoFollowEnabled = true;
+    userScrollPauseUntil = 0;
+    autoScrollY = window.scrollY;
+    lastFrameTs = performance.now();
+    if (!autoScrollRaf) {
+      autoScrollRaf = requestAnimationFrame(stepAutoScroll);
+    }
     updateDockUI();
   }
 
@@ -735,6 +777,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (badge) {
       badge.style.cursor = 'pointer';
       badge.addEventListener('click', () => {
+        slowAutoScrollActive = false;
         startNarrationAt(segIdx, true);
       });
     }
