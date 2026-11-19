@@ -11,7 +11,7 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=2" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=2" />
     <!-- Phông chữ & Toàn bộ Stylesheet đã được chuẩn hóa -->
-    <link rel="stylesheet" href="/css/style.css?v=26" />
+    <link rel="stylesheet" href="/css/style.css?v=27" />
     <style>
         @font-face {
             font-family: "DFVN Bropella";
@@ -98,36 +98,189 @@
             transform: translateY(-2px) scale(1.02) !important;
             box-shadow: 0 12px 28px rgba(0, 0, 0, 0.38) !important;
         }
-        /* Khám phá Cards - Hover đồng bộ 100% với Sự kiện & Tin tức */
-        .explore-section .group {
-            transition: all 0.35s ease !important;
+
+        /* ========================================================= */
+        /* KHÁM PHÁ: MOBILE SLIDER & DESKTOP GRID RULES             */
+        /* ========================================================= */
+        @media (min-width: 768px) {
+            .kh-explore-mobile-container {
+                display: none !important;
+            }
+            .kh-explore-desktop-grid {
+                display: grid !important;
+                grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+                gap: 2rem !important;
+            }
         }
-        .explore-section .group:hover {
-            transform: translateY(-6px) !important;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.08) !important;
+        @media (max-width: 767.98px) {
+            .kh-explore-mobile-container {
+                display: block !important;
+                position: relative !important;
+                width: 100% !important;
+                max-width: 400px !important;
+                margin: 0 auto !important;
+                padding: 0 16px !important;
+                box-sizing: border-box !important;
+            }
+            .kh-explore-desktop-grid {
+                display: none !important;
+            }
         }
-        .explore-section .kh-card-bar {
+
+        /* Khung chứa và Track trượt trên mobile */
+        .kh-explore-viewport {
+            width: 100% !important;
+            overflow: hidden !important;
+            border-radius: 14px !important;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
+            position: relative !important;
+        }
+        .kh-explore-track {
+            display: flex !important;
+            flex-direction: row !important;
+            flex-wrap: nowrap !important;
+            width: 100% !important;
+            transition: transform 0.45s cubic-bezier(0.25, 1, 0.5, 1) !important;
+            will-change: transform !important;
+        }
+        .kh-explore-slide {
+            flex: 0 0 100% !important;
+            width: 100% !important;
+            min-width: 100% !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+        }
+
+        /* 2 Nút tròn điều hướng < và > trên Mobile */
+        .kh-slider-nav-btn {
+            position: absolute !important;
+            top: 42% !important;
+            transform: translateY(-50%) !important;
+            z-index: 50 !important;
+            width: 44px !important;
+            height: 44px !important;
+            border-radius: 50% !important;
+            background-color: #ffffff !important;
+            color: #b21816 !important;
+            border: 1.5px solid rgba(0, 0, 0, 0.1) !important;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.28) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            cursor: pointer !important;
+            transition: all 0.25s ease !important;
+        }
+        .kh-slider-nav-btn:hover {
             background-color: #b21816 !important;
-            transition: background-color 0.3s ease !important;
-        }
-        .explore-section .group:hover .kh-card-bar {
-            background-color: #921311 !important;
-        }
-        .explore-section .group:hover .kh-card-title {
             color: #ffffff !important;
+            transform: translateY(-50%) scale(1.1) !important;
         }
-        .explore-section .group:hover .explore-card__img {
+        .kh-slider-nav-btn:active {
+            transform: translateY(-50%) scale(0.92) !important;
+        }
+        .kh-slider-nav-prev {
+            left: 0px !important;
+        }
+        .kh-slider-nav-next {
+            right: 0px !important;
+        }
+
+        /* Thẻ Khám Phá: Tranh, Hành Trình, Sáng Tạo */
+        .kh-card-box {
+            display: flex !important;
+            flex-direction: column !important;
+            border-radius: 14px !important;
+            overflow: hidden !important;
+            background-color: #ffffff !important;
+            border: 1px solid rgba(0, 0, 0, 0.08) !important;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08) !important;
+            text-decoration: none !important;
+            transition: transform 0.35s ease, box-shadow 0.35s ease !important;
+            width: 100% !important;
+        }
+        .kh-card-box:hover {
+            transform: translateY(-6px) !important;
+            box-shadow: 0 18px 32px rgba(0, 0, 0, 0.18) !important;
+        }
+
+        /* Khung ảnh tỷ lệ chuẩn 4:5 cố định, không vỡ layout */
+        .kh-card-img-wrap {
+            position: relative !important;
+            width: 100% !important;
+            aspect-ratio: 4 / 5 !important;
+            overflow: hidden !important;
+            background-color: #1a1412 !important;
+        }
+        .kh-card-img-wrap img {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+            display: block !important;
+            transition: transform 0.55s cubic-bezier(0.2, 1, 0.3, 1) !important;
+        }
+        .kh-card-box:hover .kh-card-img-wrap img {
             transform: scale(1.06) !important;
         }
-        .explore-section .group:hover .lucide-arrow-up-right {
-            transform: translate(3px, -3px) !important;
+
+        /* Thanh tiêu đề đỏ son đồng bộ với Sự kiện & Tin tức */
+        .kh-card-bottom-bar {
+            background-color: #b21816 !important;
+            color: #fdecd2 !important;
+            padding: 1.15rem 1.35rem !important;
+            min-height: 64px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            gap: 0.75rem !important;
+            transition: background-color 0.3s ease !important;
+            box-sizing: border-box !important;
+        }
+        .kh-card-box:hover .kh-card-bottom-bar {
+            background-color: #921311 !important;
+        }
+        .kh-card-name {
+            font-size: 1.05rem !important;
+            font-weight: 700 !important;
+            letter-spacing: 0.06em !important;
+            text-transform: uppercase !important;
+            color: #fdecd2 !important;
+            transition: color 0.3s ease !important;
+            margin: 0 !important;
+        }
+        .kh-card-box:hover .kh-card-name {
             color: #ffffff !important;
         }
-        .explore-section .lucide-arrow-up-right {
+        .kh-card-arrow-icon {
+            flex-shrink: 0 !important;
+            color: #fdecd2 !important;
             transition: transform 0.3s ease, color 0.3s ease !important;
         }
-        .explore-section .explore-card__img {
-            transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1) !important;
+        .kh-card-box:hover .kh-card-arrow-icon {
+            color: #ffffff !important;
+            transform: translate(3px, -3px) !important;
+        }
+
+        /* Chấm tròn chỉ số slide trên mobile */
+        .kh-explore-dots-row {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 0.5rem !important;
+            margin-top: 1.1rem !important;
+        }
+        .kh-explore-dot-item {
+            height: 8px !important;
+            width: 8px !important;
+            border-radius: 9999px !important;
+            background-color: #d6d3d1 !important;
+            border: none !important;
+            padding: 0 !important;
+            cursor: pointer !important;
+            transition: all 0.3s ease !important;
+        }
+        .kh-explore-dot-item.is-active {
+            width: 26px !important;
+            background-color: #b41818 !important;
         }
     </style>
 </head>
@@ -628,36 +781,34 @@
                             </div>
                         </div>
 
-                        <!-- MOBILE SLIDER VỚI 2 NÚT < > Ở 2 ĐẦU -->
-                        <div class="md:hidden relative kh-explore-slider px-1">
+                        <!-- MOBILE SLIDER VỚI 2 NÚT < > NỔI BẬT Ở 2 ĐẦU -->
+                        <div class="kh-explore-mobile-container">
                             <!-- Nút lùi < -->
-                            <button type="button" class="kh-explore-prev absolute -left-2 top-[42%] -translate-y-1/2 z-30 size-10 rounded-full bg-white/95 text-[#b21816] shadow-xl flex items-center justify-center border border-stone-200 transition-all active:scale-90 hover:scale-110 cursor-pointer" aria-label="Xem mục trước">
+                            <button type="button" class="kh-slider-nav-btn kh-slider-nav-prev" aria-label="Xem thẻ trước">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                     <polyline points="15 18 9 12 15 6"></polyline>
                                 </svg>
                             </button>
 
                             <!-- Nút tiến > -->
-                            <button type="button" class="kh-explore-next absolute -right-2 top-[42%] -translate-y-1/2 z-30 size-10 rounded-full bg-white/95 text-[#b21816] shadow-xl flex items-center justify-center border border-stone-200 transition-all active:scale-90 hover:scale-110 cursor-pointer" aria-label="Xem mục tiếp theo">
+                            <button type="button" class="kh-slider-nav-btn kh-slider-nav-next" aria-label="Xem thẻ tiếp theo">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                     <polyline points="9 18 15 12 9 6"></polyline>
                                 </svg>
                             </button>
 
-                            <!-- Khung trượt thẻ -->
-                            <div class="overflow-hidden rounded-xl">
-                                <div class="kh-explore-track flex transition-transform duration-500 ease-out will-change-transform">
+                            <!-- Khung trượt thẻ (Viewport) -->
+                            <div class="kh-explore-viewport">
+                                <div class="kh-explore-track">
                                     <!-- Slide 1: Tranh -->
-                                    <div class="kh-explore-slide shrink-0 w-full">
-                                        <a class="group block overflow-hidden rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 border border-stone-800/10" href="/vi/visit/tranh">
-                                            <div class="explore-card__media aspect-[4/5] w-full overflow-hidden bg-stone-900 relative">
-                                                <img alt="Tranh Dân Gian Kim Hoàng" loading="lazy" decoding="async" class="explore-card__img w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="/images/kham-pha-tranh.webp" />
+                                    <div class="kh-explore-slide">
+                                        <a class="kh-card-box" href="/vi/visit/tranh">
+                                            <div class="kh-card-img-wrap">
+                                                <img alt="Tranh Dân Gian Kim Hoàng" loading="lazy" decoding="async" src="/images/kham-pha-tranh.webp" />
                                             </div>
-                                            <div class="kh-card-bar flex items-center justify-between gap-3 px-5 py-4 transition-colors duration-300 group-hover:bg-[#921311]">
-                                                <span class="kh-card-title text-base font-bold uppercase tracking-wider text-[#fdecd2] group-hover:text-white transition-colors">
-                                                    TRANH
-                                                </span>
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-up-right shrink-0 text-[#fdecd2] group-hover:text-white transition-all duration-300 group-hover:translate-x-1 group-hover:-translate-y-1">
+                                            <div class="kh-card-bottom-bar">
+                                                <span class="kh-card-name">TRANH</span>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="kh-card-arrow-icon">
                                                     <path d="M7 7h10v10"></path>
                                                     <path d="M7 17 17 7"></path>
                                                 </svg>
@@ -666,16 +817,14 @@
                                     </div>
 
                                     <!-- Slide 2: Hành Trình -->
-                                    <div class="kh-explore-slide shrink-0 w-full">
-                                        <a class="group block overflow-hidden rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 border border-stone-800/10" href="/vi/visit/hanh-trinh">
-                                            <div class="explore-card__media aspect-[4/5] w-full overflow-hidden bg-stone-900 relative">
-                                                <img alt="Hành Trình Phục Dựng" loading="lazy" decoding="async" class="explore-card__img w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="/images/kham-pha-hanh-trinh.jpg" />
+                                    <div class="kh-explore-slide">
+                                        <a class="kh-card-box" href="/vi/visit/hanh-trinh">
+                                            <div class="kh-card-img-wrap">
+                                                <img alt="Hành Trình Phục Dựng" loading="lazy" decoding="async" src="/images/kham-pha-hanh-trinh.jpg" />
                                             </div>
-                                            <div class="kh-card-bar flex items-center justify-between gap-3 px-5 py-4 transition-colors duration-300 group-hover:bg-[#921311]">
-                                                <span class="kh-card-title text-base font-bold uppercase tracking-wider text-[#fdecd2] group-hover:text-white transition-colors">
-                                                    HÀNH TRÌNH
-                                                </span>
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-up-right shrink-0 text-[#fdecd2] group-hover:text-white transition-all duration-300 group-hover:translate-x-1 group-hover:-translate-y-1">
+                                            <div class="kh-card-bottom-bar">
+                                                <span class="kh-card-name">HÀNH TRÌNH</span>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="kh-card-arrow-icon">
                                                     <path d="M7 7h10v10"></path>
                                                     <path d="M7 17 17 7"></path>
                                                 </svg>
@@ -684,16 +833,14 @@
                                     </div>
 
                                     <!-- Slide 3: Sản Phẩm Sáng Tạo -->
-                                    <div class="kh-explore-slide shrink-0 w-full">
-                                        <a class="group block overflow-hidden rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 border border-stone-800/10" href="/vi/services/souvenirs">
-                                            <div class="explore-card__media aspect-[4/5] w-full overflow-hidden bg-stone-900 relative">
-                                                <img alt="Sản Phẩm Sáng Tạo" loading="lazy" decoding="async" class="explore-card__img w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="/images/kham-pha-sang-tao.jpg" />
+                                    <div class="kh-explore-slide">
+                                        <a class="kh-card-box" href="/vi/services/souvenirs">
+                                            <div class="kh-card-img-wrap">
+                                                <img alt="Sản Phẩm Sáng Tạo" loading="lazy" decoding="async" src="/images/kham-pha-sang-tao.jpg" />
                                             </div>
-                                            <div class="kh-card-bar flex items-center justify-between gap-3 px-5 py-4 transition-colors duration-300 group-hover:bg-[#921311]">
-                                                <span class="kh-card-title text-base font-bold uppercase tracking-wider text-[#fdecd2] group-hover:text-white transition-colors">
-                                                    SẢN PHẨM SÁNG TẠO
-                                                </span>
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-up-right shrink-0 text-[#fdecd2] group-hover:text-white transition-all duration-300 group-hover:translate-x-1 group-hover:-translate-y-1">
+                                            <div class="kh-card-bottom-bar">
+                                                <span class="kh-card-name">SẢN PHẨM SÁNG TẠO</span>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="kh-card-arrow-icon">
                                                     <path d="M7 7h10v10"></path>
                                                     <path d="M7 17 17 7"></path>
                                                 </svg>
@@ -704,25 +851,23 @@
                             </div>
 
                             <!-- Dots chỉ số trang trên mobile -->
-                            <div class="flex items-center justify-center gap-2 mt-4">
-                                <button type="button" class="kh-explore-dot size-2 rounded-full bg-[#b41818] w-6 transition-all duration-300" aria-label="Xem thẻ 1"></button>
-                                <button type="button" class="kh-explore-dot size-2 rounded-full bg-stone-300 transition-all duration-300" aria-label="Xem thẻ 2"></button>
-                                <button type="button" class="kh-explore-dot size-2 rounded-full bg-stone-300 transition-all duration-300" aria-label="Xem thẻ 3"></button>
+                            <div class="kh-explore-dots-row">
+                                <button type="button" class="kh-explore-dot-item is-active" aria-label="Xem thẻ 1"></button>
+                                <button type="button" class="kh-explore-dot-item" aria-label="Xem thẻ 2"></button>
+                                <button type="button" class="kh-explore-dot-item" aria-label="Xem thẻ 3"></button>
                             </div>
                         </div>
 
                         <!-- DESKTOP GRID (3 CỘT SANG TRỌNG) -->
-                        <div class="hidden md:grid md:grid-cols-3 gap-6 lg:gap-8">
+                        <div class="kh-explore-desktop-grid">
                             <!-- Card 1: Tranh -->
-                            <a class="group block overflow-hidden rounded-xl shadow-md hover:shadow-2xl transition-all duration-400 hover:-translate-y-1.5 border border-stone-800/10" href="/vi/visit/tranh">
-                                <div class="explore-card__media aspect-[4/5] w-full overflow-hidden bg-stone-900 relative">
-                                    <img alt="Tranh Dân Gian Kim Hoàng" loading="lazy" decoding="async" class="explore-card__img w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="/images/kham-pha-tranh.webp" />
+                            <a class="kh-card-box" href="/vi/visit/tranh">
+                                <div class="kh-card-img-wrap">
+                                    <img alt="Tranh Dân Gian Kim Hoàng" loading="lazy" decoding="async" src="/images/kham-pha-tranh.webp" />
                                 </div>
-                                <div class="kh-card-bar flex items-center justify-between gap-3 px-5 py-4 transition-colors duration-300 group-hover:bg-[#921311]">
-                                    <span class="kh-card-title text-lg font-bold uppercase tracking-wider text-[#fdecd2] group-hover:text-white transition-colors">
-                                        TRANH
-                                    </span>
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-up-right shrink-0 text-[#fdecd2] group-hover:text-white transition-all duration-300 group-hover:translate-x-1 group-hover:-translate-y-1">
+                                <div class="kh-card-bottom-bar">
+                                    <span class="kh-card-name">TRANH</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="kh-card-arrow-icon">
                                         <path d="M7 7h10v10"></path>
                                         <path d="M7 17 17 7"></path>
                                     </svg>
@@ -730,15 +875,13 @@
                             </a>
 
                             <!-- Card 2: Hành Trình -->
-                            <a class="group block overflow-hidden rounded-xl shadow-md hover:shadow-2xl transition-all duration-400 hover:-translate-y-1.5 border border-stone-800/10" href="/vi/visit/hanh-trinh">
-                                <div class="explore-card__media aspect-[4/5] w-full overflow-hidden bg-stone-900 relative">
-                                    <img alt="Hành Trình Phục Dựng" loading="lazy" decoding="async" class="explore-card__img w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="/images/kham-pha-hanh-trinh.jpg" />
+                            <a class="kh-card-box" href="/vi/visit/hanh-trinh">
+                                <div class="kh-card-img-wrap">
+                                    <img alt="Hành Trình Phục Dựng" loading="lazy" decoding="async" src="/images/kham-pha-hanh-trinh.jpg" />
                                 </div>
-                                <div class="kh-card-bar flex items-center justify-between gap-3 px-5 py-4 transition-colors duration-300 group-hover:bg-[#921311]">
-                                    <span class="kh-card-title text-lg font-bold uppercase tracking-wider text-[#fdecd2] group-hover:text-white transition-colors">
-                                        HÀNH TRÌNH
-                                    </span>
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-up-right shrink-0 text-[#fdecd2] group-hover:text-white transition-all duration-300 group-hover:translate-x-1 group-hover:-translate-y-1">
+                                <div class="kh-card-bottom-bar">
+                                    <span class="kh-card-name">HÀNH TRÌNH</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="kh-card-arrow-icon">
                                         <path d="M7 7h10v10"></path>
                                         <path d="M7 17 17 7"></path>
                                     </svg>
@@ -746,15 +889,13 @@
                             </a>
 
                             <!-- Card 3: Sản Phẩm Sáng Tạo -->
-                            <a class="group block overflow-hidden rounded-xl shadow-md hover:shadow-2xl transition-all duration-400 hover:-translate-y-1.5 border border-stone-800/10" href="/vi/services/souvenirs">
-                                <div class="explore-card__media aspect-[4/5] w-full overflow-hidden bg-stone-900 relative">
-                                    <img alt="Sản Phẩm Sáng Tạo" loading="lazy" decoding="async" class="explore-card__img w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="/images/kham-pha-sang-tao.jpg" />
+                            <a class="kh-card-box" href="/vi/services/souvenirs">
+                                <div class="kh-card-img-wrap">
+                                    <img alt="Sản Phẩm Sáng Tạo" loading="lazy" decoding="async" src="/images/kham-pha-sang-tao.jpg" />
                                 </div>
-                                <div class="kh-card-bar flex items-center justify-between gap-3 px-5 py-4 transition-colors duration-300 group-hover:bg-[#921311]">
-                                    <span class="kh-card-title text-lg font-bold uppercase tracking-wider text-[#fdecd2] group-hover:text-white transition-colors">
-                                        SẢN PHẨM SÁNG TẠO
-                                    </span>
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-up-right shrink-0 text-[#fdecd2] group-hover:text-white transition-all duration-300 group-hover:translate-x-1 group-hover:-translate-y-1">
+                                <div class="kh-card-bottom-bar">
+                                    <span class="kh-card-name">SẢN PHẨM SÁNG TẠO</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="kh-card-arrow-icon">
                                         <path d="M7 7h10v10"></path>
                                         <path d="M7 17 17 7"></path>
                                     </svg>
@@ -2162,7 +2303,7 @@
 </footer>
 </div>
     <!-- Javascript tương tác giao diện (Menu mobile, Drawer, Search, Sliders) -->
-    <script src="/js/main.js?v=35">
+    <script src="/js/main.js?v=36">
     </script>
 </body>
 

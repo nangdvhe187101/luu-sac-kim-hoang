@@ -659,14 +659,14 @@ function initCarousels() {
  * 6.0. Mobile Slider cho Khám Phá (Nút < >, Dots, Cảm ứng vuốt Touch)
  */
 function initExploreSlider() {
-  const slider = document.querySelector('.kh-explore-slider');
-  if (!slider) return;
+  const container = document.querySelector('.kh-explore-mobile-container');
+  if (!container) return;
 
-  const track = slider.querySelector('.kh-explore-track');
-  const slides = slider.querySelectorAll('.kh-explore-slide');
-  const prevBtn = slider.querySelector('.kh-explore-prev');
-  const nextBtn = slider.querySelector('.kh-explore-next');
-  const dots = slider.querySelectorAll('.kh-explore-dot');
+  const track = container.querySelector('.kh-explore-track');
+  const slides = container.querySelectorAll('.kh-explore-slide');
+  const prevBtn = container.querySelector('.kh-slider-nav-prev');
+  const nextBtn = container.querySelector('.kh-slider-nav-next');
+  const dots = container.querySelectorAll('.kh-explore-dot-item');
 
   if (!track || slides.length === 0) return;
 
@@ -686,9 +686,9 @@ function initExploreSlider() {
 
     dots.forEach((dot, idx) => {
       if (idx === currentIndex) {
-        dot.className = 'kh-explore-dot size-2 rounded-full bg-[#b41818] w-6 transition-all duration-300';
+        dot.classList.add('is-active');
       } else {
-        dot.className = 'kh-explore-dot size-2 rounded-full bg-stone-300 transition-all duration-300';
+        dot.classList.remove('is-active');
       }
     });
   }
@@ -735,8 +735,7 @@ function initExploreSlider() {
     const diffX = startX - e.changedTouches[0].clientX;
     const diffY = startY - e.changedTouches[0].clientY;
 
-    // Chỉ kích hoạt lướt slide nếu chuyển động ngang lớn hơn chuyển động dọc
-    if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 35) {
+    if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 30) {
       if (diffX > 0) {
         goToSlide(currentIndex + 1);
       } else {
