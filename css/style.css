@@ -21026,7 +21026,13 @@ header.header-shell,
 .guestbook-section {
   position: relative;
   background-color: transparent;
-  padding: 4rem 1rem 5rem;
+  padding: 1.5rem 1rem 3rem;
+}
+
+@media (max-width: 768px) {
+  .guestbook-section {
+    padding: 1rem 1rem 2.5rem;
+  }
 }
 
 .guestbook-header-title {
