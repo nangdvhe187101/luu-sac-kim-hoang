@@ -21417,16 +21417,13 @@ header.header-shell,
   color: rgba(255, 250, 240, 0.94) !important;
   font-size: 0.98rem;
   line-height: 1.72;
-  padding-left: 1.25rem;
+  padding-left: 0 !important;
+  list-style: none !important;
   position: relative;
 }
 
 .kh-vm-list li::before {
-  content: "—";
-  color: #ffe08a;
-  position: absolute;
-  left: 0;
-  top: 0;
+  display: none !important;
 }
 
 .kh-vm-list strong {
@@ -22429,4 +22426,13 @@ html {
 
 .group:hover .explore-card__img {
   transform: scale(1.06);
+}
+
+/* ========================================================= */
+/* DISABLE MEGA PANEL DROPDOWNS (TOP-LEVEL NAV ONLY)         */
+/* ========================================================= */
+.header-panel,
+#header-mega-panel {
+  display: none !important;
+  pointer-events: none !important;
 }
