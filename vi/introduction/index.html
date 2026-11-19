@@ -8,7 +8,7 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=2" />
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=2" />
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=2" />
-  <link rel="stylesheet" href="/css/style.css?v=30" />
+  <link rel="stylesheet" href="/css/style.css?v=32" />
 </head>
 <body class="min-h-screen flex flex-col font-sans antialiased text-foreground bg-background">
 <div hidden=""><!--$--><!--/$--></div><div class="admin-bar bg-black text-white hidden"><div class="container"></div></div><section class="header-shell"><div class="pointer-events-none h-px w-full bg-(--header-bg)" aria-hidden="true"></div><header class="header-shell fixed top-0 z-(--z-header) w-full bg-(--header-bg) shadow-(--shadow-dropdown)">
@@ -39,15 +39,56 @@
           <nav class="header-nav" aria-label="Main">
             <ul class="flex flex-wrap items-center justify-end gap-x-6 gap-y-1">
               <li class="header-nav__item"><a class="header-nav__trigger" href="/">Trang chủ</a></li>
-              <li class="header-nav__item"><a class="header-nav__trigger" href="/vi/introduction">Giới thiệu</a></li>
-              <li class="header-nav__item"><a class="header-nav__trigger" href="/vi/visit">Tham quan</a></li>
+              <li class="header-nav__item" data-menu="gioi-thieu"><a class="header-nav__trigger" href="/vi/introduction" aria-expanded="false">Giới thiệu</a></li>
+              <li class="header-nav__item" data-menu="tham-quan"><a class="header-nav__trigger" href="/vi/visit" aria-expanded="false">Tham quan</a></li>
               <li class="header-nav__item"><a class="header-nav__trigger" href="/vi/visit/3d">3D Tour</a></li>
-              <li class="header-nav__item"><a class="header-nav__trigger" href="/vi/services">Sản phẩm sáng tạo</a></li>
+              <li class="header-nav__item" data-menu="san-pham-sang-tao"><a class="header-nav__trigger" href="/vi/services" aria-expanded="false">Sản phẩm sáng tạo</a></li>
               <li class="header-nav__item"><a class="header-nav__trigger" href="/vi/events">Sự kiện</a></li>
               <li class="header-nav__item"><a class="header-nav__trigger" href="/vi/posts">Tin tức</a></li>
             </ul>
           </nav>
-          <div id="header-mega-panel" class="header-panel font-sans" style="display: none !important;"></div>
+          <div id="header-mega-panel" class="header-panel font-sans">
+            <div class="header-panel__backdrop">
+              <div class="container header-panel__content" id="header-mega-content">
+                <!-- GIỚI THIỆU -->
+                <div class="header-panel-slot" data-slot="gioi-thieu" style="display: none;">
+                  <div class="header-mega">
+                    <div class="header-mega__col">
+                      <a class="header-mega__heading header-mega__heading--solo" href="/vi/introduction">Lưu Sắc Kim Hoàng</a>
+                    </div>
+                    <div class="header-mega__col">
+                      <a class="header-mega__heading header-mega__heading--solo" href="/vi/introduction/nghe-nhan">Nghệ Nhân &amp; Nhà Nghiên Cứu</a>
+                    </div>
+                    <div class="header-mega__col">
+                      <a class="header-mega__heading header-mega__heading--solo" href="/vi/introduction/doi-tac">Đối Tác</a>
+                    </div>
+                  </div>
+                </div>
+                <!-- THAM QUAN -->
+                <div class="header-panel-slot" data-slot="tham-quan" style="display: none;">
+                  <div class="header-mega">
+                    <div class="header-mega__col">
+                      <a class="header-mega__heading header-mega__heading--solo" href="/vi/visit/tranh">Tranh</a>
+                    </div>
+                    <div class="header-mega__col">
+                      <a class="header-mega__heading header-mega__heading--solo" href="/vi/visit/hanh-trinh">Hành Trình</a>
+                    </div>
+                  </div>
+                </div>
+                <!-- SẢN PHẨM SÁNG TẠO -->
+                <div class="header-panel-slot" data-slot="san-pham-sang-tao" style="display: none;">
+                  <div class="header-mega">
+                    <div class="header-mega__col">
+                      <a class="header-mega__heading header-mega__heading--solo" href="/vi/services">Tất Cả Sản Phẩm</a>
+                    </div>
+                    <div class="header-mega__col">
+                      <a class="header-mega__heading header-mega__heading--solo" href="/vi/services/souvenirs">Quà Tặng Lưu Niệm &amp; Tranh Sáng Tạo</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -83,14 +124,47 @@
             </a>
           </li>
           <li class="header-mobile-nav__item" style="--nav-stagger: 1;">
-            <a class="header-mobile-nav__row" href="/vi/introduction" style="text-decoration:none;display:flex;align-items:center;justify-content:space-between;width:100%;">
+            <button type="button" class="header-mobile-nav__row" aria-expanded="false" data-mobile-row="gioi-thieu">
               <span class="header-mobile-nav__row-label">Giới thiệu</span>
-            </a>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down header-mobile-nav__row-icon" aria-hidden="true">
+                <path d="m6 9 6 6 6-6"></path>
+              </svg>
+            </button>
+            <div class="header-mobile-nav__panel" aria-hidden="true">
+              <div class="header-mobile-nav__panel-inner">
+                <div class="header-mega">
+                  <div class="header-mega__col">
+                    <a class="header-mega__heading header-mega__heading--solo" href="/vi/introduction">Lưu Sắc Kim Hoàng</a>
+                  </div>
+                  <div class="header-mega__col">
+                    <a class="header-mega__heading header-mega__heading--solo" href="/vi/introduction/nghe-nhan">Nghệ Nhân &amp; Nhà Nghiên Cứu</a>
+                  </div>
+                  <div class="header-mega__col">
+                    <a class="header-mega__heading header-mega__heading--solo" href="/vi/introduction/doi-tac">Đối Tác</a>
+                  </div>
+                </div>
+              </div>
+            </div>
           </li>
           <li class="header-mobile-nav__item" style="--nav-stagger: 2;">
-            <a class="header-mobile-nav__row" href="/vi/visit" style="text-decoration:none;display:flex;align-items:center;justify-content:space-between;width:100%;">
+            <button type="button" class="header-mobile-nav__row" aria-expanded="false" data-mobile-row="tham-quan">
               <span class="header-mobile-nav__row-label">Tham quan</span>
-            </a>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down header-mobile-nav__row-icon" aria-hidden="true">
+                <path d="m6 9 6 6 6-6"></path>
+              </svg>
+            </button>
+            <div class="header-mobile-nav__panel" aria-hidden="true">
+              <div class="header-mobile-nav__panel-inner">
+                <div class="header-mega">
+                  <div class="header-mega__col">
+                    <a class="header-mega__heading header-mega__heading--solo" href="/vi/visit/tranh">Tranh</a>
+                  </div>
+                  <div class="header-mega__col">
+                    <a class="header-mega__heading header-mega__heading--solo" href="/vi/visit/hanh-trinh">Hành Trình</a>
+                  </div>
+                </div>
+              </div>
+            </div>
           </li>
           <li class="header-mobile-nav__item" style="--nav-stagger: 3;">
             <a class="header-mobile-nav__row" href="/vi/visit/3d" style="text-decoration:none;display:flex;align-items:center;justify-content:space-between;width:100%;">
@@ -98,9 +172,24 @@
             </a>
           </li>
           <li class="header-mobile-nav__item" style="--nav-stagger: 4;">
-            <a class="header-mobile-nav__row" href="/vi/services" style="text-decoration:none;display:flex;align-items:center;justify-content:space-between;width:100%;">
+            <button type="button" class="header-mobile-nav__row" aria-expanded="false" data-mobile-row="san-pham-sang-tao">
               <span class="header-mobile-nav__row-label">Sản phẩm sáng tạo</span>
-            </a>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down header-mobile-nav__row-icon" aria-hidden="true">
+                <path d="m6 9 6 6 6-6"></path>
+              </svg>
+            </button>
+            <div class="header-mobile-nav__panel" aria-hidden="true">
+              <div class="header-mobile-nav__panel-inner">
+                <div class="header-mega">
+                  <div class="header-mega__col">
+                    <a class="header-mega__heading header-mega__heading--solo" href="/vi/services">Tất Cả Sản Phẩm</a>
+                  </div>
+                  <div class="header-mega__col">
+                    <a class="header-mega__heading header-mega__heading--solo" href="/vi/services/souvenirs">Quà Tặng Lưu Niệm &amp; Tranh Sáng Tạo</a>
+                  </div>
+                </div>
+              </div>
+            </div>
           </li>
           <li class="header-mobile-nav__item" style="--nav-stagger: 5;">
             <a class="header-mobile-nav__row" href="/vi/events" style="text-decoration:none;display:flex;align-items:center;justify-content:space-between;width:100%;">
@@ -117,6 +206,7 @@
     </div>
   </aside>
 </div>
+</section>
 
 
 

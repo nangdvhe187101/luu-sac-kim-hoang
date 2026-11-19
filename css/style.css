@@ -20683,6 +20683,81 @@ h6,
   color: #ffffffeb !important;
 }
 
+/* Mobile Submenu & Solo Headings */
+.header-mobile-nav__panel-inner .header-mega {
+  display: flex !important;
+  flex-direction: column !important;
+  padding: 0.25rem 0 0.6rem !important;
+  gap: 0.15rem !important;
+}
+
+.header-mobile-nav__panel-inner .header-mega__col {
+  padding: 0 !important;
+  min-width: 100% !important;
+  border-top: none !important;
+}
+
+.header-mobile-nav__panel-inner .header-mega__heading--solo {
+  display: flex !important;
+  align-items: center !important;
+  padding: 0.65rem 0.75rem 0.65rem 1rem !important;
+  color: #ffe08a !important;
+  font-size: 0.88rem !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  border-radius: 6px !important;
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(255, 224, 138, 0.15) !important;
+  margin: 0.2rem 0 !important;
+  transition: all 0.2s ease !important;
+  text-decoration: none !important;
+}
+
+.header-mobile-nav__panel-inner .header-mega__heading--solo:hover,
+.header-mobile-nav__panel-inner .header-mega__heading--solo:active {
+  background: rgba(255, 224, 138, 0.16) !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 224, 138, 0.45) !important;
+}
+
+/* Desktop Mega Menu Refinements for Solo Headings */
+.header-panel-slot .header-mega {
+  padding: 1.25rem 0 1.5rem !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 1.5rem !important;
+}
+
+.header-panel-slot .header-mega__col {
+  padding: 0 !important;
+  min-width: auto !important;
+}
+
+.header-panel-slot .header-mega__heading--solo {
+  font-size: 0.85rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.08em !important;
+  color: #fff8eb !important;
+  padding: 0.5rem 1.1rem !important;
+  border-radius: 999px !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 224, 138, 0.3) !important;
+  transition: all 0.2s ease !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  text-decoration: none !important;
+}
+
+.header-panel-slot .header-mega__heading--solo:hover {
+  background: rgba(255, 224, 138, 0.25) !important;
+  border-color: #ffe08a !important;
+  color: #ffe08a !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25) !important;
+}
+
 /* Header Red Do Paper Texture */
 header.header-shell,
 .header-shell {
