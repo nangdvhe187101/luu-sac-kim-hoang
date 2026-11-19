@@ -11,7 +11,7 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=2" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=2" />
     <!-- Phông chữ & Toàn bộ Stylesheet đã được chuẩn hóa -->
-    <link rel="stylesheet" href="/css/style.css?v=28" />
+    <link rel="stylesheet" href="/css/style.css?v=29" />
     <style>
         @font-face {
             font-family: "DFVN Bropella";
@@ -163,38 +163,45 @@
             box-sizing: border-box !important;
         }
 
-        /* 2 Nút tròn điều hướng < và > trên Mobile */
+        /* 2 Nút điều hướng < và > cùng Dải chấm bên dưới Mobile (Tách rời khỏi tranh) */
+        .kh-explore-controls-row {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 1.25rem !important;
+            margin-top: 1rem !important;
+        }
         .kh-slider-nav-btn {
-            position: absolute !important;
-            top: 42% !important;
-            transform: translateY(-50%) !important;
-            z-index: 50 !important;
-            width: 44px !important;
-            height: 44px !important;
+            position: static !important;
+            transform: none !important;
+            width: 42px !important;
+            height: 42px !important;
             border-radius: 50% !important;
             background-color: #ffffff !important;
             color: #b21816 !important;
-            border: 1.5px solid rgba(0, 0, 0, 0.1) !important;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.28) !important;
+            border: 1.5px solid rgba(0, 0, 0, 0.12) !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12) !important;
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
             cursor: pointer !important;
             transition: all 0.25s ease !important;
+            flex-shrink: 0 !important;
         }
         .kh-slider-nav-btn:hover {
             background-color: #b21816 !important;
             color: #ffffff !important;
-            transform: translateY(-50%) scale(1.1) !important;
+            transform: scale(1.08) !important;
         }
         .kh-slider-nav-btn:active {
-            transform: translateY(-50%) scale(0.92) !important;
+            transform: scale(0.92) !important;
         }
-        .kh-slider-nav-prev {
-            left: 0px !important;
-        }
-        .kh-slider-nav-next {
-            right: 0px !important;
+        .kh-explore-dots-row {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 0.5rem !important;
+            margin: 0 !important;
         }
 
         /* Thẻ Khám Phá: Tranh, Hành Trình, Sáng Tạo */
@@ -273,13 +280,6 @@
         }
 
         /* Chấm tròn chỉ số slide trên mobile */
-        .kh-explore-dots-row {
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            gap: 0.5rem !important;
-            margin-top: 1.1rem !important;
-        }
         .kh-explore-dot-item {
             height: 8px !important;
             width: 8px !important;
@@ -793,23 +793,9 @@
                             </div>
                         </div>
 
-                        <!-- MOBILE SLIDER VỚI 2 NÚT < > NỔI BẬT Ở 2 ĐẦU -->
+                        <!-- MOBILE SLIDER VỚI ĐIỀU KHIỂN TÁCH RỜI KHỎI TRANH -->
                         <div class="kh-explore-mobile-container">
-                            <!-- Nút lùi < -->
-                            <button type="button" class="kh-slider-nav-btn kh-slider-nav-prev" aria-label="Xem thẻ trước">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                    <polyline points="15 18 9 12 15 6"></polyline>
-                                </svg>
-                            </button>
-
-                            <!-- Nút tiến > -->
-                            <button type="button" class="kh-slider-nav-btn kh-slider-nav-next" aria-label="Xem thẻ tiếp theo">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                    <polyline points="9 18 15 12 9 6"></polyline>
-                                </svg>
-                            </button>
-
-                            <!-- Khung trượt thẻ (Viewport) -->
+                            <!-- Khung trượt thẻ (Viewport) - Tranh hoàn toàn sạch, không bị nút đè -->
                             <div class="kh-explore-viewport">
                                 <div class="kh-explore-track">
                                     <!-- Slide 1: Tranh -->
@@ -828,11 +814,11 @@
                                         </a>
                                     </div>
 
-                                    <!-- Slide 2: Hành Trình -->
+                                    <!-- Slide 2: Hành Trình (Ảnh mới) -->
                                     <div class="kh-explore-slide">
                                         <a class="kh-card-box" href="/vi/visit/hanh-trinh">
                                             <div class="kh-card-img-wrap">
-                                                <img alt="Hành Trình Phục Dựng" loading="lazy" decoding="async" src="/images/kham-pha-hanh-trinh.jpg" />
+                                                <img alt="Hành Trình Phục Dựng" loading="lazy" decoding="async" src="/images/kham-pha-hanh-trinh.jpg?v=2" />
                                             </div>
                                             <div class="kh-card-bottom-bar">
                                                 <span class="kh-card-name">HÀNH TRÌNH</span>
@@ -862,11 +848,23 @@
                                 </div>
                             </div>
 
-                            <!-- Dots chỉ số trang trên mobile -->
-                            <div class="kh-explore-dots-row">
-                                <button type="button" class="kh-explore-dot-item is-active" aria-label="Xem thẻ 1"></button>
-                                <button type="button" class="kh-explore-dot-item" aria-label="Xem thẻ 2"></button>
-                                <button type="button" class="kh-explore-dot-item" aria-label="Xem thẻ 3"></button>
+                            <!-- Băng điều khiển bên dưới: Nút < , 3 chấm chỉ số , Nút > -->
+                            <div class="kh-explore-controls-row">
+                                <button type="button" class="kh-slider-nav-btn kh-slider-nav-prev" aria-label="Xem thẻ trước">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="15 18 9 12 15 6"></polyline>
+                                    </svg>
+                                </button>
+                                <div class="kh-explore-dots-row">
+                                    <button type="button" class="kh-explore-dot-item is-active" aria-label="Xem thẻ 1"></button>
+                                    <button type="button" class="kh-explore-dot-item" aria-label="Xem thẻ 2"></button>
+                                    <button type="button" class="kh-explore-dot-item" aria-label="Xem thẻ 3"></button>
+                                </div>
+                                <button type="button" class="kh-slider-nav-btn kh-slider-nav-next" aria-label="Xem thẻ tiếp theo">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="9 18 15 12 9 6"></polyline>
+                                    </svg>
+                                </button>
                             </div>
                         </div>
 
@@ -889,7 +887,7 @@
                             <!-- Card 2: Hành Trình -->
                             <a class="kh-card-box" href="/vi/visit/hanh-trinh">
                                 <div class="kh-card-img-wrap">
-                                    <img alt="Hành Trình Phục Dựng" loading="lazy" decoding="async" src="/images/kham-pha-hanh-trinh.jpg" />
+                                    <img alt="Hành Trình Phục Dựng" loading="lazy" decoding="async" src="/images/kham-pha-hanh-trinh.jpg?v=2" />
                                 </div>
                                 <div class="kh-card-bottom-bar">
                                     <span class="kh-card-name">HÀNH TRÌNH</span>
@@ -2315,7 +2313,7 @@
 </footer>
 </div>
     <!-- Javascript tương tác giao diện (Menu mobile, Drawer, Search, Sliders) -->
-    <script src="/js/main.js?v=37">
+    <script src="/js/main.js?v=38">
     </script>
 </body>
 
