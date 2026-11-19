@@ -1,0 +1,6 @@
+.DS_Store
+server.js
+scripts/
+README.md
+*.log
+

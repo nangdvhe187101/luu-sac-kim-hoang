@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Thông Tin Bảo Trợ Truyền Thông | Lưu Sắc Kim Hoàng</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico?v=2" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=2" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=2" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=2" />
+  <link rel="stylesheet" href="/css/style.css?v=20" />
+</head>
+<body class="min-h-screen flex flex-col font-sans antialiased text-foreground bg-background">
+<div hidden=""><!--$--><!--/$--></div><div class="admin-bar bg-black text-white hidden"><div class="container"></div></div><section class="header-shell"><div class="pointer-events-none h-px w-full bg-(--header-bg)" aria-hidden="true"></div><header class="header-shell fixed top-0 z-(--z-header) w-full bg-(--header-bg) shadow-(--shadow-dropdown)">
+  <div class="container header-shell__inner">
+    <a class="header-shell__logo shrink-0" href="/vi">
+      <div class="logo-brand graphic-logo logo-brand--on-dark">
+        <img decoding="async" src="/logo-lskh.png?v=2" alt="" class="logo-brand__icon" loading="eager" fetchPriority="high"/>
+      </div>
+    </a>
+    <div class="header-shell__top-right">
+      <div class="header-shell__utilities">
+        <div class="header-search">
+          <div class="header-search-field">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search header-search-field__icon" aria-hidden="true">
+              <path d="m21 21-4.34-4.34"></path>
+              <circle cx="11" cy="11" r="8"></circle>
+            </svg>
+            <input placeholder="Tìm kiếm..." aria-label="Tìm kiếm..." class="header-search-field__input" value=""/>
+          </div>
+        </div>
+        <div class="locale-tabs header-shell__locale" role="group" aria-label="Chọn ngôn ngữ">
+          <div role="button" tabindex="0" aria-pressed="true" aria-current="true" class="locale-tabs__tab is-active">VI</div>
+          <div role="button" tabindex="0" aria-pressed="false" class="locale-tabs__tab">EN</div>
+        </div>
+      </div>
+      <div class="header-shell__nav">
+        <div class="header-nav-root">
+          <nav class="header-nav" aria-label="Main">
+            <ul class="flex flex-wrap items-center justify-end gap-x-6 gap-y-1">
+              <li class="header-nav__item is-active" data-menu="gioi-thieu"><a class="header-nav__trigger" href="/vi/introduction" aria-expanded="false">Giới thiệu</a></li>
+              <li class="header-nav__item" data-menu="tham-quan"><a class="header-nav__trigger" href="/vi/visit" aria-expanded="false" onclick="window.location.href=this.getAttribute('href');">Tham quan</a></li>
+              <li class="header-nav__item" data-menu="san-pham-sang-tao"><a class="header-nav__trigger" href="/vi/services" aria-expanded="false" onclick="window.location.href=this.getAttribute('href');">Sản phẩm sáng tạo</a></li>
+              <li class="header-nav__item"><a class="header-nav__trigger" href="/vi/events">Sự kiện</a></li>
+              <li class="header-nav__item"><a class="header-nav__trigger" href="/vi/posts">Tin tức</a></li>
+            </ul>
+          </nav>
+          <div id="header-mega-panel" class="header-panel font-sans">
+            <div class="header-panel__backdrop">
+              <div class="container header-panel__content" id="header-mega-content">
+                <div class="header-panel-slot" data-slot="gioi-thieu" style="display: none;">
+<div class="header-mega"><div class="header-mega__col"><a class="header-mega__heading" href="/#ve-du-an">Lưu Sắc Kim Hoàng</a><ul class="header-mega__links"><li><a class="header-mega__link" href="/#ve-du-an">Câu chuyện thương hiệu</a></li><li><a class="header-mega__link" href="/#tam-nhin">Tầm nhìn</a></li><li><a class="header-mega__link" href="/#su-menh">Sứ mệnh</a></li></ul></div><div class="header-mega__col"><a class="header-mega__heading" href="/vi/introduction/nghe-nhan">Nghệ Nhân &amp; Chuyên Gia</a><ul class="header-mega__links"><li><a class="header-mega__link" href="/vi/introduction/nghe-nhan/dao-dinh-chung">Nghệ nhân Đào Đình Chung</a></li><li><a class="header-mega__link" href="/vi/introduction/nghe-nhan/nguyen-thi-thu-hoa">Chuyên gia TS. Nguyễn Thị Thu Hòa</a></li></ul></div><div class="header-mega__col"><a class="header-mega__heading" href="/vi/introduction/doi-tac">Đối Tác</a><ul class="header-mega__links"><li><a class="header-mega__link" href="/vi/introduction/doi-tac/nha-tai-tro">Nhà tài trợ</a></li><li><a class="header-mega__link" href="/vi/introduction/doi-tac/bao-tro-truyen-thong">Bảo trợ truyền thông</a></li></ul></div></div>
+</div>
+                <div class="header-panel-slot" data-slot="tham-quan" style="display: none;">
+<div class="header-mega"><div class="header-mega__col"><a class="header-mega__heading" href="/vi/visit/tranh">Tranh</a><ul class="header-mega__links"><li><a class="header-mega__link" href="/vi/visit/tranh">Bộ sưu tập tranh Kim Hoàng</a></li><li><a class="header-mega__link" href="/vi/visit/tranh#gold">Tranh nghệ thuật dát vàng</a></li><li><a class="header-mega__link" href="/vi/visit/tranh#masterpiece">Kiệt tác Lưu Sắc Kim Hoàng</a></li></ul></div><div class="header-mega__col"><a class="header-mega__heading" href="/vi/visit/hanh-trinh">Hành Trình</a><ul class="header-mega__links header-mega__links--2col"><li><a class="header-mega__link" href="/vi/visit/hanh-trinh#phan-1">1. Nguồn Cội Phường Tranh Kim Hoàng</a></li><li><a class="header-mega__link" href="/vi/visit/hanh-trinh#phan-2">2. Trận Lụt Ất Mão &amp; Thời Kỳ Thất Truyền</a></li><li><a class="header-mega__link" href="/vi/visit/hanh-trinh#phan-3">3. Dấu Tích Trong Sách Sử &amp; Bảo Tàng</a></li><li><a class="header-mega__link" href="/vi/visit/hanh-trinh#phan-4">4. Khởi Xướng Dự Án Phục Hồi</a></li><li><a class="header-mega__link" href="/vi/visit/hanh-trinh#phan-5">5. Khôi Phục Sắc Màu, Mộc Bản &amp; Giấy Dó</a></li><li><a class="header-mega__link" href="/vi/visit/hanh-trinh#phan-6">6. Phục Dựng 52 Mẫu Tranh &amp; Truyền Nghề</a></li><li><a class="header-mega__link" href="/vi/visit/hanh-trinh#phan-7">7. Sức Sống Mới Trong Đời Sống Đương Đại</a></li></ul></div><div class="header-mega__col"><a class="header-mega__heading" href="/vi/visit/3d">3D</a><ul class="header-mega__links"><li><a class="header-mega__link" href="/vi/visit/3d">Không gian thực tế ảo 3D</a></li><li><a class="header-mega__link" href="/vi/visit/3d#tour">Tour tham quan 360 độ</a></li><li><a class="header-mega__link" href="/vi/visit/3d#digital">Tương tác hiện vật số 3D</a></li></ul></div></div>
+</div>
+                <div class="header-panel-slot" data-slot="san-pham-sang-tao" style="display: none;">
+<div class="header-mega"><div class="header-mega__col"><a class="header-mega__heading" href="/vi/services/souvenirs">Sản phẩm vật lý &amp; Tranh sáng tạo</a><ul class="header-mega__links"><li><a class="header-mega__link" href="/vi/services/souvenirs?filter=vat-ly">Sản phẩm vật lý (TT Leather, Thảo Trần Studio)</a></li><li><a class="header-mega__link" href="/vi/services/souvenirs?filter=tranh-sang-tao">Tranh &amp; Minh họa sáng tạo (7 tác phẩm)</a></li></ul></div><div class="header-mega__col"><a class="header-mega__heading" href="/vi/visit/3d">Triển lãm &amp; Làm tranh 3D</a><ul class="header-mega__links"><li><a class="header-mega__link" href="/vi/visit/3d">Không gian triển lãm thực tế ảo 3D</a></li><li><a class="header-mega__link" href="/vi/visit/3d#digital">Trải nghiệm làm tranh &amp; hiện vật 3D</a></li></ul></div></div>
+</div>
+                
+                
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="header-shell__actions">
+      <button type="button" class="header-menu-btn" aria-expanded="false" aria-controls="header-mobile-nav" aria-label="Mở menu">
+        <span class="header-menu-btn__icon" aria-hidden="true">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-menu size-[1.15rem]" aria-hidden="true">
+            <path d="M4 5h16"></path>
+            <path d="M4 12h16"></path>
+            <path d="M4 19h16"></path>
+          </svg>
+        </span>
+      </button>
+    </div>
+  </div>
+</header>
+<div id="header-mobile-overlay" class="header-mobile-nav__overlay" style="display: none;">
+  <button type="button" class="header-mobile-nav__backdrop" aria-label="Đóng menu"></button>
+  <aside class="header-mobile-nav__drawer" id="header-mobile-nav" aria-modal="true">
+    <div class="header-mobile-nav__scroll">
+      <nav class="header-mobile-nav" aria-label="Menu điều hướng">
+        <div class="header-mobile-nav__toolbar">
+          <p class="header-mobile-nav__eyebrow">Menu điều hướng</p>
+          <div class="locale-tabs header-shell__locale" role="group" aria-label="Chọn ngôn ngữ">
+            <div role="button" tabindex="0" aria-pressed="true" aria-current="true" class="locale-tabs__tab is-active">VI</div>
+            <div role="button" tabindex="0" aria-pressed="false" class="locale-tabs__tab">EN</div>
+          </div>
+        </div>
+        <ul class="header-mobile-nav__list">
+          <li class="header-mobile-nav__item" style="--nav-stagger: 0;">
+            <button type="button" class="header-mobile-nav__row" aria-expanded="false" data-mobile-row="gioi-thieu">
+              <span class="header-mobile-nav__row-label">Giới thiệu</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down header-mobile-nav__row-icon" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+            </button>
+            <div class="header-mobile-nav__panel" aria-hidden="true">
+              <div class="header-mobile-nav__panel-inner"><a class="header-mobile-nav__parent-link" href="/vi/introduction"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-up-right header-mobile-nav__parent-icon" aria-hidden="true"><path d="M7 7h10v10"></path><path d="M7 17 17 7"></path></svg>Giới thiệu dự án</a><div class="header-mega"><div class="header-mega__col"><a class="header-mega__heading" href="/#ve-du-an">Lưu Sắc Kim Hoàng</a><ul class="header-mega__links"><li><a class="header-mega__link" href="/#ve-du-an">Câu chuyện thương hiệu</a></li><li><a class="header-mega__link" href="/#tam-nhin">Tầm nhìn</a></li><li><a class="header-mega__link" href="/#su-menh">Sứ mệnh</a></li></ul></div><div class="header-mega__col"><a class="header-mega__heading" href="/vi/introduction/nghe-nhan">Nghệ Nhân &amp; Chuyên Gia</a><ul class="header-mega__links"><li><a class="header-mega__link" href="/vi/introduction/nghe-nhan/dao-dinh-chung">Nghệ nhân Đào Đình Chung</a></li><li><a class="header-mega__link" href="/vi/introduction/nghe-nhan/nguyen-thi-thu-hoa">Chuyên gia TS. Nguyễn Thị Thu Hòa</a></li></ul></div><div class="header-mega__col"><a class="header-mega__heading" href="/vi/introduction/doi-tac">Đối Tác</a><ul class="header-mega__links"><li><a class="header-mega__link" href="/vi/introduction/doi-tac/nha-tai-tro">Nhà tài trợ</a></li><li><a class="header-mega__link" href="/vi/introduction/doi-tac/bao-tro-truyen-thong">Bảo trợ truyền thông</a></li></ul></div></div></div>
+            </div>
+          </li>
+          <li class="header-mobile-nav__item" style="--nav-stagger: 1;">
+            <button type="button" class="header-mobile-nav__row" aria-expanded="false" data-mobile-row="tham-quan">
+              <span class="header-mobile-nav__row-label">Tham quan</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down header-mobile-nav__row-icon" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+            </button>
+            <div class="header-mobile-nav__panel" aria-hidden="true">
+              <div class="header-mobile-nav__panel-inner"><a class="header-mobile-nav__parent-link" href="/vi/visit"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-up-right header-mobile-nav__parent-icon" aria-hidden="true"><path d="M7 7h10v10"></path><path d="M7 17 17 7"></path></svg>Tất cả Tham quan</a><div class="header-mega"><div class="header-mega__col"><a class="header-mega__heading" href="/vi/visit/tranh">Tranh</a><ul class="header-mega__links"><li><a class="header-mega__link" href="/vi/visit/tranh">Bộ sưu tập tranh Kim Hoàng</a></li><li><a class="header-mega__link" href="/vi/visit/tranh#gold">Tranh nghệ thuật dát vàng</a></li><li><a class="header-mega__link" href="/vi/visit/tranh#masterpiece">Kiệt tác Lưu Sắc Kim Hoàng</a></li></ul></div><div class="header-mega__col"><a class="header-mega__heading" href="/vi/visit/hanh-trinh">Hành Trình</a><ul class="header-mega__links header-mega__links--2col"><li><a class="header-mega__link" href="/vi/visit/hanh-trinh#phan-1">1. Nguồn Cội Phường Tranh Kim Hoàng</a></li><li><a class="header-mega__link" href="/vi/visit/hanh-trinh#phan-2">2. Trận Lụt Ất Mão &amp; Thời Kỳ Thất Truyền</a></li><li><a class="header-mega__link" href="/vi/visit/hanh-trinh#phan-3">3. Dấu Tích Trong Sách Sử &amp; Bảo Tàng</a></li><li><a class="header-mega__link" href="/vi/visit/hanh-trinh#phan-4">4. Khởi Xướng Dự Án Phục Hồi</a></li><li><a class="header-mega__link" href="/vi/visit/hanh-trinh#phan-5">5. Khôi Phục Sắc Màu, Mộc Bản &amp; Giấy Dó</a></li><li><a class="header-mega__link" href="/vi/visit/hanh-trinh#phan-6">6. Phục Dựng 52 Mẫu Tranh &amp; Truyền Nghề</a></li><li><a class="header-mega__link" href="/vi/visit/hanh-trinh#phan-7">7. Sức Sống Mới Trong Đời Sống Đương Đại</a></li></ul></div><div class="header-mega__col"><a class="header-mega__heading" href="/vi/visit/3d">3D</a><ul class="header-mega__links"><li><a class="header-mega__link" href="/vi/visit/3d">Không gian thực tế ảo 3D</a></li><li><a class="header-mega__link" href="/vi/visit/3d#tour">Tour tham quan 360 độ</a></li><li><a class="header-mega__link" href="/vi/visit/3d#digital">Tương tác hiện vật số 3D</a></li></ul></div></div></div>
+            </div>
+          </li>
+          <li class="header-mobile-nav__item" style="--nav-stagger: 2;">
+            <button type="button" class="header-mobile-nav__row" aria-expanded="false" data-mobile-row="san-pham-sang-tao">
+              <span class="header-mobile-nav__row-label">Sản phẩm sáng tạo</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down header-mobile-nav__row-icon" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+            </button>
+            <div class="header-mobile-nav__panel" aria-hidden="true">
+              <div class="header-mobile-nav__panel-inner"><a class="header-mobile-nav__parent-link" href="/vi/services"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-up-right header-mobile-nav__parent-icon" aria-hidden="true"><path d="M7 7h10v10"></path><path d="M7 17 17 7"></path></svg>Tất cả Sản phẩm sáng tạo</a><div class="header-mega"><div class="header-mega__col"><a class="header-mega__heading" href="/vi/services/souvenirs">Sản phẩm vật lý &amp; Tranh sáng tạo</a><ul class="header-mega__links"><li><a class="header-mega__link" href="/vi/services/souvenirs?filter=vat-ly">Sản phẩm vật lý (TT Leather, Thảo Trần Studio)</a></li><li><a class="header-mega__link" href="/vi/services/souvenirs?filter=tranh-sang-tao">Tranh &amp; Minh họa sáng tạo (7 tác phẩm)</a></li></ul></div><div class="header-mega__col"><a class="header-mega__heading" href="/vi/visit/3d">Triển lãm &amp; Làm tranh 3D</a><ul class="header-mega__links"><li><a class="header-mega__link" href="/vi/visit/3d">Không gian triển lãm thực tế ảo 3D</a></li><li><a class="header-mega__link" href="/vi/visit/3d#digital">Trải nghiệm làm tranh &amp; hiện vật 3D</a></li></ul></div></div></div>
+            </div>
+          </li>
+<li class="header-mobile-nav__item" style="--nav-stagger: 3;">
+            <a class="header-mobile-nav__row" href="/vi/events" style="text-decoration:none;display:flex;align-items:center;justify-content:space-between;width:100%;">
+              <span class="header-mobile-nav__row-label">Sự kiện</span>
+            </a>
+          </li>
+          <li class="header-mobile-nav__item" style="--nav-stagger: 4;">
+            <a class="header-mobile-nav__row" href="/vi/posts" style="text-decoration:none;display:flex;align-items:center;justify-content:space-between;width:100%;">
+              <span class="header-mobile-nav__row-label">Tin tức</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </aside>
+</div>
+
+
+
+
+<div class="breadcrumb overflow-x-auto" style="padding-top:105px"><div class="container"><nav aria-label="Breadcrumb"><ol class="m-0 flex min-w-0 list-none flex-nowrap items-center gap-x-0 p-0"><li class="inline-flex min-w-0 shrink-0 items-center"><a class="truncate" href="/vi">Trang chủ</a></li><li class="inline-flex min-w-0 shrink-0 items-center"><span class="sep" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right h-2 w-2" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></span><a class="truncate" href="/vi/introduction">Giới thiệu</a></li><li class="inline-flex min-w-0 shrink-0 items-center"><span class="sep" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right h-2 w-2" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></span><span class="truncate">Đối Tác</span></li><li class="inline-flex min-w-0 shrink-0 items-center"><span class="sep" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right h-2 w-2" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></span><span aria-current="page" class="truncate">Thông tin Bảo trợ truyền thông</span></li></ol></nav></div></div></section><article>
+  <style>
+    .dt-page-bg {
+      position: relative;
+      background-color: #f5f1e8;
+      background-image: url("/images/bg-paper-l3.webp");
+      background-size: 100% auto;
+      background-position: center top;
+      background-repeat: repeat-y;
+      padding: 24px 16px 64px;
+      min-height: 100dvh;
+    }
+    .dt-sheet {
+      max-width: 1140px;
+      margin: 0 auto;
+      background-color: #ffffff;
+      padding: 40px 48px 56px;
+      box-shadow: 0 4px 28px rgba(0, 0, 0, 0.05);
+      border-radius: 6px;
+    }
+    .breadcrumb {
+      font-size: 14px !important;
+      padding-top: 112px !important;
+      padding-bottom: 14px !important;
+    }
+    .breadcrumb a,
+    .breadcrumb span {
+      font-size: 14px !important;
+    }
+    .dt-header-box {
+      text-align: center;
+      margin-bottom: 36px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid rgba(158, 28, 28, 0.15);
+    }
+    .dt-header-tag {
+      display: inline-block;
+      font-size: 12.5px;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #9e1c1c;
+      margin-bottom: 8px;
+    }
+    .dt-header-title {
+      font-size: 32px;
+      font-weight: 700;
+      color: #9e1c1c;
+      margin: 0 0 14px;
+      line-height: 1.25;
+      text-transform: uppercase;
+    }
+    .dt-header-desc {
+      max-width: 860px;
+      margin: 0 auto;
+      font-size: 15.5px;
+      line-height: 1.7;
+      color: #444444;
+    }
+
+    /* Rank section headers */
+    .dt-rank-section {
+      margin-bottom: 48px;
+    }
+    .dt-rank-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding-bottom: 12px;
+      margin-bottom: 24px;
+      border-bottom: 2px solid #9e1c1c;
+    }
+    .dt-rank-title {
+      font-size: 21px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #9e1c1c;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .dt-rank-count {
+      font-size: 13px;
+      font-weight: 600;
+      padding: 3px 12px;
+      border-radius: 999px;
+      background: rgba(158, 28, 28, 0.08);
+      color: #9e1c1c;
+    }
+
+    /* Partner Cards */
+    .partner-card {
+      display: grid;
+      grid-template-columns: 320px minmax(0, 1fr);
+      gap: 32px;
+      background: #faf8f5;
+      border-radius: 8px;
+      border: 1px solid rgba(158, 28, 28, 0.16);
+      padding: 26px;
+      margin-bottom: 26px;
+      box-shadow: 0 4px 16px rgba(43, 22, 13, 0.04);
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+    .partner-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(158, 28, 28, 0.1);
+      border-color: rgba(158, 28, 28, 0.32);
+    }
+    .partner-card__media {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      border-radius: 6px;
+      overflow: hidden;
+      background-color: #8c1818;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+    }
+    .partner-card__img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.3s ease;
+    }
+    .partner-card:hover .partner-card__img {
+      transform: scale(1.02);
+    }
+    .partner-card__content {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
+    .partner-card__badge-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .rank-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 13px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .rank-badge--diamond {
+      background: linear-gradient(135deg, #fff9e6 0%, #fee8a6 100%);
+      color: #8c1818;
+      border: 1px solid #d4a017;
+      box-shadow: 0 2px 6px rgba(212, 160, 23, 0.2);
+    }
+    .rank-badge--platinum {
+      background: linear-gradient(135deg, #f0f7fb 0%, #d8eaf5 100%);
+      color: #174868;
+      border: 1px solid #7eb8db;
+      box-shadow: 0 2px 6px rgba(126, 184, 219, 0.2);
+    }
+    .rank-badge--silver {
+      background: linear-gradient(135deg, #f7f7f9 0%, #e2e4e8 100%);
+      color: #374151;
+      border: 1px solid #b5bac4;
+      box-shadow: 0 2px 6px rgba(100, 116, 139, 0.15);
+    }
+    .rank-badge--bronze {
+      background: linear-gradient(135deg, #fdf5ef 0%, #f6dccb 100%);
+      color: #78370f;
+      border: 1px solid #dca177;
+      box-shadow: 0 2px 6px rgba(220, 161, 119, 0.2);
+    }
+    .rank-badge--media {
+      background: linear-gradient(135deg, #fff2f2 0%, #fcdcdc 100%);
+      color: #9e1c1c;
+      border: 1px solid #e29b9b;
+      box-shadow: 0 2px 6px rgba(158, 28, 28, 0.12);
+    }
+    .partner-card__title {
+      font-size: 23px;
+      font-weight: 700;
+      color: #9e1c1c;
+      margin: 0 0 14px;
+      line-height: 1.3;
+    }
+    .partner-card__body {
+      font-size: 14.5px;
+      line-height: 1.7;
+      color: #333333;
+      margin-bottom: 20px;
+      flex: 1;
+    }
+    .partner-card__body p {
+      margin: 0 0 10px;
+    }
+    .partner-card__quote {
+      padding: 12px 16px;
+      background: #f1eae0;
+      border-left: 3px solid #9e1c1c;
+      border-radius: 0 4px 4px 0;
+      font-size: 13.5px;
+      color: #493a32;
+      margin: 12px 0 14px;
+      line-height: 1.6;
+    }
+    .partner-card__footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding-top: 14px;
+      border-top: 1px dashed rgba(158, 28, 28, 0.2);
+    }
+    .partner-card__btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 18px;
+      border-radius: 4px;
+      background: #9e1c1c;
+      color: #ffffff !important;
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: background 0.2s ease, transform 0.15s ease;
+    }
+    .partner-card__btn:hover {
+      background: #7a1111;
+      transform: translateY(-1px);
+    }
+    .partner-card__meta-tag {
+      font-size: 13px;
+      color: #777777;
+    }
+
+    /* Back link button */
+    .dt-back-nav {
+      margin-top: 40px;
+      text-align: center;
+    }
+    .dt-back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 22px;
+      border: 1px solid #9e1c1c;
+      border-radius: 4px;
+      color: #9e1c1c !important;
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      background: #ffffff;
+      transition: all 0.2s ease;
+    }
+    .dt-back-link:hover {
+      background: #9e1c1c;
+      color: #ffffff !important;
+    }
+
+    @media (max-width: 860px) {
+      .dt-sheet {
+        padding: 28px 20px 40px;
+      }
+      .partner-card {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        padding: 18px;
+      }
+      .partner-card__media {
+        max-width: 320px;
+        margin: 0 auto;
+      }
+      .dt-header-title {
+        font-size: 26px;
+      }
+    }
+  </style>
+
+  <div class="dt-page-bg">
+    <div class="dt-sheet">
+      <!-- Header -->
+      <div class="dt-header-box">
+        <span class="dt-header-tag">Mạng Lưới Truyền Thông Đồng Hành</span>
+        <h1 class="dt-header-title font-serif">Thông Tin Bảo Trợ Truyền Thông</h1>
+        <p class="dt-header-desc">
+          Các đơn vị <strong>Bảo trợ truyền thông</strong> là nhịp cầu quan trọng kết nối dự án <strong>Lưu Sắc Kim Hoàng</strong> với đông đảo bạn đọc, người yêu nghệ thuật dân gian và đặc biệt là thế hệ trẻ. Sự đồng hành này giúp những câu chuyện về hành trình phục hồi tranh đỏ Kim Hoàng được lan tỏa sâu rộng, đúng thời điểm và chạm tới trái tim công chúng.
+        </p>
+      </div>
+
+      <!-- PARTNER LIST (4 ĐƠN VỊ) -->
+      <div class="dt-partner-list">
+        <!-- 1. Youth+ -->
+        <article class="partner-card">
+          <div class="partner-card__media">
+            <img decoding="async" class="partner-card__img" src="/media/doi-tac/youth-plus.jpg" alt="Youth+ - Đơn vị Bảo trợ truyền thông" loading="eager" />
+          </div>
+          <div class="partner-card__content">
+            <div class="partner-card__badge-wrap">
+              <span class="rank-badge rank-badge--media">Đơn Vị Bảo Trợ Truyền Thông</span>
+            </div>
+            <h2 class="partner-card__title font-serif">Youth+</h2>
+            <div class="partner-card__body">
+              <p>
+                <strong>Youth+</strong> là nền tảng <em>“ĐỊNH HƯỚNG VÀ KẾT NỐI VIỆC LÀM ĐƠN GIẢN CHÍNH XÁC”</em> uy tín dành cho giới trẻ, hoạt động dựa trên 4 giá trị cốt lõi:
+              </p>
+              <ul style="margin: 6px 0 12px 20px; line-height: 1.6; list-style: disc; color: #444;">
+                <li><strong>Kết nối:</strong> Kết nối bạn trẻ – bạn trẻ; bạn trẻ – mentor; bạn trẻ – doanh nghiệp.</li>
+                <li><strong>Chia sẻ:</strong> Cộng đồng giao lưu, chia sẻ và học hỏi kiến thức đa lĩnh vực.</li>
+                <li><strong>Giá trị:</strong> Luôn nỗ lực tạo giá trị thực chất cho người trẻ.</li>
+                <li><strong>Tin cậy:</strong> Tạo lập môi trường tin cậy, đồng hành bền vững cùng thế hệ tương lai.</li>
+              </ul>
+              <div class="partner-card__quote">
+                &ldquo;Sự đồng hành của Youth+ mang ý nghĩa to lớn đối với Lưu Sắc Kim Hoàng, trực tiếp đưa câu chuyện về những con người đã dành tâm huyết đưa tranh Kim Hoàng trở lại đời sống đến gần hơn với cộng đồng thanh niên Việt Nam.&rdquo;
+              </div>
+            </div>
+            <div class="partner-card__footer">
+              <span class="partner-card__meta-tag">Hệ sinh thái giới trẻ · Định hướng &amp; Phát triển</span>
+              <a class="partner-card__btn" href="https://www.facebook.com/share/p/19wW2Evbhb/" target="_blank" rel="noopener noreferrer">
+                Xem bài viết trên Fanpage
+              </a>
+            </div>
+          </div>
+        </article>
+
+        <!-- 2. Khoa Truyền Thông - Đại học FPT -->
+        <article class="partner-card">
+          <div class="partner-card__media">
+            <img decoding="async" class="partner-card__img" src="/media/doi-tac/khoa-truyen-thong-fptu.jpg" alt="Khoa Truyền Thông FPTU - Đơn vị Bảo trợ truyền thông" loading="lazy" />
+          </div>
+          <div class="partner-card__content">
+            <div class="partner-card__badge-wrap">
+              <span class="rank-badge rank-badge--media">Đơn Vị Bảo Trợ Truyền Thông</span>
+            </div>
+            <h2 class="partner-card__title font-serif">Khoa Truyền Thông – Đại Học FPT Hà Nội</h2>
+            <div class="partner-card__body">
+              <p>
+                Dự án <strong>Lưu Sắc Kim Hoàng</strong> là một dự án truyền thông giàu ý nghĩa được thực hiện bởi chính các bạn sinh viên chuyên ngành Truyền Thông Đa Phương Tiện của Đại học FPT (FPTU). Vì vậy, sự đồng hành bảo trợ từ Khoa Truyền Thông là sự bảo chứng chuyên môn và nguồn tự hào to lớn của đội ngũ dự án.
+              </p>
+              <p>
+                Tại ngành Công nghệ Truyền thông FPTU, sinh viên được đào tạo trong môi trường thực tiễn mang hơi thở doanh nghiệp, tham gia các dự án thực tế ngay từ năm đầu, tiếp cận chuyên gia đầu ngành và phát triển toàn diện tư duy chiến lược, kỹ năng sáng tạo đa phương tiện, phân tích dữ liệu và năng lực triển khai chiến dịch truyền thông đa nền tảng.
+              </p>
+              <div class="partner-card__quote">
+                &ldquo;Khoa Truyền Thông – Đại học FPT là điểm tựa tri thức và bảo trợ truyền thông vững chắc, giúp lan tỏa thông điệp tôn vinh nghệ nhân và nghệ thuật tranh dân gian một cách chuyên nghiệp, sáng tạo.&rdquo;
+              </div>
+            </div>
+            <div class="partner-card__footer">
+              <span class="partner-card__meta-tag">Giáo dục đại học · Công nghệ truyền thông · FPTU</span>
+              <a class="partner-card__btn" href="https://www.facebook.com/share/p/1CYubDmy2c/" target="_blank" rel="noopener noreferrer">
+                Xem bài viết trên Fanpage
+              </a>
+            </div>
+          </div>
+        </article>
+
+        <!-- 3. Giải Trí Văn Hóa -->
+        <article class="partner-card">
+          <div class="partner-card__media">
+            <img decoding="async" class="partner-card__img" src="/media/doi-tac/giai-tri-van-hoa.jpg" alt="Giải Trí Văn Hóa - Đơn vị Bảo trợ truyền thông" loading="lazy" />
+          </div>
+          <div class="partner-card__content">
+            <div class="partner-card__badge-wrap">
+              <span class="rank-badge rank-badge--media">Đơn Vị Bảo Trợ Truyền Thông</span>
+            </div>
+            <h2 class="partner-card__title font-serif">Giải Trí Văn Hóa</h2>
+            <div class="partner-card__body">
+              <p>
+                <strong>Giải Trí Văn Hóa</strong> là kênh thông tin điện tử chuyên biệt, cập nhật liên tục những tin tức nổi bật và góc nhìn sâu sắc về văn hóa, nghệ thuật và đời sống giải trí đương đại.
+              </p>
+              <p>
+                Tại đây, độc giả không chỉ nắm bắt nhanh chóng các sự kiện nóng hổi mà còn khám phá thế giới đa dạng qua các lĩnh vực: Sự kiện, Nghệ thuật, Hậu trường, Giới trẻ, Du lịch và Công nghệ.
+              </p>
+              <div class="partner-card__quote">
+                &ldquo;Lưu Sắc Kim Hoàng tin rằng khi giá trị nhân văn được truyền thông đúng lúc, đúng nơi và đúng người, giá trị ấy sẽ được nhân rộng và tạo thêm nhiều dấu ấn bền vững trong đời sống tinh thần của cộng đồng.&rdquo;
+              </div>
+            </div>
+            <div class="partner-card__footer">
+              <span class="partner-card__meta-tag">Thông tin văn hóa · Nghệ thuật · Giới trẻ</span>
+              <a class="partner-card__btn" href="https://www.facebook.com/share/p/195JymP3xY/" target="_blank" rel="noopener noreferrer">
+                Xem bài viết trên Fanpage
+              </a>
+            </div>
+          </div>
+        </article>
+
+        <!-- 4. Connect Vietnam (Tracuudi.vn) -->
+        <article class="partner-card">
+          <div class="partner-card__media">
+            <img decoding="async" class="partner-card__img" src="/media/doi-tac/connect-vietnam.jpg" alt="Connect Vietnam - Đơn vị Bảo trợ truyền thông" loading="lazy" />
+          </div>
+          <div class="partner-card__content">
+            <div class="partner-card__badge-wrap">
+              <span class="rank-badge rank-badge--media">Đơn Vị Bảo Trợ Truyền Thông</span>
+            </div>
+            <h2 class="partner-card__title font-serif">Connect Vietnam (Tracuudi.vn)</h2>
+            <div class="partner-card__body">
+              <p>
+                <strong>Connect Vietnam</strong> là đơn vị tiên phong xây dựng hệ sinh thái công nghệ, dữ liệu và truyền thông xoay quanh văn hóa truyền thống Việt Nam.
+              </p>
+              <p>
+                Xuất phát từ những trăn trở trong việc tìm kiếm, tiếp cận và lưu giữ tư liệu văn hóa cổ truyền, Connect Vietnam phát triển nền tảng số <strong>Tracuudi.vn</strong> &mdash; cổng dữ liệu văn hóa mở kết nối thông tin, hình ảnh và tư liệu về di tích lịch sử, lễ hội cổ truyền, làng nghề truyền thống, nghệ nhân và tinh hoa văn hóa các vùng miền. Nền tảng cùng cộng đồng gìn giữ, chia sẻ và tiếp nối các giá trị văn hóa quý báu của dân tộc.
+              </p>
+              <div class="partner-card__quote">
+                &ldquo;Sự đồng hành của Connect Vietnam là chiếc cầu nối số quan trọng, góp phần đưa các tư liệu, hình ảnh và tri thức về dòng tranh đỏ Kim Hoàng đến với mạng lưới bạn đọc yêu văn hóa trên khắp cả nước.&rdquo;
+              </div>
+            </div>
+            <div class="partner-card__footer">
+              <span class="partner-card__meta-tag">Công nghệ văn hóa · Dữ liệu số Tracuudi.vn</span>
+              <a class="partner-card__btn" href="https://www.facebook.com/share/p/1Fu6Lbe688/" target="_blank" rel="noopener noreferrer">
+                Xem bài viết trên Fanpage
+              </a>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <!-- Back to Doi Tac Hub -->
+      <div class="dt-back-nav"><a class="dt-back-link" href="/vi/introduction/doi-tac/nha-tai-tro">Xem Nhà tài trợ đồng hành</a></div>
+    </div>
+  </div>
+</article><!--$--><!--/$--><!-- Partner Logos Marquee/Carousel -->
+<!-- Partner & Sponsor Infinite Marquee (Hailuunguoc.vn Standard) -->
+<section class="partner-logos-bar sponsor-strip" aria-label="Đối tác &amp; Đồng hành">
+  <div class="container partner-logos-container">
+    <div class="partner-logos-header">
+      <h3 class="partner-logos-title font-serif">ĐỐI TÁC &amp; ĐỒNG HÀNH</h3>
+    </div>
+  </div>
+  <div class="partner-carousel-viewport partner-marquee-viewport" aria-label="Danh sách đối tác và nhà tài trợ">
+    <div class="partner-carousel-track partner-marquee-track">
+      <!-- Group Set 1 -->
+      <div class="partner-ticker-group-set">
+        
+        <!-- Đơn Vị Tổ Chức -->
+        <div class="partner-group">
+          <p class="partner-group__label">Đơn Vị Tổ Chức</p>
+          <div class="partner-group__logos">
+            <span class="partner-logo-item partner-logo-item--wide" title="FPT University">
+              <img decoding="async" src="/media/doi-tac/logos/fpt-university.png?v=5" alt="FPT University" loading="lazy" />
+            </span>
+            <span class="partner-logo-item partner-logo-item--tall" title="Lưu Sắc Kim Hoàng">
+              <img decoding="async" src="/logo-lskh.png?v=3" alt="Lưu Sắc Kim Hoàng" loading="lazy" />
+            </span>
+          </div>
+        </div>
+
+        <!-- Nhà Tài Trợ Kim Cương -->
+        <div class="partner-group">
+          <p class="partner-group__label">Nhà Tài Trợ Kim Cương</p>
+          <div class="partner-group__logos">
+            <a class="partner-logo-item partner-logo-item--tall" href="/vi/introduction/doi-tac/nha-tai-tro#roseway" title="Roseway Academy">
+              <img decoding="async" src="/media/doi-tac/logos/roseway.png?v=3" alt="Roseway Academy" loading="lazy" />
+            </a>
+            <span class="partner-logo-item partner-logo-item--tall" title="Bảo Tàng Hà Nội">
+              <img decoding="async" src="/media/doi-tac/logos/bao-tang-ha-noi.png?v=4" alt="Bảo Tàng Hà Nội" loading="lazy" />
+            </span>
+          </div>
+        </div>
+
+        <!-- Nhà Tài Trợ Bạch Kim -->
+        <div class="partner-group">
+          <p class="partner-group__label">Nhà Tài Trợ Bạch Kim</p>
+          <div class="partner-group__logos">
+            <span class="partner-logo-item partner-logo-item--wide" title="29 Photobooth">
+              <img decoding="async" src="/media/doi-tac/logos/29-photobooth.png?v=4" alt="29 Photobooth" loading="lazy" />
+            </span>
+          </div>
+        </div>
+
+        <!-- Nhà Tài Trợ Bạc -->
+        <div class="partner-group">
+          <p class="partner-group__label">Nhà Tài Trợ Bạc</p>
+          <div class="partner-group__logos">
+            <a class="partner-logo-item" href="/vi/introduction/doi-tac/nha-tai-tro#tri-viet" title="Trí Việt Agency">
+              <img decoding="async" src="/media/doi-tac/logos/tri-viet.png?v=3" alt="Trí Việt Agency" loading="lazy" />
+            </a>
+          </div>
+        </div>
+
+        <!-- Nhà Tài Trợ Đồng -->
+        <div class="partner-group">
+          <p class="partner-group__label">Nhà Tài Trợ Đồng</p>
+          <div class="partner-group__logos">
+            <a class="partner-logo-item" href="/vi/introduction/doi-tac/nha-tai-tro#dai-an" title="Đại An Contracting">
+              <img decoding="async" src="/media/doi-tac/logos/dai-an.png?v=3" alt="Đại An Contracting" loading="lazy" />
+            </a>
+          </div>
+        </div>
+
+        <!-- Đơn Vị Hỗ Trợ -->
+        <div class="partner-group">
+          <p class="partner-group__label">Đơn Vị Hỗ Trợ</p>
+          <div class="partner-group__logos">
+            <span class="partner-logo-item" title="610 Florist">
+              <img decoding="async" src="/media/doi-tac/logos/610-florist.png?v=3" alt="610 Florist" loading="lazy" />
+            </span>
+          </div>
+        </div>
+
+        <!-- Bảo Trợ Truyền Thông -->
+        <div class="partner-group">
+          <p class="partner-group__label">Bảo Trợ Truyền Thông</p>
+          <div class="partner-group__logos">
+            <a class="partner-logo-item partner-logo-item--tall" href="/vi/introduction/doi-tac/bao-tro-truyen-thong#youth-plus" title="Youth+">
+              <img decoding="async" src="/media/doi-tac/logos/youth-plus.png?v=3" alt="Youth+" loading="lazy" />
+            </a>
+            <a class="partner-logo-item partner-logo-item--wide" href="/vi/introduction/doi-tac/bao-tro-truyen-thong#khoa-truyen-thong" title="Khoa Truyền Thông FPTU">
+              <img decoding="async" src="/media/doi-tac/logos/khoa-truyen-thong.png?v=3" alt="Khoa Truyền Thông FPTU" loading="lazy" />
+            </a>
+            <a class="partner-logo-item partner-logo-item--wide" href="/vi/introduction/doi-tac/bao-tro-truyen-thong#giai-tri-van-hoa" title="Giải Trí Văn Hóa">
+              <img decoding="async" src="/media/doi-tac/logos/giai-tri-van-hoa.png?v=3" alt="Giải Trí Văn Hóa" loading="lazy" />
+            </a>
+            <a class="partner-logo-item" href="/vi/introduction/doi-tac/bao-tro-truyen-thong#connect-vietnam" title="Connect Vietnam">
+              <img decoding="async" src="/media/doi-tac/logos/connect-vietnam.png?v=3" alt="Connect Vietnam" loading="lazy" />
+            </a>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Group Set 2 (Identical Clone for Seamless Infinite Loop) -->
+      <div class="partner-ticker-group-set" aria-hidden="true">
+        
+        <!-- Đơn Vị Tổ Chức -->
+        <div class="partner-group">
+          <p class="partner-group__label">Đơn Vị Tổ Chức</p>
+          <div class="partner-group__logos">
+            <span class="partner-logo-item partner-logo-item--wide" title="FPT University">
+              <img decoding="async" src="/media/doi-tac/logos/fpt-university.png?v=5" alt="FPT University" loading="lazy" />
+            </span>
+            <span class="partner-logo-item partner-logo-item--tall" title="Lưu Sắc Kim Hoàng">
+              <img decoding="async" src="/logo-lskh.png?v=3" alt="Lưu Sắc Kim Hoàng" loading="lazy" />
+            </span>
+          </div>
+        </div>
+
+        <!-- Nhà Tài Trợ Kim Cương -->
+        <div class="partner-group">
+          <p class="partner-group__label">Nhà Tài Trợ Kim Cương</p>
+          <div class="partner-group__logos">
+            <a class="partner-logo-item partner-logo-item--tall" href="/vi/introduction/doi-tac/nha-tai-tro#roseway" title="Roseway Academy">
+              <img decoding="async" src="/media/doi-tac/logos/roseway.png?v=3" alt="Roseway Academy" loading="lazy" />
+            </a>
+            <span class="partner-logo-item partner-logo-item--tall" title="Bảo Tàng Hà Nội">
+              <img decoding="async" src="/media/doi-tac/logos/bao-tang-ha-noi.png?v=4" alt="Bảo Tàng Hà Nội" loading="lazy" />
+            </span>
+          </div>
+        </div>
+
+        <!-- Nhà Tài Trợ Bạch Kim -->
+        <div class="partner-group">
+          <p class="partner-group__label">Nhà Tài Trợ Bạch Kim</p>
+          <div class="partner-group__logos">
+            <span class="partner-logo-item partner-logo-item--wide" title="29 Photobooth">
+              <img decoding="async" src="/media/doi-tac/logos/29-photobooth.png?v=4" alt="29 Photobooth" loading="lazy" />
+            </span>
+          </div>
+        </div>
+
+        <!-- Nhà Tài Trợ Bạc -->
+        <div class="partner-group">
+          <p class="partner-group__label">Nhà Tài Trợ Bạc</p>
+          <div class="partner-group__logos">
+            <a class="partner-logo-item" href="/vi/introduction/doi-tac/nha-tai-tro#tri-viet" title="Trí Việt Agency">
+              <img decoding="async" src="/media/doi-tac/logos/tri-viet.png?v=3" alt="Trí Việt Agency" loading="lazy" />
+            </a>
+          </div>
+        </div>
+
+        <!-- Nhà Tài Trợ Đồng -->
+        <div class="partner-group">
+          <p class="partner-group__label">Nhà Tài Trợ Đồng</p>
+          <div class="partner-group__logos">
+            <a class="partner-logo-item" href="/vi/introduction/doi-tac/nha-tai-tro#dai-an" title="Đại An Contracting">
+              <img decoding="async" src="/media/doi-tac/logos/dai-an.png?v=3" alt="Đại An Contracting" loading="lazy" />
+            </a>
+          </div>
+        </div>
+
+        <!-- Đơn Vị Hỗ Trợ -->
+        <div class="partner-group">
+          <p class="partner-group__label">Đơn Vị Hỗ Trợ</p>
+          <div class="partner-group__logos">
+            <span class="partner-logo-item" title="610 Florist">
+              <img decoding="async" src="/media/doi-tac/logos/610-florist.png?v=3" alt="610 Florist" loading="lazy" />
+            </span>
+          </div>
+        </div>
+
+        <!-- Bảo Trợ Truyền Thông -->
+        <div class="partner-group">
+          <p class="partner-group__label">Bảo Trợ Truyền Thông</p>
+          <div class="partner-group__logos">
+            <a class="partner-logo-item partner-logo-item--tall" href="/vi/introduction/doi-tac/bao-tro-truyen-thong#youth-plus" title="Youth+">
+              <img decoding="async" src="/media/doi-tac/logos/youth-plus.png?v=3" alt="Youth+" loading="lazy" />
+            </a>
+            <a class="partner-logo-item partner-logo-item--wide" href="/vi/introduction/doi-tac/bao-tro-truyen-thong#khoa-truyen-thong" title="Khoa Truyền Thông FPTU">
+              <img decoding="async" src="/media/doi-tac/logos/khoa-truyen-thong.png?v=3" alt="Khoa Truyền Thông FPTU" loading="lazy" />
+            </a>
+            <a class="partner-logo-item partner-logo-item--wide" href="/vi/introduction/doi-tac/bao-tro-truyen-thong#giai-tri-van-hoa" title="Giải Trí Văn Hóa">
+              <img decoding="async" src="/media/doi-tac/logos/giai-tri-van-hoa.png?v=3" alt="Giải Trí Văn Hóa" loading="lazy" />
+            </a>
+            <a class="partner-logo-item" href="/vi/introduction/doi-tac/bao-tro-truyen-thong#connect-vietnam" title="Connect Vietnam">
+              <img decoding="async" src="/media/doi-tac/logos/connect-vietnam.png?v=3" alt="Connect Vietnam" loading="lazy" />
+            </a>
+          </div>
+        </div>
+
+      </div>
+    
+    </div>
+  </div>
+</section>
+<div id="site-footer-container">
+<footer class="site-footer mt-auto">
+  <div class="site-footer__inner container">
+    <div class="site-footer__main">
+      <div class="site-footer__brand">
+        <a class="flex shrink-0 items-center" href="/vi">
+          <div class="logo-brand graphic-logo logo-brand--stacked">
+            <img decoding="async" src="/logo-lskh.png?v=2" alt="Lưu Sắc Kim Hoàng" class="logo-brand__icon" loading="lazy"/>
+          </div>
+        </a>
+        <p class="site-footer__desc">
+          Dự án bảo tồn, phục dựng và lan tỏa giá trị dòng tranh dân gian Kim Hoàng trong đời sống đương đại.
+        </p>
+        <div class="site-footer__contact">
+          <a class="site-footer__contact-link" href="mailto:luusackimhoang@gmail.com">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-mail" aria-hidden="true"><rect width="20" height="16" x="2" y="4" rx="2"></rect><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path></svg>
+            <span>luusackimhoang@gmail.com</span>
+          </a>
+        </div>
+        <div class="site-footer__social">
+          <p class="site-footer__social-label">THEO DÕI CHÚNG TÔI</p>
+          <ul class="site-footer__social-list">
+            <li>
+              <a class="site-footer__social-link site-footer__social-link--fb" href="https://www.facebook.com/profile.php?id=61595100294116" target="_blank" rel="noopener noreferrer" aria-label="Facebook Lưu Sắc Kim Hoàng" title="Facebook Lưu Sắc Kim Hoàng">
+                <svg viewBox="0 0 320 512" width="18" height="18" fill="currentColor" aria-hidden="true">
+                  <path d="M279.14 288l14.22-92.66h-88.91v-60.13c0-25.35 12.42-50.06 52.24-50.06h40.42V6.26S260.43 0 225.36 0c-73.22 0-121.08 44.38-121.08 124.72v70.62H22.89V288h81.39v224h100.17V288z"/>
+                </svg>
+              </a>
+            </li>
+            <li>
+              <a class="site-footer__social-link site-footer__social-link--tiktok" href="https://www.tiktok.com/@luusackimhoang26" target="_blank" rel="noopener noreferrer" aria-label="TikTok @luusackimhoang26" title="TikTok @luusackimhoang26">
+                <svg viewBox="0 0 448 512" width="18" height="18" fill="currentColor" aria-hidden="true">
+                  <path d="M448,209.91a210.06,210.06,0,0,1-122.77-39.25V349.38A162.55,162.55,0,1,1,185,188.31V278.2a74.62,74.62,0,1,0,52.23,71.18V0l88,0a121.18,121.18,0,0,0,1.86,22.17h0A122.18,122.18,0,0,0,381,102.39a121.43,121.43,0,0,0,67,20.14Z"/>
+                </svg>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <nav class="site-footer__nav" aria-label="Footer Navigation">
+        <div class="site-footer__nav-grid">
+          <div class="site-footer__nav-column">
+            <a class="site-footer__nav-title" href="/vi/introduction">Giới thiệu</a>
+            <ul class="site-footer__nav-links">
+              <li><a class="site-footer__nav-link" href="/#ve-du-an">Câu chuyện thương hiệu</a></li>
+              <li><a class="site-footer__nav-link" href="/#tam-nhin">Tầm nhìn</a></li>
+              <li><a class="site-footer__nav-link" href="/#su-menh">Sứ mệnh</a></li>
+              <li><a class="site-footer__nav-link" href="/vi/introduction/nghe-nhan">Nghệ nhân &amp; Chuyên gia</a></li>
+              <li><a class="site-footer__nav-link" href="/vi/introduction/doi-tac">Đối tác &amp; Đồng hành</a></li>
+            </ul>
+          </div>
+          <div class="site-footer__nav-column">
+            <a class="site-footer__nav-title" href="/vi/visit">Tham quan</a>
+            <ul class="site-footer__nav-links">
+              <li><a class="site-footer__nav-link" href="/vi/visit/tranh">Tranh dân gian Kim Hoàng</a></li>
+              <li><a class="site-footer__nav-link" href="/vi/visit/hanh-trinh">Hành trình phục dựng</a></li>
+              <li><a class="site-footer__nav-link" href="/vi/visit/3d">Không gian thực tế ảo 3D</a></li>
+            </ul>
+          </div>
+          <div class="site-footer__nav-column">
+            <a class="site-footer__nav-title" href="/vi/services">Sản phẩm sáng tạo</a>
+            <ul class="site-footer__nav-links">
+              <li><a class="site-footer__nav-link" href="/vi/services/souvenirs">Tất cả sản phẩm sáng tạo</a></li>
+              <li><a class="site-footer__nav-link" href="/vi/services/souvenirs?filter=vat-ly">Sản phẩm vật lý</a></li>
+              <li><a class="site-footer__nav-link" href="/vi/services/souvenirs?filter=tranh-sang-tao">Tranh &amp; Minh họa sáng tạo</a></li>
+              <li><a class="site-footer__nav-link" href="/vi/visit/3d">Triển lãm &amp; Làm tranh 3D</a></li>
+            </ul>
+          </div>
+          <div class="site-footer__nav-column">
+            <a class="site-footer__nav-title" href="/vi/events">Sự kiện &amp; Tin tức</a>
+            <ul class="site-footer__nav-links">
+              <li><a class="site-footer__nav-link" href="/vi/events">Sự kiện &amp; Hoạt động</a></li>
+              <li><a class="site-footer__nav-link" href="/vi/posts">Tin tức &amp; Báo chí</a></li>
+              <li><a class="site-footer__nav-link" href="/vi/search">Tìm kiếm</a></li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+    </div>
+    <div class="site-footer__bottom">
+      <p class="site-footer__copyright">© 2026 Lưu Sắc Kim Hoàng. Bảo lưu mọi quyền.</p>
+      <p class="site-footer__credit">Gìn giữ &amp; Lan tỏa văn hóa Việt Nam</p>
+    </div>
+  </div>
+</footer>
+</div>
+  <script src="/js/main.js?v=34"></script>
+</body>
+</html>

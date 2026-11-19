@@ -1,34 +1,32 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "**/*",
-      "use": "@vercel/static"
-    }
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "rewrites": [
+    { "source": "/vi", "destination": "/index.html" },
+    { "source": "/vi/", "destination": "/index.html" },
+    { "source": "/vi/news", "destination": "/vi/posts/index.html" },
+    { "source": "/vi/news/", "destination": "/vi/posts/index.html" },
+    { "source": "/vi/creative-products", "destination": "/vi/services/souvenirs/index.html" },
+    { "source": "/vi/creative-products/", "destination": "/vi/services/souvenirs/index.html" }
   ],
-  "routes": [
+  "headers": [
     {
-      "src": "/(data|docs|plans)/.*",
-      "status": 404
+      "source": "/(.*)\\.(css|js|webp|png|jpg|jpeg|svg|woff|woff2|ttf|otf|mp3|mp4|glb)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=604800, stale-while-revalidate=86400"
+        }
+      ]
     },
     {
-      "src": "/assets/loc-do/(.*)",
-      "headers": {
-        "Content-Disposition": "attachment; filename=\"$1\"",
-        "Cache-Control": "public, max-age=31536000, immutable",
-        "X-Content-Type-Options": "nosniff"
-      },
-      "continue": true
-    },
-    {
-      "src": "/(.*)",
-      "headers": {
-        "X-Content-Type-Options": "nosniff",
-        "X-Frame-Options": "DENY",
-        "Referrer-Policy": "strict-origin-when-cross-origin",
-        "Permissions-Policy": "camera=(), microphone=(), geolocation=()"
-      },
-      "continue": true
+      "source": "/trien-lam-3d/(.*)\\.glb",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "model/gltf-binary"
+        }
+      ]
     }
   ]
 }

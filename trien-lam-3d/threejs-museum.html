@@ -1,0 +1,1802 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Triển Lãm Số 3D | Lưu Sắc Kim Hoàng</title>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico?v=2" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=2" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=2" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=2" />
+  <link rel="stylesheet" href="fonts.css" />
+  <link rel="stylesheet" href="game/kim-hoang-ui.css?v=kim_hoang_ui_v33" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: 100%; height: 100%; overflow: hidden;
+      background: #0d0907;
+      font-family: 'Montserrat', system-ui, -apple-system, sans-serif;
+      color: #fff;
+      user-select: none;
+    }
+
+    #viewer-canvas { position: fixed; inset: 0; z-index: 1; }
+    #hotspots-layer { position: fixed; inset: 0; z-index: 2; pointer-events: none; overflow: hidden; }
+
+    /* Welcome Screen */
+    #welcome-screen {
+      position: fixed; inset: 0; z-index: 50;
+      background: radial-gradient(circle at center, rgba(24, 15, 10, 0.72) 0%, rgba(10, 6, 4, 0.92) 100%);
+      backdrop-filter: blur(6px);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center; padding: 24px;
+      transition: opacity 0.5s ease, visibility 0.5s ease;
+    }
+    #welcome-screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+    .welcome-sub {
+      color: #db9b4d; font-size: clamp(16px, 2.5vw, 28px);
+      font-weight: 700; letter-spacing: 2px;
+      text-shadow: 1px 1px 4px rgba(0,0,0,0.7);
+      margin-bottom: 10px;
+    }
+    .welcome-title {
+      color: #ffffff; font-size: clamp(26px, 4.5vw, 48px);
+      font-weight: 700; letter-spacing: 1px;
+      text-shadow: 1px 2px 6px rgba(0,0,0,0.8);
+      margin-bottom: 32px;
+    }
+    .welcome-btn {
+      background: linear-gradient(135deg, #db9b4d, #b87a2e);
+      color: #1a1008; border: none; border-radius: 30px;
+      padding: 14px 36px; font-size: 15px; font-weight: 700;
+      letter-spacing: 1px; cursor: pointer;
+      box-shadow: 0 8px 25px rgba(219, 155, 77, 0.35);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .welcome-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(219, 155, 77, 0.5); }
+
+    .lang-switch-welcome { margin-top: 22px; display: flex; gap: 12px; }
+    .lang-pill {
+      background: rgba(255,255,255,0.08); color: #e6d7c3;
+      border: 1px solid rgba(219, 155, 77, 0.45);
+      padding: 7px 18px; border-radius: 20px; font-size: 12px; font-weight: 600;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .lang-pill.active, .lang-pill:hover { background: #db9b4d; color: #1a1008; }
+
+    /* 3DVista Exact UI Layout */
+    #top-right-langs {
+      position: fixed; top: 18px; right: 20px; z-index: 20;
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .vista-lang-btn {
+      width: 112px; padding: 6px 10px;
+      background: rgba(0, 0, 0, 0.42);
+      border: 1px solid rgba(255, 255, 255, 0.55);
+      border-radius: 5px;
+      color: #fff; font-size: 11px; font-weight: 600; letter-spacing: 0.5px;
+      text-align: center; cursor: pointer;
+      transition: background 0.15s;
+    }
+    .vista-lang-btn:hover, .vista-lang-btn.active { background: rgba(0, 0, 0, 0.72); border-color: #fff; }
+
+    #bottom-left-controls {
+      position: fixed; bottom: 16px; left: 16px; z-index: 20;
+      display: grid;
+      grid-template-columns: repeat(3, 42px);
+      grid-template-rows: 42px 42px;
+      gap: 4px;
+    }
+    .vista-sq-btn {
+      width: 42px; height: 42px;
+      background: rgba(0, 0, 0, 0.52);
+      border: 1px solid rgba(255, 255, 255, 0.65);
+      border-radius: 3px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; padding: 6px;
+      transition: background 0.15s;
+    }
+    .vista-sq-btn:hover { background: rgba(0, 0, 0, 0.8); border-color: #fff; }
+    .vista-sq-btn img { width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
+    .vista-sq-btn.pos-top { grid-column: 2; grid-row: 1; }
+    .vista-sq-btn.pos-bl { grid-column: 1; grid-row: 2; }
+    .vista-sq-btn.pos-bm { grid-column: 2; grid-row: 2; }
+    .vista-sq-btn.pos-br { grid-column: 3; grid-row: 2; }
+
+    #bottom-right-controls {
+      position: fixed; bottom: 16px; right: 16px; z-index: 20;
+      display: flex; gap: 6px; align-items: center;
+    }
+
+    /* Hotspots (nhỏ gọn, dịu mắt giống 3DVista) */
+    .hotspot {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      pointer-events: auto;
+      cursor: pointer;
+      transition: transform 0.15s ease, opacity 0.15s ease;
+    }
+    .hotspot:hover { transform: translate(-50%, -50%) scale(1.12); }
+
+    .hotspot-nav {
+      width: 46px; height: 46px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.78);
+      background: rgba(255, 255, 255, 0.12);
+      box-shadow: 0 0 10px rgba(0,0,0,0.35);
+      transform: translate(-50%, -50%) perspective(200px) rotateX(62deg);
+      opacity: 0.78;
+    }
+    .hotspot-nav:hover {
+      opacity: 1;
+      background: rgba(255, 255, 255, 0.28);
+      transform: translate(-50%, -50%) perspective(200px) rotateX(62deg) scale(1.18);
+    }
+
+    .hotspot-info {
+      background: transparent;
+      border: none;
+      z-index: 1;
+    }
+    .hotspot-info:hover {
+      background: transparent;
+      border: none;
+      transform: translate(-50%, -50%);
+    }
+    .hotspot-nav { z-index: 2; }
+
+    /* Navigation Help Panel (giống ảnh 1 khi nhấn ?) */
+    #nav-help-panel {
+      position: fixed; left: 20px; top: 20px; bottom: 112px; width: 270px; z-index: 35;
+      background: linear-gradient(180deg, rgba(84, 68, 45, 0.92) 0%, rgba(62, 50, 34, 0.94) 100%);
+      backdrop-filter: blur(8px);
+      border-radius: 10px;
+      padding: 28px 22px 20px;
+      display: none; flex-direction: column; justify-content: space-between;
+      box-shadow: 0 12px 35px rgba(0,0,0,0.55);
+    }
+    #nav-help-panel.open { display: flex; }
+    .nav-help-title {
+      text-align: center; font-size: 14px; font-weight: 700; letter-spacing: 1px; color: #fff;
+      margin-bottom: 20px;
+    }
+    .nav-help-list { display: flex; flex-direction: column; gap: 18px; flex: 1; justify-content: center; }
+    .nav-help-row {
+      display: flex; align-items: center; gap: 16px; color: #fff; font-size: 13px; font-style: italic;
+    }
+    .nav-help-row img { width: 32px; height: 32px; object-fit: contain; }
+    .nav-help-close {
+      align-self: center; background: transparent; border: none; color: #fff;
+      font-size: 22px; cursor: pointer; padding: 6px 14px; opacity: 0.85;
+    }
+    .nav-help-close:hover { opacity: 1; }
+
+    /* 3D Map Modal (giống ảnh 2 khi nhấn Map) */
+    #map-modal {
+      position: fixed; inset: 0; z-index: 45;
+      background: rgba(0,0,0,0.65); backdrop-filter: blur(4px);
+      display: none; align-items: center; justify-content: center; padding: 24px;
+    }
+    #map-modal.open { display: flex; }
+    .map-modal-card {
+      position: relative;
+      width: min(1040px, 94vw); aspect-ratio: 16 / 9;
+      background: #c5c1bd url('skin/museum-map-3d.png') center/cover no-repeat;
+      border-radius: 16px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.75);
+      display: flex; align-items: center; padding: 36px 42px;
+      overflow: hidden;
+    }
+    .map-close-btn {
+      position: absolute; top: 16px; right: 20px;
+      background: transparent; border: none; color: #fff;
+      font-size: 30px; font-weight: 300; cursor: pointer; line-height: 1;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.5);
+    }
+    .map-zones-col {
+      display: flex; flex-direction: column; gap: 10px; width: 46%; z-index: 2;
+    }
+    .map-zone-btn {
+      display: flex; align-items: center; gap: 14px;
+      padding: 8px 14px; border-radius: 8px;
+      background: transparent; border: 1px solid transparent;
+      cursor: pointer; text-align: left;
+      transition: all 0.15s;
+    }
+    .map-zone-btn:hover, .map-zone-btn.active {
+      background: rgba(0, 0, 0, 0.52);
+      border-color: rgba(255, 255, 255, 0.75);
+    }
+    .map-zone-num {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: #520404; color: #fff;
+      border: 2px solid #fff;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700; flex-shrink: 0;
+    }
+    .map-zone-label {
+      color: #4b0000; font-size: 13px; font-weight: 700; letter-spacing: 0.4px;
+    }
+    .map-zone-btn:hover .map-zone-label,
+    .map-zone-btn.active .map-zone-label { color: #fff; }
+
+    /* Artwork Fullscreen Viewer — khớp 100% thông số 3DVista */
+    #info-modal {
+      position: fixed; inset: 0; z-index: 40;
+      background: #000;
+      display: none;
+      width: 100vw; height: 100vh; overflow: hidden;
+    }
+    #info-modal.open { display: block; }
+    .artwork-stage {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+    .artwork-stage img {
+      max-width: 100%; max-height: 100%; object-fit: contain;
+    }
+    .artwork-dim {
+      position: absolute; inset: 0; z-index: 42;
+      background: rgba(0, 0, 0, 0.35);
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.35s ease;
+    }
+    #info-modal.show-info .artwork-dim { opacity: 1; }
+    .artwork-close {
+      position: fixed; top: 2%; left: 1%; z-index: 48;
+      width: 40px; height: 40px;
+      background: transparent; border: none; color: #fff;
+      font-size: 28px; font-weight: 300; cursor: pointer; line-height: 1;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+    }
+    .album-nav {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      background: rgba(0,0,0,0.55); color: #fff; border: 1px solid rgba(255,255,255,0.3);
+      width: 38px; height: 38px; border-radius: 50%; cursor: pointer; font-size: 18px; z-index: 43;
+    }
+    .album-nav.prev { left: 18px; }
+    .album-nav.next { right: 18px; }
+
+    .vista-art-btn {
+      position: fixed; bottom: 1%; z-index: 46;
+      width: 60px; height: 60px;
+      background: transparent; border: none; padding: 0; cursor: pointer;
+      transition: transform 0.15s;
+    }
+    .vista-art-btn:hover { transform: scale(1.06); }
+    .vista-art-btn img { width: 100%; height: 100%; object-fit: contain; display: block; }
+    #btn-narrate { right: 6%; }
+    #btn-toggle-info { right: 3%; }
+    #btn-close-info {
+      right: 1.5%;
+      display: none;
+      color: #fff; font-size: 32px; font-weight: 300;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.6);
+    }
+    #info-modal.show-info #btn-toggle-info { display: none; }
+    #info-modal.show-info #btn-close-info { display: flex; align-items: center; justify-content: center; }
+    #info-modal.show-info #btn-narrate { right: 5.5%; }
+
+    .artwork-info-drawer {
+      position: fixed; top: 0; right: 0; bottom: 0;
+      width: min(370px, 26vw); min-width: 280px; z-index: 44;
+      display: flex; flex-direction: column;
+      background: rgba(132, 92, 44, 0.94) url('skin/Container_107E6BDA_73E2_B41D_41BC_A7E43B319D52.png') center/cover no-repeat;
+      background-blend-mode: soft-light;
+      transform: translateX(100%);
+      opacity: 0;
+      transition: transform 0.35s ease, opacity 0.35s ease;
+      font-size: 14px; line-height: 1.6; color: #fff;
+    }
+    #info-modal.show-info .artwork-info-drawer {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    .artwork-info-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 46px 26px 16px;
+    }
+    .artwork-info-footer {
+      height: 70px;
+      flex-shrink: 0;
+    }
+    .artwork-info-scroll hr { border: none; border-top: 1px solid rgba(255,255,255,0.22); margin: 14px 0; }
+    @media (max-width: 768px) {
+      #welcome-screen { padding: 18px; }
+      .welcome-sub { font-size: 13px; letter-spacing: 1.4px; }
+      .welcome-title { font-size: 22px; margin-bottom: 22px; line-height: 1.35; }
+      .welcome-btn { padding: 12px 26px; font-size: 13.5px; }
+
+      #top-right-langs { top: 10px; right: 10px; gap: 4px; }
+      .vista-lang-btn { width: 92px; padding: 5px 8px; font-size: 10px; }
+
+      #bottom-left-controls {
+        bottom: 12px; left: 12px;
+        grid-template-columns: repeat(3, 38px);
+        grid-template-rows: 38px 38px;
+        gap: 4px;
+      }
+      .vista-sq-btn { width: 38px; height: 38px; padding: 5px; }
+      #bottom-right-controls { bottom: 12px; right: 12px; }
+
+      /* Navigation Help Panel trên Mobile */
+      #nav-help-panel {
+        left: 12px; right: 12px; top: auto; bottom: 102px;
+        width: auto; max-height: 62vh;
+        padding: 18px 18px 14px;
+        overflow-y: auto;
+      }
+      .nav-help-title { margin-bottom: 12px; font-size: 13px; }
+      .nav-help-list { gap: 12px; }
+      .nav-help-row { font-size: 12.5px; gap: 12px; }
+      .nav-help-row img { width: 26px; height: 26px; }
+
+      /* 3D Map Modal trên Mobile — Hiển thị đầy đủ cả 5 khu vực và bản đồ 3D, không bị cắt hay tràn */
+      #map-modal { padding: 12px; }
+      .map-modal-card {
+        width: min(440px, 94vw);
+        aspect-ratio: auto;
+        min-height: 0;
+        max-height: 86vh;
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: flex-start;
+        padding: 44px 16px 16px;
+        background: linear-gradient(180deg, rgba(46, 28, 18, 0.94) 0%, rgba(28, 16, 10, 0.97) 100%);
+        border: 1.5px solid rgba(245, 197, 24, 0.45);
+        overflow-y: auto;
+      }
+      .map-modal-card::before {
+        content: '';
+        display: block;
+        width: 100%;
+        aspect-ratio: 4 / 3;
+        border-radius: 10px;
+        margin-bottom: 12px;
+        flex-shrink: 0;
+        background: #b6b1ac url('skin/museum-map-3d-mobile.jpg') center / contain no-repeat;
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+      }
+      .map-close-btn {
+        top: 10px; right: 14px;
+        width: 32px; height: 32px;
+        font-size: 26px;
+        display: flex; align-items: center; justify-content: center;
+      }
+      .map-zones-col {
+        width: 100%;
+        gap: 7px;
+      }
+      .map-zone-btn {
+        width: 100%;
+        padding: 9px 12px;
+        gap: 12px;
+        background: rgba(255, 255, 255, 0.07);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 10px;
+      }
+      .map-zone-btn:hover, .map-zone-btn.active {
+        background: rgba(219, 155, 77, 0.25);
+        border-color: #f5c518;
+      }
+      .map-zone-num {
+        width: 30px; height: 30px;
+        font-size: 13px;
+      }
+      .map-zone-label {
+        color: #fff6e5;
+        font-size: 12.5px;
+        line-height: 1.3;
+        white-space: normal;
+      }
+
+      /* Artwork Modal & Drawer thông tin tranh trên Mobile */
+      .artwork-close { top: 12px; left: 12px; width: 38px; height: 38px; background: rgba(0,0,0,0.5); border-radius: 50%; }
+      .artwork-info-drawer {
+        top: auto; left: 0; right: 0; bottom: 0;
+        width: 100%; min-width: 0;
+        height: 62vh; max-height: 75vh;
+        border-radius: 18px 18px 0 0;
+        border-top: 1.5px solid rgba(255, 213, 132, 0.5);
+        box-shadow: 0 -12px 35px rgba(0,0,0,0.75);
+        transform: translateY(100%);
+      }
+      #info-modal.show-info .artwork-info-drawer {
+        transform: translateY(0);
+      }
+      .artwork-info-scroll {
+        padding: 22px 18px 14px;
+      }
+      .artwork-info-footer { height: 64px; }
+      .vista-art-btn { width: 48px; height: 48px; bottom: 12px; }
+      #btn-narrate { right: 68px; }
+      #btn-toggle-info { right: 14px; }
+      #btn-close-info { right: 14px; }
+      #info-modal.show-info #btn-narrate { right: 68px; }
+    }
+
+    #loading-toast {
+      position: fixed; top: 70px; left: 50%; transform: translateX(-50%);
+      background: rgba(15,11,9,0.88); border: 1px solid #db9b4d;
+      color: #db9b4d; padding: 6px 14px; border-radius: 20px;
+      font-size: 12px; z-index: 30; display: none;
+    }
+
+    /* Nút CTA Trải Nghiệm Vẽ Tranh Kim Hoàng */
+    #workshop-cta {
+      position: fixed;
+      bottom: 84px;
+      left: 50%;
+      transform: translateX(-50%) translateY(16px);
+      z-index: 25;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 24px;
+      border-radius: 999px;
+      border: 1.5px solid #f5c518;
+      background: linear-gradient(135deg, rgba(96, 12, 12, 0.94), rgba(54, 8, 8, 0.96));
+      color: #fff6db;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      cursor: pointer;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55), 0 0 18px rgba(245, 197, 24, 0.25);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.28s ease, transform 0.28s ease, background 0.2s ease;
+    }
+    #workshop-cta.visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateX(-50%) translateY(0);
+    }
+    #workshop-cta:hover {
+      background: linear-gradient(135deg, rgba(130, 18, 18, 0.98), rgba(75, 10, 10, 0.98));
+      transform: translateX(-50%) translateY(-2px) scale(1.03);
+    }
+
+    #showcase-tooltip {
+      position: fixed;
+      z-index: 26;
+      padding: 7px 13px;
+      border-radius: 8px;
+      background: rgba(18, 10, 8, 0.9);
+      border: 1px solid #f5c518;
+      color: #ffe9a8;
+      font-size: 12px;
+      font-weight: 600;
+      pointer-events: none;
+      display: none;
+      white-space: nowrap;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Fullscreen Preloaded 3D Room Overlay */
+    #game-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      background: #0d0907;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 0.45s ease, visibility 0.45s ease;
+    }
+    #game-overlay.open {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+    #game-iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+
+    /* Back to main website button (standalone fullscreen mode only) */
+    #btn-back-site {
+      position: fixed;
+      top: 18px;
+      left: 18px;
+      z-index: 60;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      background: rgba(18, 10, 6, 0.72);
+      border: 1px solid rgba(219, 155, 77, 0.65);
+      border-radius: 999px;
+      color: #ffe08a;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.4px;
+      text-decoration: none;
+      backdrop-filter: blur(8px);
+      transition: background 0.2s, border-color 0.2s, transform 0.2s;
+    }
+    #btn-back-site:hover {
+      background: rgba(180, 24, 24, 0.9);
+      border-color: #ffe08a;
+      color: #fff;
+      transform: translateY(-1px);
+    }
+    body.is-embedded #btn-back-site {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+  <a id="btn-back-site" href="/vi/visit/3d" title="Quay lại Lưu Sắc Kim Hoàng">
+    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 19-7-7 7-7"></path><path d="M19 12H5"></path></svg>
+    <span>Về Lưu Sắc Kim Hoàng</span>
+  </a>
+  <audio id="bg-audio" loop>
+    <source src="background.mp3" type="audio/mp3" />
+  </audio>
+
+  <div id="viewer-canvas"></div>
+  <div id="hotspots-layer"></div>
+
+  <!-- Welcome Overlay -->
+  <div id="welcome-screen">
+    <div class="welcome-sub" id="w-sub">KHÔNG GIAN TRIỂN LÃM SỐ</div>
+    <div class="welcome-title" id="w-title">TRANH KIM HOÀNG VIỆT NAM</div>
+    <button class="welcome-btn" id="btn-enter">THAM QUAN TRIỂN LÃM</button>
+    <div class="lang-switch-welcome">
+      <button class="lang-pill active" data-lang="vi">TIẾNG VIỆT</button>
+      <button class="lang-pill" data-lang="en">ENGLISH</button>
+    </div>
+  </div>
+
+  <!-- Top Right Language Buttons (giống 3DVista) -->
+  <div id="top-right-langs">
+    <button class="vista-lang-btn" id="btn-en" data-lang="en">ENGLISH</button>
+    <button class="vista-lang-btn active" id="btn-vi" data-lang="vi">VIETNAMESE</button>
+  </div>
+
+  <!-- Bottom Left Control Cluster (giống 3DVista) -->
+  <div id="bottom-left-controls">
+    <button class="vista-sq-btn pos-top" id="btn-map" title="Bản đồ / Khu vực">
+      <img src="skin/Button_123F4514_73A7_BC16_41D3_946301F4B9A4.png" alt="Map" />
+    </button>
+    <button class="vista-sq-btn pos-bl" id="btn-prev" title="Quay lại">
+      <img src="skin/Button_082639AF_73A6_9433_41DD_25893F51AF02.png" alt="Prev" />
+    </button>
+    <button class="vista-sq-btn pos-bm" id="btn-audio" title="Âm thanh / Ngôn ngữ">
+      <img src="skin/Button_122FDE0E_73A7_EFF2_41CB_103BED20C85E.png" alt="Audio/Lang" />
+    </button>
+    <button class="vista-sq-btn pos-br" id="btn-next" title="Đi tiếp">
+      <img src="skin/Button_15FEB6E7_73A6_7C33_4188_A0A7FCC09627.png" alt="Next" />
+    </button>
+  </div>
+
+  <!-- Bottom Right Info Button (giống 3DVista) -->
+  <div id="bottom-right-controls">
+    <button class="vista-sq-btn" id="btn-info" title="Thông tin">
+      <img src="skin/Button_1585DD3B_73A6_AC13_41CF_F522B6512D3F.png" alt="Info" />
+    </button>
+  </div>
+
+  <!-- Navigation Help Panel (giống ảnh 1 khi bấm ?) -->
+  <div id="nav-help-panel">
+    <div class="nav-help-title" id="nav-help-title">NAVIGATION</div>
+    <div class="nav-help-list">
+      <div class="nav-help-row"><img src="skin/Button_1585DD3B_73A6_AC13_41CF_F522B6512D3F.png" alt=""> <span id="nh-info">Information</span></div>
+      <div class="nav-help-row"><img src="skin/Button_122FDE0E_73A7_EFF2_41CB_103BED20C85E.png" alt=""> <span id="nh-lang">Languages</span></div>
+      <div class="nav-help-row"><img src="skin/Button_123F4514_73A7_BC16_41D3_946301F4B9A4.png" alt=""> <span id="nh-map">Map</span></div>
+      <div class="nav-help-row"><img src="skin/Button_15FEB6E7_73A6_7C33_4188_A0A7FCC09627.png" alt=""> <span id="nh-next">Next</span></div>
+      <div class="nav-help-row"><img src="skin/Button_082639AF_73A6_9433_41DD_25893F51AF02.png" alt=""> <span id="nh-prev">Previous</span></div>
+    </div>
+    <button class="nav-help-close" id="close-nav-help">✕</button>
+  </div>
+
+  <!-- 3D Map Modal (giống ảnh 2 khi bấm Map) -->
+  <div id="map-modal">
+    <div class="map-modal-card">
+      <button class="map-close-btn" id="close-map">✕</button>
+      <div class="map-zones-col" id="zones-list"></div>
+    </div>
+  </div>
+
+  <!-- Artwork Fullscreen Modal (khớp 100% thông số 3DVista) -->
+  <audio id="narrator-audio"></audio>
+  <div id="info-modal">
+    <button class="artwork-close" id="close-modal">✕</button>
+    <div class="artwork-stage" id="modal-media">
+      <button class="album-nav prev" id="album-prev">‹</button>
+      <img id="modal-img" src="" alt="" />
+      <button class="album-nav next" id="album-next">›</button>
+    </div>
+    <div class="artwork-dim"></div>
+    <div class="artwork-info-drawer">
+      <div class="artwork-info-scroll" id="modal-body"></div>
+      <div class="artwork-info-footer"></div>
+    </div>
+    <button class="vista-art-btn" id="btn-narrate" title="Thuyết minh">
+      <img src="skin/IconButton_6B0CE09C_434B_D6C0_41C7_40BC8687ED23.png" alt="Audio" />
+    </button>
+    <button class="vista-art-btn" id="btn-toggle-info" title="Thông tin">
+      <img src="skin/IconButton_64C9ADAC_434C_2EC1_41BC_2F481F0B4635.png" alt="Info" />
+    </button>
+    <button class="vista-art-btn" id="btn-close-info" title="Thu gọn">›</button>
+  </div>
+
+  <div id="showcase-tooltip">Nhấn để ngồi xuống bàn vẽ tranh cùng Ông Đồ</div>
+
+  <!-- Native Kim Hoàng Crafting Table UI (from game/index.html) -->
+  <div id="kh-labels" class="hidden" aria-hidden="true"></div>
+  <canvas id="kh-brush-cursor" width="120" height="120" class="kh-brush-cursor hidden" aria-hidden="true"></canvas>
+
+  <div id="kh-print-hud" class="hidden">
+    <div id="hint3d"></div>
+    <div id="kh-info" class="hidden">
+      <button type="button" id="infox" aria-label="Đóng">×</button>
+      <b id="info-t"></b>
+      <p id="info-w"></p>
+      <p id="info-u"></p>
+      <p id="info-n"></p>
+    </div>
+    <div id="kh-bottom-actions">
+      <div id="donebar" class="hidden">
+        <button type="button" class="kh-btn" id="reprint2">In lại</button>
+        <button type="button" class="kh-btn primary" id="gocolor2">Mang tranh đi tô màu</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="kh-color-zoombar" class="kh-color-zoombar hidden">
+    <button type="button" class="kh-btn" id="cpan-toggle" title="Kéo để di chuyển vùng nhìn">✋ Di chuyển</button>
+    <button type="button" class="kh-btn" id="czoom-out" title="Thu nhỏ">−</button>
+    <button type="button" class="kh-btn" id="czoom-reset" title="Đặt lại 100%">100%</button>
+    <button type="button" class="kh-btn" id="czoom-in" title="Phóng to">+</button>
+  </div>
+
+  <aside id="kh-sidebar" class="kh-sidebar hidden" aria-label="Bàn làm tranh Kim Hoàng">
+    <div class="kh-sidebar-top">
+      <div class="kh-sidebar-actions">
+        <button type="button" id="kh-sheet-toggle" class="kh-sheet-toggle" aria-expanded="true">Thu gọn</button>
+        <button type="button" id="stand-up-btn" class="stand-up-btn" title="Đứng dậy (ESC)">Đứng dậy (ESC)</button>
+      </div>
+    </div>
+    <section id="p-pick">
+      <h2>Chọn bản khắc mẫu trên bàn</h2>
+      <p>Bạn đang ngồi tại bàn in tranh cùng Ông Đồ. Chọn một mẫu ván khắc bên dưới để đặt lên bàn và bắt đầu in.</p>
+      <div class="kh-cards" id="cards"></div>
+    </section>
+    <section id="p-print" class="hidden">
+      <h2>In tranh trực tiếp trên bàn</h2>
+      <figure class="kh-block-fig" id="blockfig">
+        <img id="blockimg" alt="Ván khắc gỗ thật" />
+        <figcaption>Ván khắc gỗ thật của bản in này. Chỉ phần nổi trên ván ăn mực.</figcaption>
+      </figure>
+      <ol class="kh-flow" id="flow">
+        <li data-s="ink">Cầm con lăn mực trên bàn, nhúng khay rồi lăn lên ván</li>
+        <li data-s="place">Chạm vào chồng giấy để đặt lên ván</li>
+        <li data-s="press">Cầm con lăn ép trên bàn, lăn lên giấy</li>
+        <li data-s="peel">Chạm vào giấy để bóc và lật lại</li>
+      </ol>
+      <p class="kh-note kh-print-tip"><strong>Lưu ý:</strong> Khi lăn mực và lăn ép phải lăn thật đều và kĩ thì hình in mới rõ, không bị mất nét.</p>
+      <div class="kh-row">
+        <button type="button" class="kh-btn primary hidden" id="gocolor">Tô màu ngay trên bàn</button>
+        <button type="button" class="kh-btn" id="reprint">In lại từ đầu</button>
+        <button type="button" class="kh-btn" id="back-to-pick">Đổi mẫu khác</button>
+      </div>
+    </section>
+    <section id="p-color" class="hidden">
+      <h2>Tự tay chấm phá màu trên bàn</h2>
+      <p>Đưa chuột lên tờ tranh đang trải trên mặt bàn gỗ trước mặt bạn để tô màu trực tiếp.</p>
+      <div class="kh-tools" id="tools">
+        <button type="button" class="kh-btn tool on" data-t="brush">Cọ vẽ</button>
+        <button type="button" class="kh-btn tool" data-t="fill">Đổ màu vùng</button>
+        <button type="button" class="kh-btn tool" data-t="erase">Tẩy</button>
+      </div>
+      <p class="kh-note" id="toolhelp"></p>
+      <label class="kh-opt" id="lockrow">
+        <input type="checkbox" id="lock" checked />
+        <span>Tô gọn trong nét: cọ chỉ tô trong ô bạn bắt đầu chạm, không tràn ra ngoài đường viền.</span>
+      </label>
+      <div id="sizerow">
+        <div class="kh-label"><span>Cỡ cọ</span><span id="sizev">18</span></div>
+        <input type="range" id="size" min="4" max="60" value="18" />
+      </div>
+      <div class="kh-curcolor">
+        <div class="dot" id="dot"></div>
+        <div>
+          <div id="cname"></div>
+          <div class="kh-note" id="cnote"></div>
+        </div>
+      </div>
+      <div class="kh-label"><span>Màu truyền thống Kim Hoàng</span></div>
+      <div class="kh-swatches" id="swatches"></div>
+      <div class="kh-label">
+        <span>Bảng màu đầy đủ</span>
+        <input type="color" id="picker" value="#f5c518" title="Chọn màu bất kỳ" />
+      </div>
+      <div class="kh-grid" id="grid"></div>
+      <div class="kh-label"><span>Màu vừa dùng</span></div>
+      <div class="kh-recent" id="recent"></div>
+      <div class="kh-row">
+        <button type="button" class="kh-btn" id="undo">Hoàn tác</button>
+        <button type="button" class="kh-btn" id="clearc">Xoá hết màu</button>
+        <button type="button" class="kh-btn primary" id="finish">Hoàn thành</button>
+      </div>
+    </section>
+    <section id="p-done" class="hidden">
+      <h2>Bức tranh của bạn đã hoàn thành!</h2>
+      <p>Ký tay trực tiếp vào khung bên dưới để lưu dấu ấn lên tranh, sau đó lưu ảnh hoặc treo lên bức tường chữ LƯU SẮC KIM HOÀNG.</p>
+      <div class="kh-sig-box">
+        <div class="kh-sig-head">
+          <span>Ký tay trực tiếp (chuột / cảm ứng)</span>
+          <button type="button" class="kh-btn" id="sig-clear">Xoá chữ ký</button>
+        </div>
+        <canvas id="sig-pad" class="kh-sig-pad" width="480" height="140" title="Ký tay trực tiếp vào ô này"></canvas>
+      </div>
+      <div class="kh-row">
+        <button type="button" class="kh-btn primary" id="save">Lưu ảnh PNG</button>
+        <button type="button" class="kh-btn" id="backcolor">Quay lại tô tiếp</button>
+        <button type="button" class="kh-btn" id="hang">Treo lên tường</button>
+        <button type="button" class="kh-btn" id="again">Làm bức khác</button>
+      </div>
+      <p class="kh-note" id="hangmsg"></p>
+    </section>
+  </aside>
+
+  <div id="loading-toast">Đang tải không gian 360°...</div>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+      }
+    }
+  </script>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { createMuseumKimHoangExperience, HALLWAY_PANO_ID, ARCHWAY_PANO_ID, WORKSHOP_PANO_ID } from './kim-hoang-museum-showcase.js?v=kim_hoang_v34';
+    import { createLacquerWorkshopRoom } from './kim-hoang-lacquer-room.js?v=kim_hoang_v34';
+    import { KIM_HOANG_DESCRIPTIONS } from './kim-hoang-descriptions.js?v=kim_hoang_v34';
+
+    const I18N = {
+      vi: {
+        wSub: 'KHÔNG GIAN TRIỂN LÃM SỐ',
+        wTitle: 'TRANH KIM HOÀNG VIỆT NAM',
+        enter: 'THAM QUAN TRIỂN LÃM',
+        audioOn: '🔊 Âm thanh: Bật',
+        audioOff: '🔇 Âm thanh: Tắt',
+        mapBtn: '🗺️ Bản đồ',
+        infoBtn: 'ℹ️ Thông tin',
+        langBtn: '🌐 VI',
+        mapTitle: 'Bản đồ điểm đứng (25)',
+        introTitle: 'Giới thiệu triển lãm',
+        artworkTitle: 'Thông tin tác phẩm'
+      },
+      en: {
+        wSub: 'DIGITAL EXHIBITION SPACE',
+        wTitle: 'VIETNAMESE KIM HOANG PAINTING',
+        enter: 'VISIT VIRTUAL EXHIBITION',
+        audioOn: '🔊 Sound: On',
+        audioOff: '🔇 Sound: Off',
+        mapBtn: '🗺️ Map',
+        infoBtn: 'ℹ️ Information',
+        langBtn: '🌐 EN',
+        mapTitle: 'Floor Locations (25)',
+        introTitle: 'Exhibition Information',
+        artworkTitle: 'Artwork Details'
+      }
+    };
+
+    let lang = 'vi';
+    let audioEnabled = true;
+    let tourData = null;
+    let panoIds = [];
+    let currentIndex = 0;
+    let historyStack = [];
+    let currentPanoId = null;
+    let albumImages = [];
+    let albumIdx = 0;
+
+    // Three.js Setup
+    const container = document.getElementById('viewer-canvas');
+    const hotspotsLayer = document.getElementById('hotspots-layer');
+    const loadingToast = document.getElementById('loading-toast');
+    const bgAudio = document.getElementById('bg-audio');
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 0.98;
+    container.appendChild(renderer.domElement);
+
+    function buildCubemapGeometry(size = 100) {
+      const e = size / 2;
+      const geo = new THREE.BufferGeometry();
+      
+      // 6 mặt theo đúng thứ tự và hệ toạ độ UV chuẩn của 3DVista cubemap:
+      // Index 0: 'f' (Front, z = -e)
+      // Index 1: 'r' (Right, x = +e)
+      // Index 2: 'b' (Back, z = +e)
+      // Index 3: 'l' (Left, x = -e)
+      // Index 4: 'u' (Top/Ceiling, y = +e)
+      // Index 5: 'd' (Bottom/Floor, y = -e)
+      const quads = [
+        // 0: f (Front, z = -e)
+        [ [-e,  e, -e], [-e, -e, -e], [ e, -e, -e], [ e,  e, -e] ],
+        // 1: r (Right, x = +e)
+        [ [ e,  e, -e], [ e, -e, -e], [ e, -e,  e], [ e,  e,  e] ],
+        // 2: b (Back, z = +e)
+        [ [ e,  e,  e], [ e, -e,  e], [-e, -e,  e], [-e,  e,  e] ],
+        // 3: l (Left, x = -e)
+        [ [-e,  e,  e], [-e, -e,  e], [-e, -e, -e], [-e,  e, -e] ],
+        // 4: u (Top/Ceiling, y = +e)
+        [ [-e,  e,  e], [-e,  e, -e], [ e,  e, -e], [ e,  e,  e] ],
+        // 5: d (Bottom/Floor, y = -e)
+        [ [-e, -e, -e], [-e, -e,  e], [ e, -e,  e], [ e, -e, -e] ]
+      ];
+
+      const positions = [];
+      const uvs = [];
+
+      for (let i = 0; i < 6; i++) {
+        const [v0, v1, v2, v3] = quads[i];
+        // 2 tam giác hướng mặt vào trong (inward-facing CCW nhìn từ gốc toạ độ)
+        positions.push(...v0, ...v1, ...v2);
+        uvs.push(0, 1,  0, 0,  1, 0);
+        positions.push(...v0, ...v2, ...v3);
+        uvs.push(0, 1,  1, 0,  1, 1);
+        geo.addGroup(i * 6, 6, i);
+      }
+
+      geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+      geo.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+      return geo;
+    }
+
+    const skyGeo = buildCubemapGeometry(100);
+    const skyMats = Array.from({ length: 6 }, () => new THREE.MeshBasicMaterial({ color: 0x0d0907, depthWrite: false, toneMapped: false }));
+    const skyBox = new THREE.Mesh(skyGeo, skyMats);
+    skyBox.renderOrder = 0;
+    scene.add(skyBox);
+
+    // Màn hình TV phát video/Web.mp4 ở Tiền sảnh (QuadVideoPanoramaOverlay)
+    const lobbyVideoEl = document.createElement('video');
+    lobbyVideoEl.src = 'video/Web.mp4';
+    lobbyVideoEl.loop = true;
+    lobbyVideoEl.muted = true;
+    lobbyVideoEl.playsInline = true;
+    lobbyVideoEl.crossOrigin = 'anonymous';
+    const lobbyVideoTex = new THREE.VideoTexture(lobbyVideoEl);
+    lobbyVideoTex.colorSpace = THREE.SRGBColorSpace;
+
+    function buildLobbyVideoMesh() {
+      const r = 46;
+      const v0 = yawPitchToVec3(67.05, 29.24, r);  // top-left
+      const v1 = yawPitchToVec3(108.99, 29.69, r); // top-right
+      const v2 = yawPitchToVec3(109.05, 8.9, r);   // bottom-right
+      const v3 = yawPitchToVec3(66.97, 8.52, r);   // bottom-left
+      const geo = new THREE.BufferGeometry();
+      const positions = new Float32Array([
+        v0.x, v0.y, v0.z, v3.x, v3.y, v3.z, v2.x, v2.y, v2.z,
+        v0.x, v0.y, v0.z, v2.x, v2.y, v2.z, v1.x, v1.y, v1.z
+      ]);
+      const uvs = new Float32Array([
+        0, 1,  0, 0,  1, 0,
+        0, 1,  1, 0,  1, 1
+      ]);
+      geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      geo.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
+      const mat = new THREE.MeshBasicMaterial({ map: lobbyVideoTex, side: THREE.DoubleSide });
+      const mesh = new THREE.Mesh(geo, mat);
+      mesh.renderOrder = 2;
+      mesh.visible = false;
+      return mesh;
+    }
+    const lobbyVideoMesh = buildLobbyVideoMesh();
+    scene.add(lobbyVideoMesh);
+
+    const showcaseTooltip = document.getElementById('showcase-tooltip');
+    const khSidebarEl = document.getElementById('kh-sidebar');
+    const khLabelsEl = document.getElementById('kh-labels');
+    const standUpBtn = document.getElementById('stand-up-btn');
+    let kimHoangExp = null;
+    let lacquerRoom = null;
+    let isInLacquer3DRoom = false;
+    let isSeatedAtKimHoang = false;
+    let savedStandingView = null;
+    let lacquerWalkTarget = null;
+    const lacquerWalkKeys = { w: false, s: false, a: false, d: false };
+
+    createMuseumKimHoangExperience({
+      camera,
+      domElement: renderer.domElement,
+      maxAnisotropy: renderer.capabilities.getMaxAnisotropy()
+    }).then((exp) => {
+      kimHoangExp = exp;
+      scene.add(exp.root);
+      renderer.compile(exp.root, camera);
+      if (currentPanoId && !isInLacquer3DRoom) exp.placeForPano(currentPanoId);
+    });
+
+    createLacquerWorkshopRoom({
+      camera,
+      domElement: renderer.domElement,
+      maxAnisotropy: renderer.capabilities.getMaxAnisotropy()
+    }).then((room) => {
+      lacquerRoom = room;
+      scene.add(room.root);
+      renderer.compile(room.root, camera);
+    });
+
+    function enterLacquer3DRoom() {
+      if (!lacquerRoom || isInLacquer3DRoom) return;
+      isInLacquer3DRoom = true;
+      lacquerWalkTarget = null;
+      skyBox.visible = false;
+      skyBoxNext.visible = false;
+      if (kimHoangExp) kimHoangExp.root.visible = false;
+      if (lacquerRoom.attachStation) lacquerRoom.attachStation();
+      lacquerRoom.refreshMosaic();
+      lacquerRoom.root.visible = true;
+      hotspotsLayer.style.display = 'none';
+      showcaseTooltip.style.display = 'none';
+      camera.position.set(0, 1.55, 5.8);
+      yaw = targetYaw = 0;
+      pitch = targetPitch = -3;
+      targetFov = 72;
+    }
+
+    function exitLacquer3DRoom(targetPano = ARCHWAY_PANO_ID) {
+      if (!isInLacquer3DRoom) return;
+      if (isSeatedAtKimHoang) standUpFromKimHoangTable();
+      isInLacquer3DRoom = false;
+      lacquerWalkTarget = null;
+      if (lacquerRoom) lacquerRoom.root.visible = false;
+      skyBox.visible = true;
+      hotspotsLayer.style.display = '';
+      camera.position.set(0, 0, 0);
+      if (kimHoangExp) kimHoangExp.refreshMosaic();
+      goToPanorama(targetPano, false, 15, 0);
+    }
+
+    function isLookingAtKimHoangRoom(yDeg = yaw) {
+      if (currentPanoId === HALLWAY_PANO_ID) return Math.abs(shortestAngleDiff(yDeg, -125)) < 65;
+      if (currentPanoId === ARCHWAY_PANO_ID) return Math.abs(shortestAngleDiff(yDeg, -90)) < 55;
+      return false;
+    }
+
+    function stepTowardsKimHoang() {
+      if (currentPanoId === HALLWAY_PANO_ID) {
+        walkToPanorama(ARCHWAY_PANO_ID, -125, -5, -90);
+      } else if (currentPanoId === ARCHWAY_PANO_ID) {
+        enterLacquer3DRoom();
+      }
+    }
+
+    function getActiveKimHoangContext() {
+      if (isInLacquer3DRoom && lacquerRoom) return lacquerRoom;
+      if (kimHoangExp && kimHoangExp.root.visible) return kimHoangExp;
+      return null;
+    }
+
+    function sitAtKimHoangTable() {
+      const ctx = getActiveKimHoangContext();
+      if (!ctx || isSeatedAtKimHoang) return;
+      isSeatedAtKimHoang = true;
+      lacquerWalkTarget = null;
+      savedStandingView = { yaw, pitch, fov: targetFov, pos: camera.position.clone() };
+      showcaseTooltip.style.display = 'none';
+      hotspotsLayer.style.display = 'none';
+      const bl = document.getElementById('bottom-left-controls');
+      const br = document.getElementById('bottom-right-controls');
+      const tr = document.getElementById('top-right-langs');
+      const nh = document.getElementById('nav-help-panel');
+      if (bl) bl.style.display = 'none';
+      if (br) br.style.display = 'none';
+      if (tr) tr.style.display = 'none';
+      if (nh) nh.classList.remove('open');
+      khSidebarEl.classList.remove('hidden');
+      khLabelsEl.classList.remove('hidden');
+      ctx.station.setSeated(true);
+    }
+
+    function standUpFromKimHoangTable() {
+      if (!isSeatedAtKimHoang) return;
+      isSeatedAtKimHoang = false;
+      const ctx = getActiveKimHoangContext();
+      if (ctx) ctx.station.setSeated(false);
+      khSidebarEl.classList.add('hidden');
+      khLabelsEl.classList.add('hidden');
+      document.getElementById('kh-print-hud').classList.add('hidden');
+      document.getElementById('kh-color-zoombar').classList.add('hidden');
+      if (!isInLacquer3DRoom) hotspotsLayer.style.display = '';
+      const bl = document.getElementById('bottom-left-controls');
+      const br = document.getElementById('bottom-right-controls');
+      const tr = document.getElementById('top-right-langs');
+      if (bl) bl.style.display = '';
+      if (br) br.style.display = '';
+      if (tr) tr.style.display = '';
+      if (isInLacquer3DRoom && savedStandingView && savedStandingView.pos) {
+        camera.position.copy(savedStandingView.pos);
+      } else {
+        camera.position.set(0, isInLacquer3DRoom ? 1.55 : 0, isInLacquer3DRoom ? 2.5 : 0);
+      }
+      camera.fov = targetFov = savedStandingView ? savedStandingView.fov : 72;
+      camera.updateProjectionMatrix();
+      if (savedStandingView) {
+        yaw = targetYaw = savedStandingView.yaw;
+        pitch = targetPitch = savedStandingView.pitch;
+      }
+    }
+
+    if (standUpBtn) standUpBtn.addEventListener('click', standUpFromKimHoangTable);
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && isSeatedAtKimHoang) {
+        standUpFromKimHoangTable();
+        return;
+      }
+      if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
+      const k = e.key.toLowerCase();
+      if (isInLacquer3DRoom && !isSeatedAtKimHoang) {
+        if (k === 'w' || e.key === 'ArrowUp') lacquerWalkKeys.w = true;
+        if (k === 's' || e.key === 'ArrowDown') lacquerWalkKeys.s = true;
+        if (k === 'a' || e.key === 'ArrowLeft') lacquerWalkKeys.a = true;
+        if (k === 'd' || e.key === 'ArrowRight') lacquerWalkKeys.d = true;
+        return;
+      }
+      if ((k === 'w' || e.key === 'ArrowUp') && !isTransitioning && !isSeatedAtKimHoang) {
+        if (isLookingAtKimHoangRoom()) stepTowardsKimHoang();
+      }
+    });
+    window.addEventListener('keyup', (e) => {
+      const k = e.key.toLowerCase();
+      if (k === 'w' || e.key === 'ArrowUp') lacquerWalkKeys.w = false;
+      if (k === 's' || e.key === 'ArrowDown') lacquerWalkKeys.s = false;
+      if (k === 'a' || e.key === 'ArrowLeft') lacquerWalkKeys.a = false;
+      if (k === 'd' || e.key === 'ArrowRight') lacquerWalkKeys.d = false;
+    });
+
+    function syncLobbyVideo(panoId) {
+      const isLobby = tourData && panoId === tourData.startPanorama;
+      lobbyVideoMesh.visible = isLobby;
+      if (isLobby) lobbyVideoEl.play().catch(() => {});
+      else lobbyVideoEl.pause();
+
+      if (kimHoangExp) kimHoangExp.placeForPano(panoId);
+      if (panoId !== WORKSHOP_PANO_ID && panoId !== ARCHWAY_PANO_ID) {
+        showcaseTooltip.style.display = 'none';
+      }
+    }
+
+    // Skybox thứ 2 dùng cho hiệu ứng cross-dissolve mượt trực tiếp trong WebGL (không bị tối đen)
+    const skyMatsNext = Array.from({ length: 6 }, () => new THREE.MeshBasicMaterial({
+      color: 0xffffff, transparent: true, opacity: 0, depthWrite: false, depthTest: false, toneMapped: false
+    }));
+    const skyBoxNext = new THREE.Mesh(skyGeo, skyMatsNext);
+    skyBoxNext.renderOrder = 1;
+    skyBoxNext.visible = false;
+    scene.add(skyBoxNext);
+
+    // Camera controls + Click-anywhere-to-walk + Subtle mouse parallax (giống 3DVista)
+    let yaw = 0, pitch = 0, targetYaw = 0, targetPitch = 0, targetFov = 75;
+    let parallaxYaw = 0, parallaxPitch = 0, targetParallaxYaw = 0, targetParallaxPitch = 0;
+    let isDragging = false, isTransitioning = false, sx = 0, sy = 0, syaw = 0, spitch = 0;
+    const raycaster = new THREE.Raycaster();
+
+    function shortestAngleDiff(from, to) {
+      return ((to - from + 540) % 360) - 180;
+    }
+
+    window.addEventListener('pointerdown', (e) => {
+      if (isTransitioning || isSeatedAtKimHoang) return;
+      if (e.target !== renderer.domElement && !e.target.classList.contains('hotspot')) return;
+      isDragging = true; sx = e.clientX; sy = e.clientY; syaw = targetYaw; spitch = targetPitch;
+    });
+    let lastHoverRayTime = 0;
+    window.addEventListener('pointermove', (e) => {
+      if (isSeatedAtKimHoang) return;
+      if (!isDragging) {
+        // Hiệu ứng nghiêng nhẹ theo con trỏ chuột (±3° ngang, ±2° dọc) giống 3DVista
+        targetParallaxYaw = ((e.clientX / window.innerWidth) - 0.5) * 6;
+        targetParallaxPitch = -((e.clientY / window.innerHeight) - 0.5) * 4;
+
+        const khCtx = getActiveKimHoangContext();
+        if (khCtx && !isTransitioning && e.target === renderer.domElement) {
+          const nowMs = performance.now();
+          if (nowMs - lastHoverRayTime < 45) return;
+          lastHoverRayTime = nowMs;
+          const ndc = new THREE.Vector2(
+            (e.clientX / window.innerWidth) * 2 - 1,
+            -(e.clientY / window.innerHeight) * 2 + 1
+          );
+          raycaster.setFromCamera(ndc, camera);
+          const stationMeshes = khCtx.station.fastHitMeshes || khCtx.station.interactiveMeshes;
+          const hits = raycaster.intersectObjects(stationMeshes, false);
+          const mosaicHits = hits.length > 0 ? [] : raycaster.intersectObjects(khCtx.mosaicInteractiveMeshes, false);
+          if (hits.length > 0) {
+            renderer.domElement.style.cursor = 'pointer';
+            showcaseTooltip.textContent = lang === 'vi'
+              ? 'Nhấn để ngồi xuống bàn vẽ tranh cùng Ông Đồ'
+              : 'Click to sit & paint Kim Hoang art';
+            showcaseTooltip.style.left = `${e.clientX + 14}px`;
+            showcaseTooltip.style.top = `${e.clientY - 12}px`;
+            showcaseTooltip.style.display = 'block';
+          } else if (mosaicHits.length > 0) {
+            renderer.domElement.style.cursor = 'pointer';
+            showcaseTooltip.textContent = lang === 'vi'
+              ? 'Nhấn để phóng to xem chi tiết bức tranh'
+              : 'Click to inspect painting detail';
+            showcaseTooltip.style.left = `${e.clientX + 14}px`;
+            showcaseTooltip.style.top = `${e.clientY - 12}px`;
+            showcaseTooltip.style.display = 'block';
+          } else {
+            renderer.domElement.style.cursor = '';
+            showcaseTooltip.style.display = 'none';
+          }
+        } else {
+          showcaseTooltip.style.display = 'none';
+        }
+        return;
+      }
+      showcaseTooltip.style.display = 'none';
+      const sens = camera.fov / 500;
+      targetYaw = syaw - (e.clientX - sx) * sens;
+      targetPitch = Math.max(-85, Math.min(85, spitch + (e.clientY - sy) * sens));
+    });
+    window.addEventListener('pointerup', (e) => {
+      if (isSeatedAtKimHoang || !isDragging) return;
+      isDragging = false;
+      const moved = Math.hypot(e.clientX - sx, e.clientY - sy);
+      // Nếu click nhanh (không phải kéo xoay) vào sàn/lối đi -> tự động bước tới điểm gần nhất theo hướng click
+      if (moved < 5 && !isTransitioning && tourData && currentPanoId && e.target === renderer.domElement) {
+        const ndc = new THREE.Vector2(
+          (e.clientX / window.innerWidth) * 2 - 1,
+          -(e.clientY / window.innerHeight) * 2 + 1
+        );
+        raycaster.setFromCamera(ndc, camera);
+
+        const khCtx = getActiveKimHoangContext();
+        if (khCtx) {
+          const stationMeshes = khCtx.station.fastHitMeshes || khCtx.station.interactiveMeshes;
+          const hits = raycaster.intersectObjects(stationMeshes, false);
+          if (hits.length > 0) {
+            sitAtKimHoangTable();
+            return;
+          }
+          const mosaicHits = raycaster.intersectObjects(khCtx.mosaicInteractiveMeshes, false);
+          if (mosaicHits.length > 0) {
+            const idx = mosaicHits[0].object.userData.slotIndex;
+            const slot = khCtx.mosaicSlots[idx];
+            if (slot && slot.currentUrl) {
+              const desc = KIM_HOANG_DESCRIPTIONS[slot.currentUrl];
+              let html = '';
+              if (desc) {
+                html = lang === 'vi' ? desc.htmlVi : desc.htmlEn;
+              } else {
+                const title = slot.sigName
+                  ? `Tác phẩm Kim Hoàng — ${slot.sigName}`
+                  : 'Tác phẩm Tranh Dân Gian Kim Hoàng';
+                html = `<div style="text-align:left; color:#fff; font-family:'Montserrat', Arial, sans-serif;"><div style="font-size:12px; color:#ffd584; font-weight:700; margin-bottom:6px;">TRANH DO KHÁCH THAM QUAN SÁNG TÁC</div><div style="font-size:22px; font-weight:800; margin-bottom:10px;">${title}</div><div style="font-size:15px; line-height:1.65;">Tác phẩm in mộc bản và chấm phá màu trực tiếp tại bàn trải nghiệm cùng Nghệ nhân Đào Đình Chung, được lưu giữ trên bức tường nghệ thuật <strong>LƯU SẮC KIM HOÀNG</strong>.</div></div>`;
+              }
+              openArtworkModal(html, [slot.currentUrl], null);
+              return;
+            }
+          }
+        }
+
+        if (isInLacquer3DRoom && lacquerRoom) {
+          const floorHits = raycaster.intersectObjects(lacquerRoom.floorMeshes, false);
+          if (floorHits.length > 0) {
+            const pt = floorHits[0].point.clone();
+            lacquerWalkTarget = lacquerRoom.clampPosition(pt);
+          }
+          return;
+        }
+
+        const dir = raycaster.ray.direction;
+        const clickPitch = THREE.MathUtils.radToDeg(Math.asin(Math.max(-1, Math.min(1, dir.y))));
+        if (clickPitch < 15) {
+          const clickYaw = THREE.MathUtils.radToDeg(Math.atan2(dir.x, -dir.z));
+          const pano = tourData.panoramas[currentPanoId];
+          const navs = pano.overlays.filter(o => o.isNav && o.target);
+          let best = null, bestDiff = 55;
+          for (const ov of navs) {
+            const diff = Math.abs(shortestAngleDiff(clickYaw, ov.yaw));
+            if (diff < bestDiff) {
+              bestDiff = diff;
+              best = ov;
+            }
+          }
+          if (kimHoangExp && kimHoangExp.root.visible && isLookingAtKimHoangRoom(clickYaw)) {
+            stepTowardsKimHoang();
+          } else if (best) {
+            const forwardYaw = (best.backwardYaw !== null && best.backwardYaw !== undefined)
+              ? best.backwardYaw + 180
+              : (best.targetYaw ?? best.yaw);
+            walkToPanorama(best.target, best.yaw, best.pitch ?? 0, forwardYaw);
+          }
+        }
+      }
+    });
+    renderer.domElement.addEventListener('wheel', (e) => {
+      targetFov = Math.max(35, Math.min(105, targetFov + e.deltaY * 0.05));
+    }, { passive: true });
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    function yawPitchToVec3(yDeg, pDeg, r = 40) {
+      const phi = THREE.MathUtils.degToRad(90 - pDeg);
+      const theta = THREE.MathUtils.degToRad(yDeg);
+      return new THREE.Vector3(
+        r * Math.sin(phi) * Math.sin(theta),
+        r * Math.cos(phi),
+        -r * Math.sin(phi) * Math.cos(theta)
+      );
+    }
+
+    const texLoader = new THREE.TextureLoader();
+    let activeHotspots = [];
+
+    function renderHotspots(pano) {
+      hotspotsLayer.innerHTML = '';
+      activeHotspots = [];
+      for (const ov of pano.overlays) {
+        const isNav = Boolean(ov.isNav && ov.target);
+        if (!isNav && !ov.htmlVi && (!ov.images || !ov.images.length)) continue;
+
+        const el = document.createElement('div');
+        el.className = 'hotspot ' + (isNav ? 'hotspot-nav' : 'hotspot-info');
+        el.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (Math.hypot(e.clientX - sx, e.clientY - sy) >= 5) return;
+          if (isNav) {
+            const forwardYaw = (ov.backwardYaw !== null && ov.backwardYaw !== undefined)
+              ? ov.backwardYaw + 180
+              : (ov.targetYaw ?? ov.yaw);
+            walkToPanorama(ov.target, ov.yaw, ov.pitch ?? 0, forwardYaw);
+          } else {
+            const img0 = (ov.images && ov.images[0]) || '';
+            const khDesc = KIM_HOANG_DESCRIPTIONS[img0];
+            const html = khDesc
+              ? (lang === 'vi' ? khDesc.htmlVi : khDesc.htmlEn)
+              : (lang === 'vi' ? (ov.htmlVi || ov.htmlEn) : (ov.htmlEn || ov.htmlVi));
+            const audioUrl = khDesc ? null : (lang === 'vi' ? (ov.audioVi || ov.audioEn) : (ov.audioEn || ov.audioVi));
+            openArtworkModal(html, ov.images || [], audioUrl);
+          }
+        });
+        hotspotsLayer.appendChild(el);
+        const pCenter = ov.pitch ?? (isNav ? -12 : 0);
+        const hf = ov.hfov || 6;
+        const vf = ov.vfov || 6;
+        activeHotspots.push({
+          el,
+          isNav,
+          pos: yawPitchToVec3(ov.yaw, pCenter),
+          corners: isNav ? null : [
+            yawPitchToVec3(ov.yaw - hf / 2, pCenter + vf / 2),
+            yawPitchToVec3(ov.yaw + hf / 2, pCenter + vf / 2),
+            yawPitchToVec3(ov.yaw + hf / 2, pCenter - vf / 2),
+            yawPitchToVec3(ov.yaw - hf / 2, pCenter - vf / 2)
+          ]
+        });
+      }
+    }
+
+    const faces = ['f', 'r', 'b', 'l', 'u', 'd'];
+    const panoCache = new Map(); // Cache texture 6 mặt để chuyển phòng không bị khựng GPU
+
+    function preloadPanoramaTextures(pano) {
+      if (panoCache.has(pano.id)) return panoCache.get(pano.id);
+      const promise = Promise.all(faces.map((face) => new Promise((resolve) => {
+        texLoader.load(`${pano.mediaDir}/${face}/vr2gen/0.jpg?v=kim_hoang_walls_v31`, (tex) => {
+          tex.colorSpace = THREE.SRGBColorSpace;
+          tex.generateMipmaps = false;
+          tex.minFilter = THREE.LinearFilter;
+          renderer.initTexture(tex); // Upload trước lên GPU để không giật frame khi chuyển cảnh
+          resolve(tex);
+        }, undefined, () => resolve(null));
+      })));
+      panoCache.set(pano.id, promise);
+      return promise;
+    }
+
+    function preloadAdjacentPanoramas(pano) {
+      if (!pano || !tourData) return;
+      for (const ov of pano.overlays) {
+        if (ov.isNav && ov.target && tourData.panoramas[ov.target]) {
+          preloadPanoramaTextures(tourData.panoramas[ov.target]);
+        }
+      }
+    }
+
+    function applyPanoramaTextures(mats, textures, opacity = 1) {
+      textures.forEach((tex, i) => {
+        if (!tex) return;
+        mats[i].map = tex;
+        mats[i].color.setHex(0xffffff);
+        mats[i].opacity = opacity;
+        mats[i].needsUpdate = true;
+      });
+    }
+
+    function easeInOutCubic(t) {
+      return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    }
+
+    let transitionState = null;
+
+    async function walkToPanorama(panoId, stepYaw, stepPitch, landYaw) {
+      const pano = tourData.panoramas[panoId];
+      if (!pano || isTransitioning) return;
+      isTransitioning = true;
+      hotspotsLayer.style.opacity = '0';
+
+      const textures = await preloadPanoramaTextures(pano);
+      const startYaw = yaw;
+      const startPitch = pitch;
+      const aimYaw = yaw + shortestAngleDiff(yaw, stepYaw);
+      const aimPitch = Math.max(-10, Math.min(10, stepPitch * 0.3));
+      const walkDir = yawPitchToVec3(aimYaw, 0, 1).normalize();
+      const walkDist = 34;
+
+      skyBoxNext.rotation.y = THREE.MathUtils.degToRad(landYaw - aimYaw);
+      skyBoxNext.position.copy(walkDir).multiplyScalar(walkDist);
+      applyPanoramaTextures(skyMatsNext, textures, 0);
+      skyBoxNext.visible = true;
+
+      transitionState = {
+        panoId, pano, textures, landYaw,
+        startYaw, aimYaw, startPitch, aimPitch,
+        walkDir, walkDist,
+        t0: performance.now(),
+        duration: 820
+      };
+    }
+
+    async function goToPanorama(panoId, pushHistory = true, lookYaw = null, lookPitch = null) {
+      if (panoId === WORKSHOP_PANO_ID && lacquerRoom) {
+        enterLacquer3DRoom();
+        return;
+      }
+      if (isInLacquer3DRoom) {
+        if (isSeatedAtKimHoang) standUpFromKimHoangTable();
+        isInLacquer3DRoom = false;
+        lacquerWalkTarget = null;
+        if (lacquerRoom) lacquerRoom.root.visible = false;
+        skyBox.visible = true;
+        hotspotsLayer.style.display = '';
+        camera.position.set(0, 0, 0);
+      }
+      const pano = tourData.panoramas[panoId];
+      if (!pano) return;
+      if (pushHistory && currentPanoId && currentPanoId !== panoId) {
+        historyStack.push(currentPanoId);
+      }
+      currentPanoId = panoId;
+      currentIndex = panoIds.indexOf(panoId);
+
+      if (!panoCache.has(panoId)) loadingToast.style.display = 'block';
+      document.querySelectorAll('.map-room').forEach(el => el.classList.toggle('active', el.dataset.id === panoId));
+
+      const textures = await preloadPanoramaTextures(pano);
+      loadingToast.style.display = 'none';
+
+      if (skyBox && skyMats[0].map) {
+        const landY = (lookYaw !== null && lookYaw !== undefined) ? lookYaw : yaw;
+        const landP = (lookPitch !== null && lookPitch !== undefined) ? lookPitch : 0;
+        skyBoxNext.rotation.y = THREE.MathUtils.degToRad(landY - yaw);
+        skyBoxNext.position.set(0, 0, 0);
+        applyPanoramaTextures(skyMatsNext, textures, 0);
+        skyBoxNext.visible = true;
+        hotspotsLayer.style.opacity = '0';
+        isTransitioning = true;
+
+        transitionState = {
+          panoId, pano, textures, landYaw: landY,
+          startYaw: yaw, aimYaw: yaw, startPitch: pitch, aimPitch: landP,
+          walkDir: new THREE.Vector3(0, 0, 0), walkDist: 0,
+          t0: performance.now(),
+          duration: 500
+        };
+      } else {
+        applyPanoramaTextures(skyMats, textures, 1);
+        if (lookYaw !== null && lookYaw !== undefined) yaw = targetYaw = lookYaw;
+        if (lookPitch !== null && lookPitch !== undefined) pitch = targetPitch = lookPitch;
+        targetFov = 75;
+        renderHotspots(pano);
+        syncLobbyVideo(panoId);
+        preloadAdjacentPanoramas(pano);
+      }
+    }
+
+    const narratorAudio = document.getElementById('narrator-audio');
+    const infoModalEl = document.getElementById('info-modal');
+    const toggleInfoBtn = document.getElementById('btn-toggle-info');
+    const closeInfoBtn = document.getElementById('btn-close-info');
+    const narrateBtn = document.getElementById('btn-narrate');
+    let currentNarrationUrl = null;
+
+    function openArtworkModal(html, images = [], audioUrl = null) {
+      document.getElementById('modal-body').innerHTML = html || '';
+      const mediaEl = document.getElementById('modal-media');
+      albumImages = images;
+      albumIdx = 0;
+
+      if (images.length > 0) {
+        mediaEl.style.display = 'flex';
+        document.getElementById('modal-img').src = images[0];
+        document.getElementById('album-prev').style.display = images.length > 1 ? 'block' : 'none';
+        document.getElementById('album-next').style.display = images.length > 1 ? 'block' : 'none';
+      } else {
+        mediaEl.style.display = 'none';
+      }
+
+      currentNarrationUrl = audioUrl;
+      narrateBtn.style.display = audioUrl ? 'block' : 'none';
+      narrateBtn.classList.remove('speaking');
+      narratorAudio.pause();
+      if (audioUrl) {
+        narratorAudio.src = audioUrl;
+        if (audioEnabled) {
+          bgAudio.pause();
+          narratorAudio.play().then(() => narrateBtn.classList.add('speaking')).catch(() => {});
+        }
+      }
+
+      infoModalEl.classList.remove('show-info');
+      infoModalEl.classList.add('open');
+    }
+
+    function closeArtworkModal() {
+      infoModalEl.classList.remove('open', 'show-info');
+      narratorAudio.pause();
+      narrateBtn.classList.remove('speaking');
+      if (audioEnabled) bgAudio.play().catch(() => {});
+    }
+
+    toggleInfoBtn.addEventListener('click', () => infoModalEl.classList.add('show-info'));
+    closeInfoBtn.addEventListener('click', () => infoModalEl.classList.remove('show-info'));
+
+    window.addEventListener('keydown', (e) => {
+      if (!infoModalEl.classList.contains('open')) return;
+      if (e.key === 'i' || e.key === 'I') {
+        infoModalEl.classList.toggle('show-info');
+      } else if (e.key === 'Escape') {
+        closeArtworkModal();
+      }
+    });
+
+    narrateBtn.addEventListener('click', () => {
+      if (!currentNarrationUrl) return;
+      if (narratorAudio.paused) {
+        bgAudio.pause();
+        narratorAudio.play().then(() => narrateBtn.classList.add('speaking')).catch(() => {});
+      } else {
+        narratorAudio.pause();
+        narrateBtn.classList.remove('speaking');
+      }
+    });
+    narratorAudio.addEventListener('ended', () => {
+      narrateBtn.classList.remove('speaking');
+      if (audioEnabled) bgAudio.play().catch(() => {});
+    });
+
+    function renderZoneTabs() {
+      if (!tourData) return;
+      const list = document.getElementById('zones-list');
+      list.innerHTML = '';
+      // 3 khu vực chính: 1. Tiền sảnh, 2. Triển lãm tranh, 3. Trải nghiệm làm tranh Kim Hoàng
+      const orderKeys = ['lobby', 'exhibition', 'workshop'];
+      const ordered = orderKeys.map(k => tourData.zones.find(z => z.key === k)).filter(Boolean);
+      ordered.forEach((z, idx) => {
+        const btn = document.createElement('button');
+        const isCurrent = (z.key === 'workshop' && isInLacquer3DRoom) || (!isInLacquer3DRoom && currentPanoId === z.panoId);
+        btn.className = 'map-zone-btn' + (isCurrent ? ' active' : '');
+        btn.innerHTML = `
+          <span class="map-zone-num">${idx + 1}</span>
+          <span class="map-zone-label">${lang === 'vi' ? z.labelVi : z.labelEn}</span>
+        `;
+        btn.addEventListener('click', () => {
+          document.getElementById('map-modal').classList.remove('open');
+          if (z.key === 'workshop') {
+            enterLacquer3DRoom();
+          } else {
+            goToPanorama(z.panoId, true, z.yaw, z.pitch);
+          }
+        });
+        list.appendChild(btn);
+      });
+    }
+
+    function applyLanguage() {
+      const t = I18N[lang];
+      document.getElementById('w-sub').textContent = t.wSub;
+      document.getElementById('w-title').textContent = t.wTitle;
+      document.getElementById('btn-enter').textContent = t.enter;
+      document.getElementById('nav-help-title').textContent = lang === 'vi' ? 'HƯỚNG DẪN' : 'NAVIGATION';
+      document.getElementById('nh-info').textContent = lang === 'vi' ? 'Thông tin' : 'Information';
+      document.getElementById('nh-lang').textContent = lang === 'vi' ? 'Ngôn ngữ' : 'Languages';
+      document.getElementById('nh-map').textContent = lang === 'vi' ? 'Bản đồ' : 'Map';
+      document.getElementById('nh-next').textContent = lang === 'vi' ? 'Đi tiếp' : 'Next';
+      document.getElementById('nh-prev').textContent = lang === 'vi' ? 'Quay lại' : 'Previous';
+      document.querySelectorAll('.lang-pill').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
+      document.querySelectorAll('.vista-lang-btn[data-lang]').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
+      renderZoneTabs();
+    }
+
+    // Event bindings
+    document.getElementById('btn-enter').addEventListener('click', () => {
+      document.getElementById('welcome-screen').classList.add('hidden');
+      if (audioEnabled) bgAudio.play().catch(() => {});
+      syncLobbyVideo(currentPanoId);
+    });
+
+    document.querySelectorAll('.lang-pill, .vista-lang-btn[data-lang]').forEach(btn => {
+      btn.addEventListener('click', () => { lang = btn.dataset.lang; applyLanguage(); });
+    });
+
+    document.getElementById('btn-audio').addEventListener('click', () => {
+      audioEnabled = !audioEnabled;
+      if (audioEnabled) bgAudio.play().catch(() => {});
+      else bgAudio.pause();
+      applyLanguage();
+    });
+
+    document.getElementById('btn-prev').addEventListener('click', () => {
+      if (isInLacquer3DRoom) { exitLacquer3DRoom(); return; }
+      if (historyStack.length > 0) goToPanorama(historyStack.pop(), false);
+      else if (panoIds.length) goToPanorama(panoIds[(currentIndex - 1 + panoIds.length) % panoIds.length], false);
+    });
+
+    document.getElementById('btn-next').addEventListener('click', () => {
+      if (panoIds.length) goToPanorama(panoIds[(currentIndex + 1) % panoIds.length], true);
+    });
+
+    document.getElementById('btn-map').addEventListener('click', () => {
+      renderZoneTabs();
+      document.getElementById('map-modal').classList.add('open');
+    });
+    document.getElementById('close-map').addEventListener('click', () => {
+      document.getElementById('map-modal').classList.remove('open');
+    });
+
+    document.getElementById('btn-info').addEventListener('click', () => {
+      document.getElementById('nav-help-panel').classList.toggle('open');
+    });
+    document.getElementById('close-nav-help').addEventListener('click', () => {
+      document.getElementById('nav-help-panel').classList.remove('open');
+    });
+    document.getElementById('close-modal').addEventListener('click', closeArtworkModal);
+
+    document.getElementById('album-prev').addEventListener('click', () => {
+      if (!albumImages.length) return;
+      albumIdx = (albumIdx - 1 + albumImages.length) % albumImages.length;
+      document.getElementById('modal-img').src = albumImages[albumIdx];
+    });
+    document.getElementById('album-next').addEventListener('click', () => {
+      if (!albumImages.length) return;
+      albumIdx = (albumIdx + 1) % albumImages.length;
+      document.getElementById('modal-img').src = albumImages[albumIdx];
+    });
+
+    let lastFrameTime = performance.now();
+    const seatedLookMat = new THREE.Matrix4();
+    const seatedTargetQuat = new THREE.Quaternion();
+
+    function animate(now = performance.now()) {
+      requestAnimationFrame(animate);
+      const dt = Math.min(0.05, Math.max(0.001, (now - lastFrameTime) * 0.001));
+      lastFrameTime = now;
+      const activeKh = getActiveKimHoangContext();
+      if (activeKh) activeKh.update(dt, now * 0.001);
+      if (isSeatedAtKimHoang && activeKh) {
+        const isPortrait = camera.aspect < 1;
+        const { camPos, lookTarget, targetFov: sFov } = activeKh.getSeatedCameraTargets(isPortrait);
+        camera.position.lerp(camPos, Math.min(1, dt * 7.5));
+        camera.fov = THREE.MathUtils.lerp(camera.fov, sFov, Math.min(1, dt * 8));
+        camera.updateProjectionMatrix();
+        seatedLookMat.lookAt(camera.position, lookTarget, camera.up);
+        seatedTargetQuat.setFromRotationMatrix(seatedLookMat);
+        camera.quaternion.slerp(seatedTargetQuat, Math.min(1, dt * 7.5));
+        renderer.render(scene, camera);
+        return;
+      }
+
+      if (isInLacquer3DRoom && lacquerRoom) {
+        yaw += shortestAngleDiff(yaw, targetYaw) * 0.18;
+        pitch += (targetPitch - pitch) * 0.18;
+        if (Math.abs(camera.fov - targetFov) > 0.05) {
+          camera.fov += (targetFov - camera.fov) * 0.15;
+          camera.updateProjectionMatrix();
+        }
+        const moveSpeed = 3.6 * dt;
+        const rad = THREE.MathUtils.degToRad(yaw);
+        const fwdX = Math.sin(rad), fwdZ = -Math.cos(rad);
+        const rightX = Math.cos(rad), rightZ = Math.sin(rad);
+        let movedKey = false;
+        if (lacquerWalkKeys.w) { camera.position.x += fwdX * moveSpeed; camera.position.z += fwdZ * moveSpeed; movedKey = true; }
+        if (lacquerWalkKeys.s) { camera.position.x -= fwdX * moveSpeed; camera.position.z -= fwdZ * moveSpeed; movedKey = true; }
+        if (lacquerWalkKeys.d) { camera.position.x += rightX * moveSpeed; camera.position.z += rightZ * moveSpeed; movedKey = true; }
+        if (lacquerWalkKeys.a) { camera.position.x -= rightX * moveSpeed; camera.position.z -= rightZ * moveSpeed; movedKey = true; }
+        if (movedKey) {
+          lacquerWalkTarget = null;
+          lacquerRoom.clampPosition(camera.position);
+        } else if (lacquerWalkTarget) {
+          camera.position.lerp(lacquerWalkTarget, Math.min(1, dt * 4.5));
+          lacquerRoom.clampPosition(camera.position);
+          if (camera.position.distanceTo(lacquerWalkTarget) < 0.08) {
+            camera.position.copy(lacquerWalkTarget);
+            lacquerWalkTarget = null;
+          }
+        }
+        if (camera.position.z > 7.9 && Math.abs(camera.position.x) < 2.6) {
+          exitLacquer3DRoom();
+          return;
+        }
+        parallaxYaw += (targetParallaxYaw - parallaxYaw) * 0.06;
+        parallaxPitch += (targetParallaxPitch - parallaxPitch) * 0.06;
+        const lookT = yawPitchToVec3(yaw + parallaxYaw, pitch + parallaxPitch, 10).add(camera.position);
+        camera.lookAt(lookT);
+        renderer.render(scene, camera);
+        return;
+      }
+
+      if (transitionState) {
+        const ts = transitionState;
+        const raw = Math.min(1, (now - ts.t0) / ts.duration);
+        const k = easeInOutCubic(raw);
+
+        yaw = ts.startYaw + (ts.aimYaw - ts.startYaw) * Math.min(1, k * 1.4);
+        pitch = ts.startPitch + (ts.aimPitch - ts.startPitch) * Math.min(1, k * 1.4);
+        targetYaw = yaw;
+        targetPitch = pitch;
+
+        camera.position.copy(ts.walkDir).multiplyScalar(k * ts.walkDist);
+        camera.fov = 75 - Math.sin(raw * Math.PI) * (ts.walkDist > 0 ? 20 : 10);
+        camera.updateProjectionMatrix();
+
+        const blendStart = ts.walkDist > 0 ? 0.25 : 0;
+        const bk = easeInOutCubic(Math.max(0, Math.min(1, (raw - blendStart) / (1 - blendStart))));
+        for (let i = 0; i < 6; i++) skyMatsNext[i].opacity = bk;
+
+        if (raw >= 1) {
+          if (currentPanoId && currentPanoId !== ts.panoId) historyStack.push(currentPanoId);
+          currentPanoId = ts.panoId;
+          currentIndex = panoIds.indexOf(ts.panoId);
+          document.querySelectorAll('.map-room').forEach(el => el.classList.toggle('active', el.dataset.id === ts.panoId));
+
+          applyPanoramaTextures(skyMats, ts.textures, 1);
+          skyBoxNext.visible = false;
+          skyBoxNext.rotation.y = 0;
+          skyBoxNext.position.set(0, 0, 0);
+          camera.position.set(0, 0, 0);
+          camera.fov = targetFov = 75;
+          camera.updateProjectionMatrix();
+
+          yaw = targetYaw = ts.landYaw;
+          pitch = targetPitch = 0;
+          renderHotspots(ts.pano);
+          syncLobbyVideo(ts.panoId);
+          preloadAdjacentPanoramas(ts.pano);
+          hotspotsLayer.style.opacity = '1';
+          transitionState = null;
+          isTransitioning = false;
+        }
+      } else {
+        yaw += shortestAngleDiff(yaw, targetYaw) * 0.18;
+        pitch += (targetPitch - pitch) * 0.18;
+        if (Math.abs(camera.fov - targetFov) > 0.05) {
+          camera.fov += (targetFov - camera.fov) * 0.15;
+          camera.updateProjectionMatrix();
+        }
+      }
+
+      parallaxYaw += (targetParallaxYaw - parallaxYaw) * 0.06;
+      parallaxPitch += (targetParallaxPitch - parallaxPitch) * 0.06;
+      const lookTarget = yawPitchToVec3(yaw + parallaxYaw, pitch + parallaxPitch, 10).add(camera.position);
+      camera.lookAt(lookTarget);
+
+      const camDir = new THREE.Vector3();
+      camera.getWorldDirection(camDir);
+      for (const hs of activeHotspots) {
+        const dir = hs.pos.clone().normalize();
+        if (camDir.dot(dir) <= 0.1) {
+          hs.el.style.display = 'none';
+          continue;
+        }
+        const p = hs.pos.clone().project(camera);
+        hs.el.style.display = 'flex';
+        hs.el.style.left = `${(p.x * 0.5 + 0.5) * window.innerWidth}px`;
+        hs.el.style.top = `${(-p.y * 0.5 + 0.5) * window.innerHeight}px`;
+        if (!hs.isNav && hs.corners) {
+          let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+          for (const c of hs.corners) {
+            const cp = c.clone().project(camera);
+            const cx = (cp.x * 0.5 + 0.5) * window.innerWidth;
+            const cy = (-cp.y * 0.5 + 0.5) * window.innerHeight;
+            if (cx < minX) minX = cx; if (cx > maxX) maxX = cx;
+            if (cy < minY) minY = cy; if (cy > maxY) maxY = cy;
+          }
+          const w = Math.max(24, Math.min(window.innerWidth * 0.9, maxX - minX));
+          const h = Math.max(24, Math.min(window.innerHeight * 0.9, maxY - minY));
+          hs.el.style.width = `${w}px`;
+          hs.el.style.height = `${h}px`;
+          hs.el.style.left = `${(minX + maxX) / 2}px`;
+          hs.el.style.top = `${(minY + maxY) / 2}px`;
+        }
+      }
+      renderer.render(scene, camera);
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const initialMode = (urlParams.get('mode') || '').toLowerCase();
+    const autoStart = urlParams.get('autostart') === '1' || urlParams.get('autostart') === 'true';
+    const isEmbed = urlParams.get('embed') === '1' || window.self !== window.top;
+    if (isEmbed) {
+      document.body.classList.add('is-embedded');
+    }
+    const initialLang = (urlParams.get('lang') || '').toLowerCase();
+    if (initialLang === 'en' || initialLang === 'vi') {
+      lang = initialLang;
+    }
+
+    function switchExhibitionMode(mode) {
+      if (!tourData) return;
+      document.getElementById('welcome-screen').classList.add('hidden');
+      if (mode === 'workshop') {
+        goToPanorama(WORKSHOP_PANO_ID, true);
+      } else if (mode === 'tour') {
+        const lobby = tourData.zones[0];
+        goToPanorama(lobby.panoId, true, lobby.yaw, lobby.pitch);
+      }
+    }
+
+    window.addEventListener('message', (event) => {
+      if (event.origin !== window.location.origin) return;
+      const msg = event.data;
+      if (!msg || typeof msg !== 'object') return;
+      if (msg.type === 'kh-3d-mode' && (msg.mode === 'tour' || msg.mode === 'workshop')) {
+        switchExhibitionMode(msg.mode);
+      } else if (msg.type === 'kh-3d-lang' && (msg.lang === 'vi' || msg.lang === 'en')) {
+        lang = msg.lang;
+        applyLanguage();
+      }
+    });
+
+    fetch('tour-data.json?v=' + Date.now())
+      .then(r => r.json())
+      .then(data => {
+        tourData = data;
+        panoIds = data.panoOrder || Object.keys(data.panoramas);
+        applyLanguage();
+        const lobby = data.zones[0];
+        if (initialMode === 'workshop') {
+          goToPanorama(WORKSHOP_PANO_ID, false);
+          if (autoStart) {
+            document.getElementById('welcome-screen').classList.add('hidden');
+          }
+        } else {
+          goToPanorama(lobby.panoId, false, lobby.yaw, lobby.pitch);
+          if (autoStart) {
+            document.getElementById('welcome-screen').classList.add('hidden');
+          }
+        }
+        animate();
+      });
+  </script>
+</body>
+</html>

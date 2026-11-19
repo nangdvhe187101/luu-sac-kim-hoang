@@ -1,0 +1,14 @@
+{
+  "name": "luu-sac-kim-hoang",
+  "version": "1.0.0",
+  "description": "Website dự án Lưu Sắc Kim Hoàng - Bảo tồn, phục dựng và lan tỏa giá trị dòng tranh dân gian Kim Hoàng",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "sync:footer": "node scripts/sync-footer.js"
+  },
+  "keywords": ["luu-sac-kim-hoang", "tranh-kim-hoang", "di-san-van-hoa"],
+  "author": "",
+  "license": "ISC"
+}
