@@ -11,7 +11,7 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=2" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=2" />
     <!-- Phông chữ & Toàn bộ Stylesheet đã được chuẩn hóa -->
-    <link rel="stylesheet" href="/css/style.css?v=25" />
+    <link rel="stylesheet" href="/css/style.css?v=26" />
     <style>
         @font-face {
             font-family: "DFVN Bropella";
@@ -23,11 +23,8 @@
         .kh-hero-intro {
             position: relative !important;
             width: 100% !important;
-            background-color: #9d1515 !important;
-            background-image: 
-                radial-gradient(circle at 80% 30%, rgba(220, 38, 38, 0.45), transparent 60%),
-                linear-gradient(to bottom, rgba(0, 0, 0, 0.45), rgba(157, 21, 21, 0.85)),
-                url('/images/bg-red-do-tall.webp') !important;
+            background-color: #ba161c !important;
+            background-image: url('/images/bg-hero-kimhoang.jpg') !important;
             background-position: center !important;
             background-repeat: no-repeat !important;
             background-size: cover !important;
@@ -37,20 +34,7 @@
             box-sizing: border-box !important;
         }
         .kh-hero-intro::after {
-            content: "" !important;
-            position: absolute !important;
-            right: -5% !important;
-            top: 50% !important;
-            transform: translateY(-50%) !important;
-            width: min(520px, 48vw) !important;
-            height: min(520px, 48vw) !important;
-            background-image: url('/images/bg-kimhoang.jpg') !important;
-            background-size: contain !important;
-            background-repeat: no-repeat !important;
-            background-position: center !important;
-            opacity: 0.12 !important;
-            pointer-events: none !important;
-            filter: grayscale(1) invert(1) !important;
+            display: none !important;
         }
         .kh-hero-intro__inner {
             max-width: 860px !important;
@@ -61,27 +45,27 @@
             align-items: flex-start !important;
             text-align: left !important;
         }
-        .kh-hero-intro__eyebrow {
-            color: #ffe08a !important;
-            font-size: clamp(0.85rem, 1.25vw, 1.05rem) !important;
-            font-weight: 700 !important;
-            letter-spacing: 0.18em !important;
-            text-transform: uppercase !important;
-            margin-bottom: 1.15rem !important;
-            display: inline-flex !important;
-            align-items: center !important;
-            gap: 0.65rem !important;
-        }
         .kh-hero-intro__title {
             font-family: "DFVN Bropella", serif !important;
             color: #ffffff !important;
-            font-size: clamp(2.4rem, 6vw, 4.8rem) !important;
+            font-size: clamp(2.6rem, 6.5vw, 5rem) !important;
             font-weight: 700 !important;
             line-height: 1.1 !important;
             letter-spacing: 0.03em !important;
             text-transform: uppercase !important;
-            margin: 0 0 1.35rem 0 !important;
-            text-shadow: 0 4px 24px rgba(0, 0, 0, 0.45) !important;
+            margin: 0 0 0.75rem 0 !important;
+            text-shadow: 0 3px 20px rgba(0, 0, 0, 0.45) !important;
+        }
+        .kh-hero-intro__eyebrow {
+            color: #ffe08a !important;
+            font-size: clamp(0.9rem, 1.3vw, 1.15rem) !important;
+            font-weight: 700 !important;
+            letter-spacing: 0.18em !important;
+            text-transform: uppercase !important;
+            margin-bottom: 1.6rem !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.4) !important;
         }
         .kh-hero-intro__desc {
             color: rgba(255, 250, 240, 0.95) !important;
@@ -90,6 +74,7 @@
             max-width: 660px !important;
             margin: 0 0 2.25rem 0 !important;
             font-weight: 400 !important;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.35) !important;
         }
         .kh-hero-intro__cta-btn {
             display: inline-flex !important;
@@ -575,11 +560,11 @@
                         <!-- ======================================================= -->
                         <!-- 3. GIỚI THIỆU DỰ ÁN LƯU SẮC KIM HOÀNG (PHONG CÁCH HẢI LƯU NGƯỢC) -->
                         <!-- ======================================================= -->
-                        <div class="kh-hero-intro" id="ve-du-an" style="background-color: #9d1515; background-image: radial-gradient(circle at 80% 30%, rgba(220, 38, 38, 0.45), transparent 60%), linear-gradient(to bottom, rgba(0, 0, 0, 0.45), rgba(157, 21, 21, 0.85)), url('/images/bg-red-do-tall.webp'); background-size: cover; background-position: center; color: #ffffff; padding: clamp(70px, 9vw, 130px) clamp(24px, 6vw, 80px);">
+                        <div class="kh-hero-intro" id="ve-du-an" style="background-color: #ba161c; background-image: url('/images/bg-hero-kimhoang.jpg'); background-size: cover; background-position: center; color: #ffffff; padding: clamp(70px, 9vw, 130px) clamp(24px, 6vw, 80px);">
                             <div class="kh-hero-intro__inner" style="max-width: 860px; z-index: 2; position: relative;">
-                                <p class="kh-hero-intro__eyebrow" style="color: #ffe08a; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 1.15rem;">Chạm sắc son - Lưu dấu người</p>
-                                <h2 class="kh-hero-intro__title" style="font-family: 'DFVN Bropella', serif; color: #ffffff; font-size: clamp(2.4rem, 6vw, 4.8rem); font-weight: 700; line-height: 1.1; letter-spacing: 0.03em; text-transform: uppercase; margin: 0 0 1.35rem 0;">LƯU SẮC<br>KIM HOÀNG</h2>
-                                <p class="kh-hero-intro__desc" style="color: rgba(255, 250, 240, 0.95); font-size: clamp(1rem, 1.3vw, 1.16rem); line-height: 1.8; max-width: 660px; margin: 0 0 2.25rem 0;">
+                                <h2 class="kh-hero-intro__title" style="font-family: 'DFVN Bropella', serif; color: #ffffff; font-size: clamp(2.6rem, 6.5vw, 5rem); font-weight: 700; line-height: 1.1; letter-spacing: 0.03em; text-transform: uppercase; margin: 0 0 0.75rem 0; text-shadow: 0 3px 20px rgba(0,0,0,0.45);">LƯU SẮC<br>KIM HOÀNG</h2>
+                                <p class="kh-hero-intro__eyebrow" style="color: #ffe08a; font-size: clamp(0.9rem, 1.3vw, 1.15rem); font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 1.6rem; text-shadow: 0 2px 10px rgba(0,0,0,0.4);">Chạm sắc son - Lưu dấu người</p>
+                                <p class="kh-hero-intro__desc" style="color: rgba(255, 250, 240, 0.95); font-size: clamp(1rem, 1.3vw, 1.16rem); line-height: 1.8; max-width: 660px; margin: 0 0 2.25rem 0; text-shadow: 0 2px 10px rgba(0,0,0,0.35);">
                                     Lưu Sắc Kim Hoàng là chiến dịch truyền thông nhằm tôn vinh hành trình
                                     phục hồi dòng tranh dân gian Kim Hoàng - một dòng tranh truyền thống
                                     mang đậm dấu ấn nghệ thuật và văn hóa của vùng đất Hà Nội.
