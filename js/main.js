@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initGuestbook();
   initTranhGallery();
   initCreativeProducts();
+  initExploreSlider();
 });
 
 /**
@@ -652,6 +653,97 @@ function initCarousels() {
       container.scrollLeft = scrollLeft - walk;
     });
   });
+}
+
+/**
+ * 6.0. Mobile Slider cho Khám Phá (Nút < >, Dots, Cảm ứng vuốt Touch)
+ */
+function initExploreSlider() {
+  const slider = document.querySelector('.kh-explore-slider');
+  if (!slider) return;
+
+  const track = slider.querySelector('.kh-explore-track');
+  const slides = slider.querySelectorAll('.kh-explore-slide');
+  const prevBtn = slider.querySelector('.kh-explore-prev');
+  const nextBtn = slider.querySelector('.kh-explore-next');
+  const dots = slider.querySelectorAll('.kh-explore-dot');
+
+  if (!track || slides.length === 0) return;
+
+  let currentIndex = 0;
+  const totalSlides = slides.length;
+
+  function goToSlide(index) {
+    if (index < 0) {
+      currentIndex = totalSlides - 1;
+    } else if (index >= totalSlides) {
+      currentIndex = 0;
+    } else {
+      currentIndex = index;
+    }
+
+    track.style.transform = `translateX(-${currentIndex * 100}%)`;
+
+    dots.forEach((dot, idx) => {
+      if (idx === currentIndex) {
+        dot.className = 'kh-explore-dot size-2 rounded-full bg-[#b41818] w-6 transition-all duration-300';
+      } else {
+        dot.className = 'kh-explore-dot size-2 rounded-full bg-stone-300 transition-all duration-300';
+      }
+    });
+  }
+
+  if (prevBtn) {
+    prevBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      goToSlide(currentIndex - 1);
+    });
+  }
+
+  if (nextBtn) {
+    nextBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      goToSlide(currentIndex + 1);
+    });
+  }
+
+  dots.forEach((dot, idx) => {
+    dot.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      goToSlide(idx);
+    });
+  });
+
+  // Touch Swipe cảm ứng trên thiết bị di động
+  let startX = 0;
+  let startY = 0;
+  let isSwiping = false;
+
+  track.addEventListener('touchstart', (e) => {
+    if (!e.touches || e.touches.length === 0) return;
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+    isSwiping = true;
+  }, { passive: true });
+
+  track.addEventListener('touchend', (e) => {
+    if (!isSwiping || !e.changedTouches || e.changedTouches.length === 0) return;
+    isSwiping = false;
+    const diffX = startX - e.changedTouches[0].clientX;
+    const diffY = startY - e.changedTouches[0].clientY;
+
+    // Chỉ kích hoạt lướt slide nếu chuyển động ngang lớn hơn chuyển động dọc
+    if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 35) {
+      if (diffX > 0) {
+        goToSlide(currentIndex + 1);
+      } else {
+        goToSlide(currentIndex - 1);
+      }
+    }
+  }, { passive: true });
 }
 
 /**
