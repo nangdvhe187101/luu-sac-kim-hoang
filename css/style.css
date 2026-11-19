@@ -22297,10 +22297,55 @@ html {
 }
 
 /* Social links with OFFICIAL LOGOS */
+.site-footer__contact {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.5rem !important;
+  margin: 0.85rem 0 1.15rem 0 !important;
+}
+
+.site-footer__contact-heading {
+  margin: 0 0 0.15rem 0 !important;
+  color: #ffe08a !important;
+  font-size: 0.85rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.05em !important;
+  text-transform: uppercase !important;
+}
+
+.site-footer__contact-list {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.45rem !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  list-style: none !important;
+}
+
+.site-footer__contact-item {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.55rem !important;
+  color: #fff8eb !important;
+  font-size: 0.85rem !important;
+  line-height: 1.4 !important;
+  text-decoration: none !important;
+  transition: color 0.2s ease !important;
+}
+
+.site-footer__contact-item:hover {
+  color: #ffd700 !important;
+}
+
+.site-footer__contact-item svg {
+  flex-shrink: 0 !important;
+  color: #ffe08a !important;
+}
+
 .site-footer__social {
   display: flex !important;
   flex-direction: column !important;
-  gap: 0.65rem !important;
+  gap: 0.55rem !important;
   padding-top: 0.25rem !important;
 }
 
@@ -22309,7 +22354,7 @@ html {
   color: #ffe08a !important;
   font-size: 0.825rem !important;
   font-weight: 700 !important;
-  letter-spacing: 0.08em !important;
+  letter-spacing: 0.12em !important;
   text-transform: uppercase !important;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
 }
@@ -22317,65 +22362,48 @@ html {
 .site-footer__social-list {
   display: flex !important;
   align-items: center !important;
-  gap: 0.85rem !important;
+  gap: 1.25rem !important;
   margin: 0 !important;
   padding: 0 !important;
   list-style: none !important;
 }
 
+/* Biểu tượng mạng xã hội phẳng chuẩn phong cách Văn Miếu */
 .site-footer__social-link {
   position: relative !important;
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  width: 2.65rem !important;
-  height: 2.65rem !important;
-  border-radius: 9999px !important;
+  width: auto !important;
+  height: auto !important;
+  padding: 4px !important;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
   text-decoration: none !important;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.28) !important;
-  transition: transform 0.22s ease, box-shadow 0.22s ease, filter 0.22s ease !important;
-  overflow: hidden !important;
+  color: #ffffff !important;
+  transition: transform 0.2s ease, color 0.2s ease !important;
 }
 
 .site-footer__social-link:hover {
-  transform: translateY(-3px) scale(1.05) !important;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4) !important;
+  transform: translateY(-2px) scale(1.15) !important;
+  color: #ffd700 !important;
+  box-shadow: none !important;
+  background: transparent !important;
 }
 
-/* Facebook official button */
-.site-footer__social-link--fb {
-  background: #1877F2 !important;
-  border: 1px solid rgba(255, 255, 255, 0.35) !important;
-}
-
-.site-footer__social-link--fb:hover {
-  background: #0d65d9 !important;
-  box-shadow: 0 6px 16px rgba(24, 119, 242, 0.45) !important;
-}
-
-/* TikTok official button */
-.site-footer__social-link--tiktok {
-  background: #000000 !important;
-  border: 1px solid rgba(255, 255, 255, 0.35) !important;
-}
-
-.site-footer__social-link--tiktok:hover {
-  background: #161823 !important;
-  border-color: #25F4EE !important;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.55), 0 0 10px rgba(37, 244, 238, 0.3) !important;
-}
-
-/* Ensure SVG inside social links is stroke-free and perfectly crisp */
 .site-footer__social-link svg {
   stroke: none !important;
   pointer-events: none !important;
-  width: 1.15rem !important;
-  height: 1.15rem !important;
+  width: 1.35rem !important;
+  height: 1.35rem !important;
+  fill: currentColor !important;
 }
 
 .site-footer__social-link svg path {
   stroke: none !important;
-  fill: #ffffff !important;
+  fill: currentColor !important;
 }
 
 /* Navigation area (Center & Right) */
