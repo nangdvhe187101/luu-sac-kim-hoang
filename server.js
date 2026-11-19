@@ -62,14 +62,46 @@ const server = http.createServer((req, res) => {
     return;
   }
   
-  if (safePath === '/' || safePath === '/vi' || safePath === '/vi/') {
-    safePath = '/index.html';
-  }
-  if (safePath === '/vi/news' || safePath === '/vi/news/') {
-    safePath = '/vi/posts/index.html';
-  }
-  if (safePath === '/vi/creative-products' || safePath === '/vi/creative-products/') {
-    safePath = '/vi/services/souvenirs/index.html';
+  const routeMap = {
+    '/': '/index.html',
+    '/vi': '/index.html',
+    '/3d': '/vi/visit/3d/index.html',
+    '/3d-tour': '/vi/visit/3d/index.html',
+    '/vi/3d': '/vi/visit/3d/index.html',
+    '/gioi-thieu': '/vi/introduction/index.html',
+    '/introduction': '/vi/introduction/index.html',
+    '/luu-sac-kim-hoang': '/vi/introduction/index.html',
+    '/nghe-nhan': '/vi/introduction/nghe-nhan/index.html',
+    '/nghe-nhan/dao-dinh-chung': '/vi/introduction/nghe-nhan/dao-dinh-chung/index.html',
+    '/nghe-nhan/nguyen-thi-thu-hoa': '/vi/introduction/nghe-nhan/nguyen-thi-thu-hoa/index.html',
+    '/doi-tac': '/vi/introduction/doi-tac/index.html',
+    '/nha-tai-tro': '/vi/introduction/doi-tac/nha-tai-tro/index.html',
+    '/bao-tro-truyen-thong': '/vi/introduction/doi-tac/bao-tro-truyen-thong/index.html',
+    '/tham-quan': '/vi/visit/index.html',
+    '/visit': '/vi/visit/index.html',
+    '/tranh': '/vi/visit/tranh/index.html',
+    '/hanh-trinh': '/vi/visit/hanh-trinh/index.html',
+    '/hanh-trinh/chi-tiet': '/vi/visit/hanh-trinh/chi-tiet/index.html',
+    '/san-pham': '/vi/services/index.html',
+    '/san-pham-sang-tao': '/vi/services/index.html',
+    '/services': '/vi/services/index.html',
+    '/qua-tang': '/vi/services/souvenirs/index.html',
+    '/qua-tang-luu-niem': '/vi/services/souvenirs/index.html',
+    '/creative-products': '/vi/services/souvenirs/index.html',
+    '/vi/creative-products': '/vi/services/souvenirs/index.html',
+    '/su-kien': '/vi/events/index.html',
+    '/events': '/vi/events/index.html',
+    '/tin-tuc': '/vi/posts/index.html',
+    '/posts': '/vi/posts/index.html',
+    '/news': '/vi/posts/index.html',
+    '/vi/news': '/vi/posts/index.html',
+    '/tim-kiem': '/vi/search/index.html',
+    '/search': '/vi/search/index.html'
+  };
+
+  const norm = safePath.replace(/\/$/, '') || '/';
+  if (routeMap[norm]) {
+    safePath = routeMap[norm];
   }
 
   let filePath = path.join(ROOT_DIR, safePath);
