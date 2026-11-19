@@ -11,7 +11,109 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=2" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=2" />
     <!-- Phông chữ & Toàn bộ Stylesheet đã được chuẩn hóa -->
-    <link rel="stylesheet" href="/css/style.css?v=20" />
+    <link rel="stylesheet" href="/css/style.css?v=25" />
+    <style>
+        @font-face {
+            font-family: "DFVN Bropella";
+            src: url("/fonts/custom/DFVN-Bropella.otf") format("opentype");
+            font-weight: 400 700;
+            font-style: normal;
+            font-display: swap;
+        }
+        .kh-hero-intro {
+            position: relative !important;
+            width: 100% !important;
+            background-color: #9d1515 !important;
+            background-image: 
+                radial-gradient(circle at 80% 30%, rgba(220, 38, 38, 0.45), transparent 60%),
+                linear-gradient(to bottom, rgba(0, 0, 0, 0.45), rgba(157, 21, 21, 0.85)),
+                url('/images/bg-red-do-tall.webp') !important;
+            background-position: center !important;
+            background-repeat: no-repeat !important;
+            background-size: cover !important;
+            padding: clamp(70px, 9vw, 130px) clamp(24px, 6vw, 80px) !important;
+            color: #ffffff !important;
+            overflow: hidden !important;
+            box-sizing: border-box !important;
+        }
+        .kh-hero-intro::after {
+            content: "" !important;
+            position: absolute !important;
+            right: -5% !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            width: min(520px, 48vw) !important;
+            height: min(520px, 48vw) !important;
+            background-image: url('/images/bg-kimhoang.jpg') !important;
+            background-size: contain !important;
+            background-repeat: no-repeat !important;
+            background-position: center !important;
+            opacity: 0.12 !important;
+            pointer-events: none !important;
+            filter: grayscale(1) invert(1) !important;
+        }
+        .kh-hero-intro__inner {
+            max-width: 860px !important;
+            position: relative !important;
+            z-index: 2 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            text-align: left !important;
+        }
+        .kh-hero-intro__eyebrow {
+            color: #ffe08a !important;
+            font-size: clamp(0.85rem, 1.25vw, 1.05rem) !important;
+            font-weight: 700 !important;
+            letter-spacing: 0.18em !important;
+            text-transform: uppercase !important;
+            margin-bottom: 1.15rem !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 0.65rem !important;
+        }
+        .kh-hero-intro__title {
+            font-family: "DFVN Bropella", serif !important;
+            color: #ffffff !important;
+            font-size: clamp(2.4rem, 6vw, 4.8rem) !important;
+            font-weight: 700 !important;
+            line-height: 1.1 !important;
+            letter-spacing: 0.03em !important;
+            text-transform: uppercase !important;
+            margin: 0 0 1.35rem 0 !important;
+            text-shadow: 0 4px 24px rgba(0, 0, 0, 0.45) !important;
+        }
+        .kh-hero-intro__desc {
+            color: rgba(255, 250, 240, 0.95) !important;
+            font-size: clamp(1rem, 1.3vw, 1.16rem) !important;
+            line-height: 1.8 !important;
+            max-width: 660px !important;
+            margin: 0 0 2.25rem 0 !important;
+            font-weight: 400 !important;
+        }
+        .kh-hero-intro__cta-btn {
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 0.75rem !important;
+            padding: 0.95rem 2.2rem !important;
+            border-radius: 9999px !important;
+            background-color: #ffffff !important;
+            color: #b41818 !important;
+            font-size: clamp(0.92rem, 1.15vw, 1.02rem) !important;
+            font-weight: 700 !important;
+            letter-spacing: 0.08em !important;
+            text-transform: uppercase !important;
+            text-decoration: none !important;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28) !important;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        }
+        .kh-hero-intro__cta-btn:hover {
+            background-color: #ffe08a !important;
+            color: #8b0000 !important;
+            transform: translateY(-2px) scale(1.02) !important;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.38) !important;
+        }
+    </style>
 </head>
 
 <body class="min-h-screen flex flex-col font-sans antialiased text-foreground bg-background">
@@ -473,16 +575,16 @@
                         <!-- ======================================================= -->
                         <!-- 3. GIỚI THIỆU DỰ ÁN LƯU SẮC KIM HOÀNG (PHONG CÁCH HẢI LƯU NGƯỢC) -->
                         <!-- ======================================================= -->
-                        <div class="kh-hero-intro" id="ve-du-an">
-                            <div class="kh-hero-intro__inner">
-                                <p class="kh-hero-intro__eyebrow">Chạm sắc son - Lưu dấu người</p>
-                                <h2 class="kh-hero-intro__title">LƯU SẮC<br>KIM HOÀNG</h2>
-                                <p class="kh-hero-intro__desc">
+                        <div class="kh-hero-intro" id="ve-du-an" style="background-color: #9d1515; background-image: radial-gradient(circle at 80% 30%, rgba(220, 38, 38, 0.45), transparent 60%), linear-gradient(to bottom, rgba(0, 0, 0, 0.45), rgba(157, 21, 21, 0.85)), url('/images/bg-red-do-tall.webp'); background-size: cover; background-position: center; color: #ffffff; padding: clamp(70px, 9vw, 130px) clamp(24px, 6vw, 80px);">
+                            <div class="kh-hero-intro__inner" style="max-width: 860px; z-index: 2; position: relative;">
+                                <p class="kh-hero-intro__eyebrow" style="color: #ffe08a; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 1.15rem;">Chạm sắc son - Lưu dấu người</p>
+                                <h2 class="kh-hero-intro__title" style="font-family: 'DFVN Bropella', serif; color: #ffffff; font-size: clamp(2.4rem, 6vw, 4.8rem); font-weight: 700; line-height: 1.1; letter-spacing: 0.03em; text-transform: uppercase; margin: 0 0 1.35rem 0;">LƯU SẮC<br>KIM HOÀNG</h2>
+                                <p class="kh-hero-intro__desc" style="color: rgba(255, 250, 240, 0.95); font-size: clamp(1rem, 1.3vw, 1.16rem); line-height: 1.8; max-width: 660px; margin: 0 0 2.25rem 0;">
                                     Lưu Sắc Kim Hoàng là chiến dịch truyền thông nhằm tôn vinh hành trình
                                     phục hồi dòng tranh dân gian Kim Hoàng - một dòng tranh truyền thống
                                     mang đậm dấu ấn nghệ thuật và văn hóa của vùng đất Hà Nội.
                                 </p>
-                                <a href="/vi/introduction" class="kh-hero-intro__cta-btn">
+                                <a href="/vi/introduction" class="kh-hero-intro__cta-btn" style="display: inline-flex; align-items: center; gap: 0.75rem; padding: 0.95rem 2.2rem; border-radius: 9999px; background-color: #ffffff; color: #b41818; font-weight: 700; text-transform: uppercase; text-decoration: none; box-shadow: 0 8px 24px rgba(0,0,0,0.28);">
                                     <span>Bắt đầu hành trình</span>
                                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                         <line x1="5" y1="12" x2="19" y2="12"></line>
