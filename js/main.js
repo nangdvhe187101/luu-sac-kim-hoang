@@ -4,7 +4,85 @@
  * (Mega Menu Dropdown, Real Mobile Drawer & Accordion, Live Search, Sliders, Locale Switching)
  */
 
+// 1. Tắt cơ chế tự động giữ vị trí cuộn cũ của trình duyệt để trang luôn bắt đầu từ đỉnh
+if ('scrollRestoration' in history) {
+  history.scrollRestoration = 'manual';
+}
+
+function resetScrollToTop() {
+  if (!window.location.hash) {
+    window.scrollTo(0, 0);
+    if (document.documentElement) document.documentElement.scrollTop = 0;
+    if (document.body) document.body.scrollTop = 0;
+  }
+}
+
+// Gọi ngay lập tức khi script load và khi bfcache kích hoạt (pageshow)
+resetScrollToTop();
+window.addEventListener('pageshow', () => resetScrollToTop());
+window.addEventListener('load', () => resetScrollToTop());
+
+/**
+ * Helper: Điều hướng menu an toàn & cuộn lên đầu trang
+ * - Nếu bấm vào trang hiện tại: cuộn mượt lên đỉnh trang (0, 0)
+ * - Nếu bấm sang trang khác: đóng menu, reset vị trí cuộn và chuyển trang ngay lập tức
+ */
+function navigateOrScroll(href, onClose) {
+  if (!href || href === '#' || href.startsWith('javascript:')) return;
+
+  if (typeof onClose === 'function') {
+    try { onClose(); } catch(e) {}
+  }
+
+  // 1. Xử lý liên kết hashtag trên cùng một trang
+  if (href.includes('#')) {
+    const parts = href.split('#');
+    const pathPart = parts[0];
+    const hash = '#' + parts[1];
+    const currentNorm = window.location.pathname.replace(/\/$/, '') || '/';
+    let targetNorm = '';
+    try {
+      targetNorm = (new URL(pathPart || window.location.href, window.location.origin)).pathname.replace(/\/$/, '') || '/';
+    } catch(err) {
+      targetNorm = pathPart;
+    }
+
+    if (!pathPart || targetNorm === currentNorm) {
+      const targetEl = document.querySelector(hash);
+      if (targetEl) {
+        const headerH = document.querySelector('header')?.offsetHeight || 72;
+        const y = targetEl.getBoundingClientRect().top + window.scrollY - headerH;
+        window.scrollTo({ top: y, behavior: 'smooth' });
+        return;
+      }
+    }
+  }
+
+  let targetUrl;
+  try {
+    targetUrl = new URL(href, window.location.origin);
+  } catch(e) {
+    window.location.href = href;
+    return;
+  }
+
+  const currentNorm = window.location.pathname.replace(/\/$/, '') || '/';
+  const targetNorm = targetUrl.pathname.replace(/\/$/, '') || '/';
+
+  // 2. Nếu người dùng đang ở chính trang này (không có hashtag khác)
+  if (targetNorm === currentNorm && !targetUrl.hash) {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (document.documentElement) document.documentElement.scrollTo({ top: 0, behavior: 'smooth' });
+    return;
+  }
+
+  // 3. Chuyển sang trang khác: reset scroll về 0 trước khi rời đi và chuyển trang
+  window.scrollTo(0, 0);
+  window.location.href = targetUrl.href;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+  resetScrollToTop();
   initGlobalFooter();
   initMegaMenu();
   initMobileMenu();
@@ -149,26 +227,28 @@ function initMegaMenu() {
     if (trigger) {
       trigger.addEventListener('click', (e) => {
         const href = trigger.getAttribute('href');
-        if (href && href.includes('#')) {
-          const hash = '#' + href.split('#')[1];
-          const targetEl = document.querySelector(hash);
-          if (targetEl) {
-            e.preventDefault();
-            hidePanelImmediate();
-            const headerH = header ? header.offsetHeight : 72;
-            const y = targetEl.getBoundingClientRect().top + window.scrollY - headerH;
-            window.scrollTo({ top: y, behavior: 'smooth' });
-            return;
-          }
-        }
         if (href && href !== '#' && href !== 'javascript:void(0)') {
-          window.location.href = href;
+          e.preventDefault();
+          navigateOrScroll(href, hidePanelImmediate);
         } else {
           e.preventDefault();
           showSlot(key);
         }
       });
     }
+  });
+
+  // Xử lý toàn bộ link trên thanh Header Desktop (Trang chủ, 3D Tour, Sự kiện, Tin tức)
+  header.querySelectorAll('.header-nav__list a').forEach(link => {
+    const item = link.closest('.header-nav__item');
+    if (item && item.hasAttribute('data-menu')) return;
+    link.addEventListener('click', (e) => {
+      const href = link.getAttribute('href');
+      if (href && href !== '#' && !href.startsWith('javascript:')) {
+        e.preventDefault();
+        navigateOrScroll(href, hidePanelImmediate);
+      }
+    });
   });
 
   document.addEventListener('click', (e) => {
@@ -186,20 +266,13 @@ function initMegaMenu() {
   });
   panel.addEventListener('mouseleave', hidePanel);
 
-  // Smooth scroll for mega panel anchor links on home page
-  panel.querySelectorAll('a[href*="#"]').forEach(link => {
+  // Xử lý toàn bộ link bên trong Mega panel dropdown
+  panel.querySelectorAll('a').forEach(link => {
     link.addEventListener('click', (e) => {
       const href = link.getAttribute('href');
-      if (href && href.includes('#')) {
-        const hash = '#' + href.split('#')[1];
-        const targetEl = document.querySelector(hash);
-        if (targetEl) {
-          e.preventDefault();
-          hidePanelImmediate();
-          const headerH = header ? header.offsetHeight : 72;
-          const y = targetEl.getBoundingClientRect().top + window.scrollY - headerH;
-          window.scrollTo({ top: y, behavior: 'smooth' });
-        }
+      if (href && href !== '#' && !href.startsWith('javascript:')) {
+        e.preventDefault();
+        navigateOrScroll(href, hidePanelImmediate);
       }
     });
   });
@@ -245,22 +318,9 @@ function initMobileMenu() {
     row.addEventListener('click', (e) => {
       if (row.tagName.toLowerCase() === 'a') {
         const href = row.getAttribute('href');
-        if (href && href.includes('#')) {
-          const hash = '#' + href.split('#')[1];
-          const targetEl = document.querySelector(hash);
-          if (targetEl) {
-            e.preventDefault();
-            closeDrawer();
-            const headerH = document.querySelector('header')?.offsetHeight || 72;
-            const y = targetEl.getBoundingClientRect().top + window.scrollY - headerH;
-            window.scrollTo({ top: y, behavior: 'smooth' });
-            return;
-          }
-        }
         if (href && href !== '#' && href !== 'javascript:void(0)') {
           e.preventDefault();
-          closeDrawer();
-          window.location.href = href;
+          navigateOrScroll(href, closeDrawer);
           return;
         }
         closeDrawer();
@@ -303,29 +363,31 @@ function initMobileMenu() {
     });
   });
 
-  // Handle all links inside mobile submenu panels reliably
+  // Xử lý tất cả link bên trong submenu drawer trên mobile
   mobileOverlay.querySelectorAll('.header-mobile-nav__panel a').forEach(link => {
     link.addEventListener('click', (e) => {
       const href = link.getAttribute('href');
       if (!href || href === '#' || href === 'javascript:void(0)') return;
-      if (href.includes('#')) {
-        const parts = href.split('#');
-        const pathPart = parts[0];
-        const hash = '#' + parts[1];
-        const samePage = !pathPart || pathPart === window.location.pathname || pathPart === window.location.pathname + '/';
-        const targetEl = samePage ? document.querySelector(hash) : null;
-        if (targetEl) {
+      e.preventDefault();
+      navigateOrScroll(href, closeDrawer);
+    });
+  });
+
+  // Xử lý link chân trang Footer: nếu bấm vào chính trang hiện tại thì cuộn mượt lên đỉnh
+  document.querySelectorAll('.site-footer a').forEach(link => {
+    link.addEventListener('click', (e) => {
+      const href = link.getAttribute('href');
+      if (href && !href.startsWith('http') && !href.startsWith('mailto:') && !href.startsWith('tel:')) {
+        const currentNorm = window.location.pathname.replace(/\/$/, '') || '/';
+        let targetNorm = '';
+        try {
+          targetNorm = (new URL(href, window.location.origin)).pathname.replace(/\/$/, '') || '/';
+        } catch(err) { targetNorm = href; }
+        if (targetNorm === currentNorm && !href.includes('#')) {
           e.preventDefault();
-          closeDrawer();
-          const headerH = document.querySelector('header')?.offsetHeight || 72;
-          const y = targetEl.getBoundingClientRect().top + window.scrollY - headerH;
-          window.scrollTo({ top: y, behavior: 'smooth' });
-          return;
+          window.scrollTo({ top: 0, behavior: 'smooth' });
         }
       }
-      e.preventDefault();
-      closeDrawer();
-      window.location.assign(href);
     });
   });
 }
