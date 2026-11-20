@@ -89,6 +89,8 @@ const server = http.createServer((req, res) => {
     '/services': '/vi/services/index.html',
     '/qua-tang': '/vi/services/souvenirs/index.html',
     '/qua-tang-luu-niem': '/vi/services/souvenirs/index.html',
+    '/qua-luu-niem': '/vi/services/souvenirs/index.html',
+    '/tranh-sang-tao': '/vi/services/souvenirs/index.html',
     '/creative-products': '/vi/services/souvenirs/index.html',
     '/vi/creative-products': '/vi/services/souvenirs/index.html',
     '/su-kien': '/vi/events/index.html',

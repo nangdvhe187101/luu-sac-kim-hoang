@@ -22,6 +22,8 @@
     { "source": "/san-pham", "destination": "/vi/services", "permanent": false },
     { "source": "/qua-tang", "destination": "/vi/services/souvenirs", "permanent": false },
     { "source": "/qua-tang-luu-niem", "destination": "/vi/services/souvenirs", "permanent": false },
+    { "source": "/qua-luu-niem", "destination": "/vi/services/souvenirs?filter=vat-ly", "permanent": false },
+    { "source": "/tranh-sang-tao", "destination": "/vi/services/souvenirs?filter=tranh-sang-tao", "permanent": false },
     { "source": "/su-kien", "destination": "/vi/events", "permanent": false },
     { "source": "/events", "destination": "/vi/events", "permanent": false },
     { "source": "/tin-tuc", "destination": "/vi/posts", "permanent": false },

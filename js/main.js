@@ -1467,6 +1467,16 @@ function initCreativeProducts() {
     applyFilter(urlFilter);
   }
 
+  document.querySelectorAll('a[href*="/vi/services/souvenirs?filter="]').forEach(a => {
+    a.addEventListener('click', (e) => {
+      const u = new URL(a.href, window.location.origin);
+      const f = u.searchParams.get('filter');
+      if (f && filterBtns.some(b => b.getAttribute('data-filter') === f)) {
+        applyFilter(f);
+      }
+    });
+  });
+
   function openModal(card) {
     const images = (card.getAttribute('data-images') || '').split('|').filter(Boolean);
     const author = card.getAttribute('data-author') || '';
