@@ -197,6 +197,177 @@
       box-shadow: 0 2px 10px rgba(216, 150, 72, 0.4);
     }
 
+    /* Top-left Home Button (Always visible on all screen sizes) */
+    .lskh-home-btn {
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      z-index: 120;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: rgba(22, 14, 10, 0.88);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(243, 193, 120, 0.65);
+      border-radius: 999px;
+      color: #ffe08a;
+      font-family: 'Montserrat', system-ui, -apple-system, sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      text-decoration: none;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 10px rgba(180, 24, 24, 0.3);
+      transition: all 0.25s ease;
+      pointer-events: auto;
+      cursor: pointer;
+    }
+    .lskh-home-btn svg {
+      width: 16px;
+      height: 16px;
+      stroke: #ffe08a;
+      transition: transform 0.2s ease;
+    }
+    .lskh-home-btn:hover {
+      background: #b41818;
+      border-color: #ffd584;
+      color: #fff;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 22px rgba(180, 24, 24, 0.65);
+    }
+    .lskh-home-btn:hover svg {
+      stroke: #fff;
+      transform: translateX(-2px);
+    }
+    @media (max-width: 640px) {
+      .lskh-home-btn {
+        top: 12px;
+        left: 12px;
+        padding: 6px 12px;
+        font-size: 12px;
+        gap: 6px;
+      }
+      .lskh-home-btn svg {
+        width: 14px;
+        height: 14px;
+      }
+    }
+
+    /* Mobile Portrait Rotate Screen Overlay */
+    .orientation-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      background: rgba(14, 10, 8, 0.96);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      text-align: center;
+      color: #fff;
+    }
+    .orientation-overlay.dismissed {
+      display: none !important;
+    }
+    .orientation-box {
+      max-width: 360px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: orientFadeIn 0.35s ease;
+    }
+    .phone-rotate-icon {
+      position: relative;
+      width: 80px;
+      height: 80px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .phone-device {
+      width: 34px;
+      height: 58px;
+      border: 2.5px solid #ffe08a;
+      border-radius: 7px;
+      position: relative;
+      animation: phoneRotateAnim 2.5s ease-in-out infinite;
+      box-shadow: 0 0 18px rgba(255, 224, 138, 0.35);
+    }
+    .phone-device::before {
+      content: '';
+      position: absolute;
+      top: 4px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 10px;
+      height: 2px;
+      background: #ffe08a;
+      border-radius: 1px;
+    }
+    .rotate-arrow {
+      position: absolute;
+      font-size: 26px;
+      color: #f3c178;
+      right: 0px;
+      top: 0px;
+      animation: arrowPulseAnim 2.5s ease-in-out infinite;
+    }
+    @keyframes phoneRotateAnim {
+      0%, 15% { transform: rotate(0deg); }
+      50%, 75% { transform: rotate(90deg); }
+      90%, 100% { transform: rotate(0deg); }
+    }
+    @keyframes arrowPulseAnim {
+      0%, 100% { opacity: 0.35; transform: scale(0.9); }
+      50% { opacity: 1; transform: scale(1.15); }
+    }
+    @keyframes orientFadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .orientation-title {
+      font-family: 'Montserrat', system-ui, sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: #ffe08a;
+      letter-spacing: 0.4px;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+    }
+    .orientation-desc {
+      font-size: 13px;
+      line-height: 1.55;
+      color: rgba(255, 255, 255, 0.86);
+      margin-bottom: 16px;
+    }
+    .orientation-hint {
+      font-size: 12px;
+      color: #f3c178;
+      background: rgba(255, 224, 138, 0.12);
+      border: 1px solid rgba(255, 224, 138, 0.28);
+      border-radius: 999px;
+      padding: 7px 16px;
+      margin-bottom: 20px;
+    }
+    .orientation-skip-btn {
+      background: transparent;
+      border: none;
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 12px;
+      cursor: pointer;
+      padding: 8px 16px;
+      text-decoration: underline;
+      transition: color 0.2s;
+    }
+    .orientation-skip-btn:hover {
+      color: #fff;
+    }
+
     /* Top-right Museum Controls: Audio / Loa & Chuyển ngôn ngữ Việt - Anh */
     #top-right-tools {
       position: fixed;
@@ -629,6 +800,35 @@
     <div class="minimap-label">Sơ đồ Hình Tròn</div>
   </div>
 
+  <!-- Top-left Back to Home Button -->
+  <a id="btn-back-home" href="/" class="lskh-home-btn" title="Quay lại trang chủ Lưu Sắc Kim Hoàng">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+      <polyline points="9 22 9 12 15 12 15 22"/>
+    </svg>
+    <span id="label-back-home">Về trang chủ</span>
+  </a>
+
+  <!-- Mobile Portrait Orientation Request Overlay -->
+  <div id="orientation-overlay" class="orientation-overlay" role="dialog" aria-modal="true" aria-label="Yêu cầu xoay ngang màn hình">
+    <div class="orientation-box">
+      <div class="phone-rotate-icon">
+        <div class="phone-device"></div>
+        <div class="rotate-arrow">↻</div>
+      </div>
+      <h3 class="orientation-title" id="orient-title">Vui lòng xoay ngang màn hình</h3>
+      <p class="orientation-desc" id="orient-desc">
+        Không gian bảo tàng 3D Tranh dân gian Kim Hoàng được tối ưu hóa cho góc nhìn toàn cảnh khi cầm điện thoại nằm ngang (Landscape).
+      </p>
+      <div class="orientation-hint" id="orient-hint">
+        <span>Gợi ý: Mở tính năng tự động xoay màn hình trên điện thoại</span>
+      </div>
+      <button type="button" id="btn-skip-orientation" class="orientation-skip-btn">
+        Bỏ qua &amp; tiếp tục xem dọc &rarr;
+      </button>
+    </div>
+  </div>
+
   <!-- Top Center HUD -->
   <div id="top-hud">
     <div id="room-badge">SẢNH LỄ TÂN &amp; VIDEO</div>
@@ -637,9 +837,6 @@
 
   <!-- Top-right Museum Controls: Audio / Speaker Toggle & Bilingual VI - EN Switch -->
   <div id="top-right-tools">
-    <a id="btn-back-site" class="tool-btn" href="/3d" target="_self" title="Quay về trang web Lưu Sắc Kim Hoàng" style="display:none; text-decoration:none; color:#ffe08a; font-weight:600; padding:6px 12px;">
-      <span>← Về website</span>
-    </a>
     <button class="tool-btn" id="btn-audio" title="Bật / Tắt âm thanh (Loa)">
       <span class="audio-icon" id="audio-icon">🔊</span>
       <span class="audio-label" id="audio-label">Nhạc</span>
@@ -3547,6 +3744,38 @@
       setTimeout(() => updateLanguageUI(), 50);
     }
 
+    // Orientation Lock Management (Request landscape on mobile devices)
+    const orientEl = document.getElementById('orientation-overlay');
+    const btnSkipOrient = document.getElementById('btn-skip-orientation');
+
+    function checkOrientation() {
+      if (!orientEl) return;
+      if (orientEl.classList.contains('dismissed')) return;
+      const isTouchOrMobile = ('ontouchstart' in window) || navigator.maxTouchPoints > 0 || window.innerWidth <= 920;
+      const isPortrait = window.innerHeight > window.innerWidth;
+      if (isTouchOrMobile && isPortrait) {
+        orientEl.style.display = 'flex';
+      } else {
+        orientEl.style.display = 'none';
+      }
+    }
+
+    if (btnSkipOrient && orientEl) {
+      btnSkipOrient.addEventListener('click', () => {
+        orientEl.classList.add('dismissed');
+        orientEl.style.display = 'none';
+      });
+    }
+
+    window.addEventListener('resize', checkOrientation);
+    window.addEventListener('orientationchange', () => {
+      setTimeout(checkOrientation, 150);
+      if (window.innerWidth > window.innerHeight && orientEl) {
+        orientEl.classList.remove('dismissed');
+      }
+    });
+    checkOrientation();
+
     // Ensure background music starts reliably upon any user interaction
     const triggerBgAudio = () => {
       if (audioEnabled && bgAudio.paused) {
@@ -3584,6 +3813,23 @@
       if (isStudioDialogueActive) {
         updateStudioDialogueUI();
       }
+
+      const labelBackHome = document.getElementById('label-back-home');
+      if (labelBackHome) {
+        labelBackHome.textContent = isVi ? 'Về trang chủ' : 'Home';
+      }
+      const orientTitle = document.getElementById('orient-title');
+      const orientDesc = document.getElementById('orient-desc');
+      const orientHint = document.getElementById('orient-hint');
+      const orientSkip = document.getElementById('btn-skip-orientation');
+      if (orientTitle) orientTitle.textContent = isVi ? 'Vui lòng xoay ngang màn hình' : 'Please rotate your screen';
+      if (orientDesc) orientDesc.textContent = isVi
+        ? 'Không gian bảo tàng 3D Tranh dân gian Kim Hoàng được tối ưu hóa cho góc nhìn toàn cảnh khi cầm điện thoại nằm ngang (Landscape).'
+        : 'The 3D museum exhibition is best experienced in landscape mode.';
+      if (orientHint) orientHint.innerHTML = isVi
+        ? '<span>Gợi ý: Mở tính năng tự động xoay màn hình trên điện thoại</span>'
+        : '<span>Tip: Enable auto-rotate in your phone settings</span>';
+      if (orientSkip) orientSkip.textContent = isVi ? 'Bỏ qua & tiếp tục xem dọc →' : 'Continue in portrait mode →';
     }
 
     function toggleAudio() {

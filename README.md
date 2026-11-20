@@ -11,12 +11,12 @@ Dự án được xây dựng với cấu trúc frontend chuẩn, tối ưu hóa
 - **`index.html`**: Trang chủ chính thức giới thiệu tổng quan dự án, hành trình, bộ sưu tập tranh, sản phẩm sáng tạo và tin tức.
 - **`vi/`**: Các chuyên trang chuyên sâu:
   - `vi/introduction/`: Giới thiệu dự án, nghệ nhân Đào Đình Chung, chuyên gia TS. Nguyễn Thị Thu Hòa, danh sách đối tác & nhà tài trợ.
-  - `vi/visit/`: Không gian tham quan bộ sưu tập tranh Kim Hoàng, hành trình phục dựng và không gian trải nghiệm thực tế ảo 3D (`/vi/visit/3d`).
+  - `vi/visit/`: Không gian tham quan bộ sưu tập tranh Kim Hoàng và hành trình phục dựng.
   - `vi/services/`: Danh mục sản phẩm sáng tạo (quà lưu niệm, charm da, tranh minh họa sáng tạo).
   - `vi/events/`: Lịch sự kiện, workshop và hoạt động cộng đồng.
   - `vi/posts/`: Tin tức, báo chí (Nhân Dân, Tiền Phong, Thông tấn xã VNA, Tracuudi).
   - `vi/search/`: Trang tìm kiếm toàn diện.
-- **`trien-lam-3d/`**: Ứng dụng Không gian Bảo tàng Số 3D (Three.js WebGL) tương tác: sảnh đón tiếp lễ tân & màn hình tư liệu lớn, hành lang tròn trưng bày bộ sưu tập tranh Kim Hoàng, phòng tròn trung tâm trải nghiệm vẽ tranh 3D cùng nghệ nhân Đào Đình Chung (in mộc bản, tô màu, ký tên) và bức tường mosaic khổng lồ Lưu Sắc Kim Hoàng lưu trữ tranh trên Cloudflare R2 (tích hợp trực tiếp tại `/vi/visit/3d` và mở toàn trang tại `/trien-lam-3d/`).
+- **`trien-lam-3d/`**: Ứng dụng Không gian Bảo tàng Số 3D (Three.js WebGL) tương tác toàn màn hình: sảnh đón tiếp lễ tân & màn hình tư liệu lớn, hành lang tròn trưng bày bộ sưu tập tranh Kim Hoàng, phòng tròn trung tâm trải nghiệm vẽ tranh 3D cùng nghệ nhân Đào Đình Chung (in mộc bản, tô màu, ký tên) và bức tường mosaic khổng lồ Lưu Sắc Kim Hoàng lưu trữ tranh trên Cloudflare R2 (truy cập trực tiếp tại `/3d` hoặc `/trien-lam-3d/`).
 - **`css/style.css`**: Hệ thống CSS đồng bộ (bảng màu đỏ hồng điều Kim Hoàng, typography, responsive mobile & desktop).
 - **`js/main.js`**: Điều khiển menu dropdown, mobile drawer điều hướng, tìm kiếm tự động, slider carousels.
 - **`footer.html` & `scripts/sync-footer.js`**: Footer dùng chung đồng bộ tự động trên toàn bộ các trang.

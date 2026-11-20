@@ -5,8 +5,10 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "redirects": [
-    { "source": "/3d", "destination": "/vi/visit/3d", "permanent": false },
-    { "source": "/3d-tour", "destination": "/vi/visit/3d", "permanent": false },
+    { "source": "/3d", "destination": "/trien-lam-3d/threejs-3d-room.html", "permanent": false },
+    { "source": "/3d-tour", "destination": "/trien-lam-3d/threejs-3d-room.html", "permanent": false },
+    { "source": "/vi/visit/3d", "destination": "/trien-lam-3d/threejs-3d-room.html", "permanent": false },
+    { "source": "/vi/3d", "destination": "/trien-lam-3d/threejs-3d-room.html", "permanent": false },
     { "source": "/trien-lam-3d/threejs-museum.html", "destination": "/trien-lam-3d/threejs-3d-room.html", "permanent": true },
     { "source": "/gioi-thieu", "destination": "/vi/introduction", "permanent": false },
     { "source": "/nghe-nhan", "destination": "/vi/introduction/nghe-nhan", "permanent": false },
