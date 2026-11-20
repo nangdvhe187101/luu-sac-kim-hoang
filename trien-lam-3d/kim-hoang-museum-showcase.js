@@ -162,7 +162,10 @@ export async function hangSharedPainting(outCanvas, sigName = '') {
 
   // Upload to Cloudflare R2 via Worker
   try {
-    const blob = await new Promise((resolve) => thumb.toBlob(resolve, 'image/webp', 0.88));
+    let blob = await new Promise((resolve) => thumb.toBlob(resolve, 'image/webp', 0.88));
+    if (!blob) {
+      blob = await new Promise((resolve) => thumb.toBlob(resolve, 'image/png'));
+    }
     if (blob) {
       const fd = new FormData();
       fd.append('file', blob, 'painting.webp');
@@ -171,6 +174,7 @@ export async function hangSharedPainting(outCanvas, sigName = '') {
       if (res.ok) {
         const data = await res.json();
         if (data && data.ok && data.item && data.item.url) {
+          console.log('✅ Đã upload tranh lên Cloudflare R2 thành công:', data.item);
           r2PaintingsCache = [
             { ...data.item, isUser: true },
             ...r2PaintingsCache.filter((p) => p.url !== data.item.url)
@@ -180,10 +184,16 @@ export async function hangSharedPainting(outCanvas, sigName = '') {
           } catch (_) {}
           mosaicRefreshCallbacks.forEach((cb) => cb());
           return { uploadedToR2: true, item: data.item };
+        } else {
+          console.error('❌ Upload tranh lên R2 thất bại (JSON payload không hợp lệ):', data);
         }
+      } else {
+        console.error('❌ Upload tranh lên R2 lỗi HTTP status:', res.status, res.statusText);
       }
     }
-  } catch (_) {}
+  } catch (err) {
+    console.error('❌ Lỗi kết nối khi upload tranh lên R2:', err);
+  }
 
   return { uploadedToR2: false, item: { id: localId, url: dataUrl, sigName } };
 }

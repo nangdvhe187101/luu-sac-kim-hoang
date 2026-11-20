@@ -7,6 +7,7 @@
   "redirects": [
     { "source": "/3d", "destination": "/vi/visit/3d", "permanent": false },
     { "source": "/3d-tour", "destination": "/vi/visit/3d", "permanent": false },
+    { "source": "/trien-lam-3d/threejs-museum.html", "destination": "/trien-lam-3d/threejs-3d-room.html", "permanent": true },
     { "source": "/gioi-thieu", "destination": "/vi/introduction", "permanent": false },
     { "source": "/nghe-nhan", "destination": "/vi/introduction/nghe-nhan", "permanent": false },
     { "source": "/doi-tac", "destination": "/vi/introduction/doi-tac", "permanent": false },
@@ -42,11 +43,24 @@
       ]
     },
     {
+      "source": "/trien-lam-3d/(.*)",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        }
+      ]
+    },
+    {
       "source": "/trien-lam-3d/(.*)\\.glb",
       "headers": [
         {
           "key": "Content-Type",
           "value": "model/gltf-binary"
+        },
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
         }
       ]
     }

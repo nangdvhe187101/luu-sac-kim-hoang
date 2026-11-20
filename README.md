@@ -16,7 +16,7 @@ Dự án được xây dựng với cấu trúc frontend chuẩn, tối ưu hóa
   - `vi/events/`: Lịch sự kiện, workshop và hoạt động cộng đồng.
   - `vi/posts/`: Tin tức, báo chí (Nhân Dân, Tiền Phong, Thông tấn xã VNA, Tracuudi).
   - `vi/search/`: Trang tìm kiếm toàn diện.
-- **`trien-lam-3d/`**: Ứng dụng Triển lãm thực tế ảo 3D (Three.js) với 25 điểm đứng 360°, song ngữ Việt/Anh, âm thanh thuyết minh và xưởng làm tranh Kim Hoàng 3D tương tác (tích hợp trực tiếp tại `/vi/visit/3d` và mở toàn trang tại `/trien-lam-3d/`).
+- **`trien-lam-3d/`**: Ứng dụng Không gian Bảo tàng Số 3D (Three.js WebGL) tương tác: sảnh đón tiếp lễ tân & màn hình tư liệu lớn, hành lang tròn trưng bày bộ sưu tập tranh Kim Hoàng, phòng tròn trung tâm trải nghiệm vẽ tranh 3D cùng nghệ nhân Đào Đình Chung (in mộc bản, tô màu, ký tên) và bức tường mosaic khổng lồ Lưu Sắc Kim Hoàng lưu trữ tranh trên Cloudflare R2 (tích hợp trực tiếp tại `/vi/visit/3d` và mở toàn trang tại `/trien-lam-3d/`).
 - **`css/style.css`**: Hệ thống CSS đồng bộ (bảng màu đỏ hồng điều Kim Hoàng, typography, responsive mobile & desktop).
 - **`js/main.js`**: Điều khiển menu dropdown, mobile drawer điều hướng, tìm kiếm tự động, slider carousels.
 - **`footer.html` & `scripts/sync-footer.js`**: Footer dùng chung đồng bộ tự động trên toàn bộ các trang.

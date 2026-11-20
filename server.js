@@ -67,6 +67,7 @@ const server = http.createServer((req, res) => {
     '/vi': '/index.html',
     '/3d': '/vi/visit/3d/index.html',
     '/3d-tour': '/vi/visit/3d/index.html',
+    '/trien-lam-3d/threejs-museum.html': '/trien-lam-3d/threejs-3d-room.html',
     '/vi/3d': '/vi/visit/3d/index.html',
     '/gioi-thieu': '/vi/introduction/index.html',
     '/introduction': '/vi/introduction/index.html',
@@ -158,6 +159,8 @@ function serveFile(filePath, req, res, stats) {
   const cacheControl = isHtml
     ? 'no-cache, must-revalidate'
     : 'public, max-age=604800, stale-while-revalidate=86400';
+
+  res.setHeader('Access-Control-Allow-Origin', '*');
 
   // Dynamic component injection for HTML (Single footer.html file source)
   if (isHtml) {

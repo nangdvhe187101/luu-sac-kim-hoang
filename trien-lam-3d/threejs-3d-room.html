@@ -1,0 +1,3840 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Triển Lãm Thực Tế Ảo 3D | Lưu Sắc Kim Hoàng</title>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico?v=2" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=2" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=2" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=2" />
+  <link rel="stylesheet" href="fonts.css" />
+  <link rel="stylesheet" href="game/kim-hoang-ui.css" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: 100%; height: 100%; overflow: hidden;
+      background: #1b1612;
+      font-family: 'Montserrat', system-ui, -apple-system, sans-serif;
+      color: #fff;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+      -webkit-touch-callout: none;
+    }
+
+    #viewer-canvas, #viewer-canvas canvas {
+      position: fixed; inset: 0; z-index: 1;
+      touch-action: none;
+      -webkit-touch-callout: none;
+    }
+
+    /* Center crosshair */
+    #crosshair {
+      position: fixed; left: 50%; top: 50%; z-index: 5;
+      width: 10px; height: 10px;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.6);
+      background: rgba(219, 155, 77, 0.35);
+      pointer-events: none;
+      transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+    }
+    #crosshair.hovering {
+      transform: translate(-50%, -50%) scale(1.7);
+      border-color: #f3c178;
+      background: rgba(219, 155, 77, 0.9);
+    }
+
+    #hover-hint {
+      position: fixed; left: 50%; top: calc(50% + 22px); z-index: 5;
+      transform: translateX(-50%);
+      background: rgba(20, 14, 10, 0.9);
+      border: 1px solid rgba(219, 155, 77, 0.75);
+      color: #f6d5a3;
+      padding: 6px 14px; border-radius: 20px;
+      font-size: 12px; font-weight: 600;
+      pointer-events: none;
+      opacity: 0; transition: opacity 0.15s ease;
+      white-space: nowrap;
+    }
+    #hover-hint.visible { opacity: 1; }
+
+    /* Welcome Overlay */
+    #welcome-screen {
+      position: fixed; inset: 0; z-index: 50;
+      background: radial-gradient(circle at center, rgba(34, 23, 15, 0.88) 0%, rgba(14, 10, 7, 0.97) 100%);
+      backdrop-filter: blur(8px);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center; padding: 24px;
+      transition: opacity 0.45s ease, visibility 0.45s ease;
+    }
+    #welcome-screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+    .welcome-badge {
+      font-size: 11px; letter-spacing: 2.5px; text-transform: uppercase;
+      color: #f3c178; border: 1px solid rgba(219, 155, 77, 0.55);
+      padding: 5px 14px; border-radius: 20px; margin-bottom: 14px;
+    }
+    .welcome-sub { font-size: 13px; letter-spacing: 2px; color: #d1c4b8; margin-bottom: 6px; }
+    .welcome-title {
+      font-size: clamp(24px, 4vw, 42px); font-weight: 800; color: #fff;
+      text-shadow: 0 4px 20px rgba(0,0,0,0.8); margin-bottom: 14px;
+    }
+    .welcome-guide {
+      max-width: 580px; font-size: 13.5px; line-height: 1.65; color: #e5dbd1;
+      background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 12px; padding: 14px 18px; margin-bottom: 24px; text-align: left;
+    }
+    .welcome-guide kbd {
+      background: rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.28);
+      border-radius: 4px; padding: 1px 6px; font-size: 12px; font-family: inherit;
+    }
+    .welcome-btn {
+      background: linear-gradient(135deg, #db9b4d, #b56c24);
+      color: #fff; border: none; border-radius: 30px;
+      padding: 14px 38px; font-size: 15px; font-weight: 700;
+      letter-spacing: 0.8px; cursor: pointer;
+      box-shadow: 0 8px 25px rgba(219, 155, 77, 0.45);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .welcome-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(219, 155, 77, 0.65); }
+    .welcome-btn.hidden { display: none !important; }
+    .welcome-btn.ready {
+      animation: btnPulse 2s infinite ease-in-out;
+    }
+    @keyframes btnPulse {
+      0%, 100% { transform: scale(1); box-shadow: 0 8px 25px rgba(219, 155, 77, 0.5); }
+      50% { transform: scale(1.03); box-shadow: 0 14px 35px rgba(245, 196, 122, 0.85); }
+    }
+
+    /* 100% Resource Preload Bar */
+    #loading-container {
+      width: 100%;
+      max-width: 520px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 4px;
+      transition: opacity 0.3s ease;
+    }
+    .loading-bar-wrap {
+      width: 100%;
+      height: 12px;
+      background: rgba(0, 0, 0, 0.65);
+      border: 1px solid rgba(219, 155, 77, 0.5);
+      border-radius: 999px;
+      overflow: hidden;
+      padding: 2px;
+      box-shadow: inset 0 2px 6px rgba(0,0,0,0.8);
+    }
+    #loading-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #b56c24, #f5c47a, #d89648);
+      border-radius: 999px;
+      box-shadow: 0 0 14px rgba(245, 196, 122, 0.7);
+      transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .loading-info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      color: #f6e0b8;
+      font-weight: 500;
+    }
+    #loading-status {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 82%;
+      text-align: left;
+      opacity: 0.95;
+    }
+    #loading-percent {
+      font-weight: 700;
+      color: #f3c178;
+      font-family: monospace;
+      font-size: 14px;
+    }
+
+    /* Clean Cinema Walkthrough: hide unnecessary overlays, d-pad, minimap, crosshair, reception modal */
+    #crosshair,
+    #hover-hint,
+    #minimap-wrap,
+    #top-hud,
+    #move-pad,
+    #bottom-hint,
+    #reception-modal {
+      display: none !important;
+    }
+
+    /* Top HUD - sleek compact glass bar */
+    #top-hud {
+      position: fixed; top: 12px; left: 50%; transform: translateX(-50%);
+      z-index: 10; display: flex; flex-direction: column; align-items: center; gap: 5px;
+      pointer-events: none;
+    }
+    #room-badge {
+      display: none;
+    }
+    #zone-bar {
+      display: flex; gap: 5px; flex-wrap: wrap; justify-content: center;
+      background: rgba(16, 12, 10, 0.52); backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      padding: 4px; border-radius: 999px;
+      pointer-events: auto;
+    }
+    .zone-pill {
+      background: transparent;
+      border: none;
+      color: rgba(255, 255, 255, 0.78); padding: 6px 14px; border-radius: 999px;
+      font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.2s ease;
+    }
+    .zone-pill:hover { color: #fff; background: rgba(255, 255, 255, 0.1); }
+    .zone-pill.active {
+      background: linear-gradient(135deg, #d89648, #b56c24); color: #fff;
+      box-shadow: 0 2px 10px rgba(216, 150, 72, 0.4);
+    }
+
+    /* Top-right Museum Controls: Audio / Loa & Chuyển ngôn ngữ Việt - Anh */
+    #top-right-tools {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      pointer-events: auto;
+    }
+
+    .tool-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: rgba(20, 16, 14, 0.72);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      color: #ffffff;
+      padding: 8px 16px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      font-family: 'Montserrat', sans-serif;
+      cursor: pointer;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.4);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      user-select: none;
+    }
+
+    .tool-btn:hover {
+      background: rgba(38, 30, 24, 0.92);
+      border-color: rgba(220, 160, 80, 0.7);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+    }
+
+    .tool-btn.muted {
+      color: rgba(255, 255, 255, 0.55);
+      border-color: rgba(255, 255, 255, 0.12);
+      background: rgba(18, 16, 14, 0.5);
+    }
+
+    .tool-btn .audio-icon {
+      font-size: 14px;
+      line-height: 1;
+    }
+
+    /* Language Switcher Pill */
+    .lang-switch-wrap {
+      display: inline-flex;
+      align-items: center;
+      background: rgba(20, 16, 14, 0.72);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 999px;
+      padding: 3px 4px;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.4);
+      user-select: none;
+    }
+
+    .lang-tab {
+      background: transparent;
+      border: none;
+      color: rgba(255, 255, 255, 0.72);
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: 11.5px;
+      font-weight: 700;
+      font-family: 'Montserrat', sans-serif;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      letter-spacing: 0.5px;
+    }
+
+    .lang-tab:hover {
+      color: #ffffff;
+    }
+
+    .lang-tab.active {
+      background: #b82e24; /* Kim Hoang signature lacquer red */
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(184, 46, 36, 0.5);
+    }
+
+    .lang-divider {
+      color: rgba(255, 255, 255, 0.25);
+      font-size: 11px;
+      padding: 0 2px;
+    }
+
+    /* Minimap */
+    #minimap-wrap {
+      position: fixed; top: 12px; left: 12px; z-index: 10;
+      background: rgba(16, 12, 10, 0.52); backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 14px; padding: 6px;
+      display: flex; flex-direction: column; align-items: center; gap: 3px;
+    }
+    #minimap { display: block; border-radius: 8px; background: rgba(0, 0, 0, 0.25); width: 108px; height: 108px; }
+    .minimap-label { font-size: 9.5px; color: rgba(255,255,255,0.72); font-weight: 600; letter-spacing: 0.3px; }
+
+    /* On-Screen D-Pad */
+    #move-pad {
+      position: fixed; bottom: 16px; left: 16px; z-index: 12;
+      display: grid; grid-template-columns: repeat(3, 42px); grid-template-rows: repeat(2, 42px);
+      gap: 5px;
+    }
+    .pad-btn {
+      background: rgba(16, 12, 10, 0.48); backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: #f6e0b8; border-radius: 10px;
+      font-size: 14px; font-weight: 700; cursor: pointer;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      line-height: 1; touch-action: none;
+    }
+    .pad-btn span.sub { font-size: 7.5px; opacity: 0.78; margin-top: 2px; font-weight: 600; }
+    .pad-btn:active, .pad-btn.pressed { background: rgba(219, 155, 77, 0.55); color: #fff; }
+
+    #bottom-hint {
+      position: fixed; bottom: 16px; right: 16px; z-index: 10;
+      background: rgba(16, 12, 10, 0.48); backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 999px; padding: 6px 14px; font-size: 11px; color: rgba(255,255,255,0.78);
+      text-align: right;
+    }
+
+    /* Receptionist Modal */
+    #reception-modal {
+      position: fixed; inset: 0; z-index: 42;
+      background: rgba(0, 0, 0, 0.68); backdrop-filter: blur(6px);
+      display: none; align-items: center; justify-content: center; padding: 20px;
+    }
+    #reception-modal.open { display: flex; }
+    .reception-card {
+      background: #1f1712; border: 1px solid rgba(219, 155, 77, 0.7);
+      border-radius: 16px; max-width: 540px; width: 100%; padding: 24px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.8); position: relative; color: #efe7df;
+    }
+    .reception-card h3 { color: #f3c178; font-size: 18px; margin-bottom: 10px; }
+    .reception-card p { font-size: 13.5px; line-height: 1.65; margin-bottom: 10px; color: #ddd2c8; }
+    .reception-card ul { padding-left: 18px; margin-bottom: 14px; font-size: 13px; line-height: 1.6; color: #d0c4b8; }
+    .reception-actions { display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }
+    .rc-btn {
+      border: 1px solid rgba(219, 155, 77, 0.6); background: rgba(219, 155, 77, 0.18);
+      color: #f6d5a3; padding: 8px 16px; border-radius: 20px; font-size: 12.5px; font-weight: 600; cursor: pointer;
+    }
+    .rc-btn.primary { background: linear-gradient(135deg, #db9b4d, #b56c24); color: #fff; border: none; }
+
+    /* Studio Artisan Dialogue Overlay & Card (Nghệ nhân Đào Đình Chung chào mừng) */
+    #studio-dialogue-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      background: rgba(0, 0, 0, 0.40);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      padding: 0 16px 28px 16px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    #studio-dialogue-overlay.open {
+      display: flex !important;
+      opacity: 1 !important;
+      pointer-events: auto !important;
+    }
+    .studio-dialogue-card {
+      background: linear-gradient(145deg, rgba(28, 19, 13, 0.96) 0%, rgba(18, 12, 8, 0.98) 100%);
+      border: 1.5px solid rgba(219, 155, 77, 0.85);
+      border-radius: 20px;
+      max-width: 660px;
+      width: 100%;
+      padding: 22px 24px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85), 0 0 28px rgba(219, 155, 77, 0.25);
+      position: relative;
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+      transform: translateY(24px) scale(0.97);
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    #studio-dialogue-overlay.open .studio-dialogue-card {
+      transform: translateY(0) scale(1);
+    }
+    .studio-dialogue-avatar-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-shrink: 0;
+      gap: 8px;
+    }
+    .studio-dialogue-avatar {
+      width: 88px;
+      height: 88px;
+      border-radius: 50%;
+      border: 3px solid #d4a359;
+      box-shadow: 0 0 18px rgba(212, 163, 89, 0.45);
+      object-fit: cover;
+      background: radial-gradient(circle, #3d2618 0%, #170e0a 100%);
+      display: block;
+    }
+    .studio-dialogue-avatar-badge {
+      background: #9e2a1b;
+      color: #ffd89c;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 999px;
+      letter-spacing: 0.5px;
+      border: 1px solid rgba(255, 216, 156, 0.45);
+      text-transform: uppercase;
+    }
+    .studio-dialogue-content {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    .studio-dialogue-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+    .studio-dialogue-title {
+      font-family: 'Cinzel', 'Be Vietnam Pro', serif, Georgia;
+      font-size: 16.5px;
+      font-weight: 700;
+      color: #f7d598;
+      letter-spacing: 0.5px;
+    }
+    .studio-dialogue-step-indicator {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .studio-dialogue-step-indicator .step-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.25);
+      transition: all 0.25s ease;
+    }
+    .studio-dialogue-step-indicator .step-dot.active {
+      background: #f7d598;
+      box-shadow: 0 0 8px #f7d598;
+      width: 22px;
+      border-radius: 4px;
+    }
+    .studio-dialogue-speech {
+      font-size: 15px;
+      line-height: 1.62;
+      color: #f3ece4;
+      margin-bottom: 16px;
+      font-weight: 400;
+      min-height: 64px;
+    }
+    .studio-dialogue-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+    .studio-dialogue-tts-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(219, 155, 77, 0.4);
+      color: #ffd89c;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 17px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .studio-dialogue-tts-btn:hover {
+      background: rgba(219, 155, 77, 0.25);
+      transform: scale(1.05);
+    }
+    .studio-dialogue-primary-btn {
+      background: linear-gradient(135deg, #d8a860 0%, #b88234 100%);
+      color: #1a100a;
+      border: none;
+      border-radius: 999px;
+      padding: 10px 24px;
+      font-size: 14.5px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(216, 168, 96, 0.35);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .studio-dialogue-primary-btn:hover {
+      filter: brightness(1.12);
+      transform: translateY(-1.5px);
+      box-shadow: 0 6px 20px rgba(216, 168, 96, 0.5);
+    }
+    .studio-dialogue-primary-btn.agree-btn {
+      background: linear-gradient(135deg, #e5b369 0%, #c48b32 100%);
+    }
+
+    @media (max-width: 640px) {
+      #studio-dialogue-overlay {
+        padding: 0 12px 18px 12px;
+      }
+      .studio-dialogue-card {
+        padding: 16px;
+        gap: 14px;
+      }
+      .studio-dialogue-avatar {
+        width: 68px;
+        height: 68px;
+      }
+      .studio-dialogue-title {
+        font-size: 14.5px;
+      }
+      .studio-dialogue-speech {
+        font-size: 13.5px;
+        line-height: 1.55;
+        min-height: 72px;
+      }
+      .studio-dialogue-primary-btn {
+        padding: 8px 18px;
+        font-size: 13.5px;
+      }
+    }
+
+    /* Artwork Detail Modal */
+    #artwork-modal {
+      position: fixed; inset: 0; z-index: 40;
+      background: rgba(0, 0, 0, 0.78); backdrop-filter: blur(6px);
+      display: none; align-items: center; justify-content: center; padding: 20px;
+    }
+    #artwork-modal.open { display: flex; }
+    .modal-card {
+      background: #fff; color: #22160e;
+      border-radius: 16px; max-width: 920px; width: 100%; max-height: 88vh;
+      overflow: hidden; display: grid; grid-template-columns: 1.15fr 1fr;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.75); position: relative;
+    }
+    @media (max-width: 760px) {
+      .modal-card { grid-template-columns: 1fr; max-height: 92vh; overflow-y: auto; }
+      #bottom-hint { display: none; }
+      #minimap-wrap { transform: scale(0.84); transform-origin: top left; }
+    }
+    .modal-media {
+      background: #140f0c; display: flex; align-items: center; justify-content: center;
+      position: relative; min-height: 300px; padding: 14px;
+    }
+    .modal-media img { max-width: 100%; max-height: 70vh; object-fit: contain; border-radius: 4px; }
+    .album-nav {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      background: rgba(0,0,0,0.65); color: #fff; border: 1px solid rgba(255,255,255,0.25);
+      width: 36px; height: 36px; border-radius: 50%; cursor: pointer; font-size: 18px;
+    }
+    #album-prev { left: 10px; }
+    #album-next { right: 10px; }
+    .modal-info { padding: 24px; overflow-y: auto; max-height: 88vh; display: flex; flex-direction: column; gap: 12px; }
+    .modal-info h3 { font-size: 19px; color: #7a2314; border-bottom: 2px solid #ecd9c4; padding-bottom: 8px; }
+    .modal-info-body { font-size: 14px; line-height: 1.65; color: #36271d; }
+    .modal-info-body * { color: #22160e !important; text-shadow: none !important; }
+    .modal-audio-btn {
+      align-self: flex-start;
+      background: #8b4a1e; color: #fff; border: none; border-radius: 20px;
+      padding: 8px 16px; font-size: 13px; font-weight: 600; cursor: pointer; display: none;
+    }
+    .modal-audio-btn.visible { display: inline-flex; align-items: center; gap: 6px; }
+    .modal-close {
+      position: absolute; top: 10px; right: 12px; z-index: 5;
+      background: rgba(0,0,0,0.65); color: #fff; border: none;
+      width: 32px; height: 32px; border-radius: 50%; font-size: 18px; cursor: pointer;
+    }
+
+    #loading-toast {
+      position: fixed; bottom: 78px; left: 50%; transform: translateX(-50%);
+      z-index: 30; background: rgba(20,15,11,0.92); border: 1px solid #db9b4d;
+      padding: 8px 18px; border-radius: 999px; font-size: 12px; color: #f6d5a3;
+      transition: opacity 0.3s ease;
+    }
+    #loading-toast.hidden { opacity: 0; pointer-events: none; }
+  </style>
+</head>
+<body>
+  <div id="viewer-canvas"></div>
+  <div id="crosshair"></div>
+  <div id="hover-hint">Nhấn để xem chi tiết</div>
+
+  <!-- Welcome Overlay with 100% Resource Loading System -->
+  <div id="welcome-screen">
+    <div class="welcome-badge">Triển Lãm Tranh Dân Gian Kim Hoàng 3D</div>
+    <div class="welcome-sub">BẢO TÀNG SỐ 3D</div>
+    <div class="welcome-title">LƯU SẮC KIM HOÀNG</div>
+    <div class="welcome-guide">
+      • <b>Lối Vào &amp; Quầy Lễ Tân:</b> Thưởng thức không gian sảnh đón tiếp sang trọng và video tư liệu Kim Hoàng trên màn hình lớn.<br>
+      • <b>Đường Đi Vòng Tròn:</b> Dạo bước theo hành lang tròn ngắm các tác phẩm tranh dân gian Kim Hoàng, nhấn vào từng bức tranh để xem phóng to và tìm hiểu ý nghĩa tác phẩm.<br>
+      • <b>Phòng Tròn Trung Tâm:</b> Bước qua cửa vào phòng kính ở giữa có bảng <i>Lưu Sắc Kim Hoàng</i>, nhấn vào <b>Ông Đồ / bàn vẽ</b> để tự tay in mộc bản &amp; tô màu.<br>
+      • <b>Điều khiển mượt mà:</b> Dùng phím <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> hoặc các phím mũi tên <kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd>, kéo chuột hoặc vuốt màn hình để dạo bước trong triển lãm.
+    </div>
+
+    <!-- 100% Resource Loading Progress Bar -->
+    <div id="loading-container">
+      <div class="loading-bar-wrap">
+        <div id="loading-bar-fill"></div>
+      </div>
+      <div class="loading-info-row">
+        <span id="loading-status">Đang tải...</span>
+        <span id="loading-percent">0%</span>
+      </div>
+    </div>
+
+    <!-- Enter Button (Only shown when 100% loaded and shaders compiled) -->
+    <button class="welcome-btn hidden" id="btn-enter">BƯỚC VÀO TRIỂN LÃM</button>
+  </div>
+
+  <!-- Top-left Minimap -->
+  <div id="minimap-wrap">
+    <canvas id="minimap" width="136" height="136"></canvas>
+    <div class="minimap-label">Sơ đồ Hình Tròn</div>
+  </div>
+
+  <!-- Top Center HUD -->
+  <div id="top-hud">
+    <div id="room-badge">SẢNH LỄ TÂN &amp; VIDEO</div>
+    <div id="zone-bar"></div>
+  </div>
+
+  <!-- Top-right Museum Controls: Audio / Speaker Toggle & Bilingual VI - EN Switch -->
+  <div id="top-right-tools">
+    <a id="btn-back-site" class="tool-btn" href="/3d" target="_self" title="Quay về trang web Lưu Sắc Kim Hoàng" style="display:none; text-decoration:none; color:#ffe08a; font-weight:600; padding:6px 12px;">
+      <span>← Về website</span>
+    </a>
+    <button class="tool-btn" id="btn-audio" title="Bật / Tắt âm thanh (Loa)">
+      <span class="audio-icon" id="audio-icon">🔊</span>
+      <span class="audio-label" id="audio-label">Nhạc</span>
+    </button>
+    <div class="lang-switch-wrap" id="lang-switch" title="Chuyển ngôn ngữ Việt - Anh / Switch Language">
+      <button class="lang-tab active" id="btn-lang-vi" title="Tiếng Việt">VI</button>
+      <span class="lang-divider">|</span>
+      <button class="lang-tab" id="btn-lang-en" title="English">EN</button>
+    </div>
+  </div>
+
+  <!-- On-Screen D-Pad -->
+  <div id="move-pad">
+    <button class="pad-btn" id="pad-sl" title="Đi ngang trái (A)">↖<span class="sub">Trái</span></button>
+    <button class="pad-btn" id="pad-fwd" title="Tiến (W / ↑)">▲<span class="sub">Tiến</span></button>
+    <button class="pad-btn" id="pad-sr" title="Đi ngang phải (D)">↗<span class="sub">Phải</span></button>
+    <button class="pad-btn" id="pad-left" title="Xoay trái (←)">⟲<span class="sub">Xoay</span></button>
+    <button class="pad-btn" id="pad-back" title="Lùi (S / ↓)">▼<span class="sub">Lùi</span></button>
+    <button class="pad-btn" id="pad-right" title="Xoay phải (→)">⟳<span class="sub">Xoay</span></button>
+  </div>
+
+  <div id="bottom-hint">
+    <b>Phím:</b> W/A/S/D hoặc ↑/↓/←/→ • <b>Shift:</b> Đi nhanh<br>
+    <b>Chuột / Touch:</b> Kéo để nhìn • <b>Click tranh / Lễ tân / Ông Đồ</b>
+  </div>
+
+  <!-- Receptionist Guide Modal -->
+  <div id="reception-modal">
+    <div class="reception-card">
+      <h3>💁 Lễ Tân Bảo Tàng Tranh Dân Gian Kim Hoàng</h3>
+      <p>Chào mừng bạn đến với không gian triển lãm <b>Tranh dân gian Kim Hoàng</b> — dòng tranh khắc gỗ dân gian đặc sắc của làng Kim Hoàng (Vân Canh, Hoài Đức, Hà Nội), nổi tiếng với sắc giấy hồng điều rực rỡ và nét vẽ phóng khoáng.</p>
+      <ul>
+        <li><b>Lối vào &amp; Quầy Lễ Tân:</b> Bạn có thể xem video giới thiệu ngay trên màn hình lớn bên cạnh quầy lễ tân.</li>
+        <li><b>Hành lang triển lãm vòng tròn:</b> Đi vòng quanh theo đường gỗ để thưởng lãm các tác phẩm tranh Kim Hoàng kèm bảng tên và đèn rọi từng bức. Nhấn vào tranh để xem chi tiết &amp; ý nghĩa tác phẩm.</li>
+        <li><b>Phòng trải nghiệm ở giữa:</b> Đi qua cửa vào căn phòng kính trung tâm có chữ <i>Lưu Sắc Kim Hoàng</i> để ngồi xuống bàn vẽ cùng Ông Đồ, tự tay in mộc bản và tô màu.</li>
+      </ul>
+      <div class="reception-actions">
+        <button class="rc-btn" id="btn-reception-speak">🔊 Nghe giới thiệu</button>
+        <button class="rc-btn primary" id="btn-reception-close">Tiếp tục tham quan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Studio Artisan Dialogue (Chào mừng khi bước vào phòng vẽ tranh) -->
+  <div id="studio-dialogue-overlay" class="hidden">
+    <div class="studio-dialogue-card" id="studio-dialogue-card">
+      <div class="studio-dialogue-avatar-wrap">
+        <img src="game/ong_do_avatar.png?v=real_artisan" alt="Nghệ nhân Đào Đình Chung" class="studio-dialogue-avatar" id="studio-dialogue-avatar" />
+        <div class="studio-dialogue-avatar-badge" id="studio-dialogue-badge">Nghệ nhân</div>
+      </div>
+      <div class="studio-dialogue-content">
+        <div class="studio-dialogue-header">
+          <div class="studio-dialogue-title" id="studio-dialogue-speaker">Nghệ nhân Đào Đình Chung</div>
+          <div class="studio-dialogue-step-indicator" id="studio-dialogue-indicator">
+            <span class="step-dot active" id="studio-step-dot-1"></span>
+            <span class="step-dot" id="studio-step-dot-2"></span>
+          </div>
+        </div>
+        <div class="studio-dialogue-speech" id="studio-dialogue-text">
+          Chào mừng bạn đến với trải nghiệm vẽ tranh dân gian Kim Hoàng!
+        </div>
+        <div class="studio-dialogue-actions">
+          <button id="studio-dialogue-btn" class="studio-dialogue-primary-btn">
+            Tiếp tục ➔
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Artwork Detail Modal -->
+  <div id="artwork-modal">
+    <div class="modal-card">
+      <button class="modal-close" id="close-modal">✕</button>
+      <div class="modal-media">
+        <button class="album-nav" id="album-prev">‹</button>
+        <img id="modal-img" src="" alt="Artwork" />
+        <button class="album-nav" id="album-next">›</button>
+      </div>
+      <div class="modal-info">
+        <h3 id="modal-title">Thông tin tác phẩm</h3>
+        <div class="modal-info-body" id="modal-body"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Native Kim Hoàng Crafting Table UI -->
+  <div id="kh-labels" class="hidden" aria-hidden="true"></div>
+  <canvas id="kh-brush-cursor" width="120" height="120" class="kh-brush-cursor hidden" aria-hidden="true"></canvas>
+
+  <div id="kh-print-hud" class="hidden">
+    <div id="hint3d"></div>
+    <div id="kh-info" class="hidden">
+      <button type="button" id="infox" aria-label="Đóng">×</button>
+      <b id="info-t"></b>
+      <p id="info-w"></p>
+      <p id="info-u"></p>
+      <p id="info-n"></p>
+    </div>
+    <div id="kh-bottom-actions">
+      <div id="donebar" class="hidden">
+        <button type="button" class="kh-btn" id="reprint2">In lại</button>
+        <button type="button" class="kh-btn primary" id="gocolor2">Mang tranh đi tô màu</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="kh-color-zoombar" class="kh-color-zoombar hidden">
+    <button type="button" class="kh-btn" id="cpan-toggle" title="Kéo để di chuyển vùng nhìn">✋ Di chuyển</button>
+    <button type="button" class="kh-btn" id="czoom-out" title="Thu nhỏ">−</button>
+    <button type="button" class="kh-btn" id="czoom-reset" title="Đặt lại 100%">100%</button>
+    <button type="button" class="kh-btn" id="czoom-in" title="Phóng to">+</button>
+  </div>
+
+  <aside id="kh-sidebar" class="kh-sidebar hidden" aria-label="Bàn làm tranh Kim Hoàng">
+    <div class="kh-sidebar-top">
+      <div class="kh-sidebar-actions">
+        <button type="button" id="kh-sheet-toggle" class="kh-sheet-toggle" aria-expanded="true">Thu gọn</button>
+        <button type="button" id="stand-up-btn" class="stand-up-btn" title="Đứng dậy (ESC)">Đứng dậy (ESC)</button>
+      </div>
+    </div>
+    <section id="p-pick">
+      <h2>Chọn bản khắc mẫu trên bàn</h2>
+      <p>Bạn đang ngồi tại bàn in tranh cùng Ông Đồ. Chọn một mẫu ván khắc bên dưới để đặt lên bàn và bắt đầu in.</p>
+      <div class="kh-cards" id="cards"></div>
+    </section>
+    <section id="p-print" class="hidden">
+      <h2>In tranh trực tiếp trên bàn</h2>
+      <figure class="kh-block-fig" id="blockfig">
+        <img id="blockimg" alt="Ván khắc gỗ thật" />
+        <figcaption>Ván khắc gỗ thật của bản in này. Chỉ phần nổi trên ván ăn mực.</figcaption>
+      </figure>
+      <ol class="kh-flow" id="flow">
+        <li data-s="ink">Cầm con lăn mực trên bàn, nhúng khay rồi lăn lên ván</li>
+        <li data-s="place">Chạm vào chồng giấy để đặt lên ván</li>
+        <li data-s="press">Cầm con lăn ép trên bàn, lăn lên giấy</li>
+        <li data-s="peel">Chạm vào giấy để bóc và lật lại</li>
+      </ol>
+      <p class="kh-note kh-print-tip"><strong>Lưu ý:</strong> Khi lăn mực và lăn ép phải lăn thật đều và kĩ thì hình in mới rõ, không bị mất nét.</p>
+      <div class="kh-row">
+        <button type="button" class="kh-btn primary hidden" id="gocolor">Tô màu ngay trên bàn</button>
+        <button type="button" class="kh-btn" id="reprint">In lại từ đầu</button>
+        <button type="button" class="kh-btn" id="back-to-pick">Đổi mẫu khác</button>
+      </div>
+    </section>
+    <section id="p-color" class="hidden">
+      <h2>Tự tay chấm phá màu trên bàn</h2>
+      <p>Đưa chuột lên tờ tranh đang trải trên mặt bàn gỗ trước mặt bạn để tô màu trực tiếp.</p>
+      <div class="kh-tools" id="tools">
+        <button type="button" class="kh-btn tool on" data-t="brush">Cọ vẽ</button>
+        <button type="button" class="kh-btn tool" data-t="fill">Đổ màu vùng</button>
+        <button type="button" class="kh-btn tool" data-t="erase">Tẩy</button>
+      </div>
+      <p class="kh-note" id="toolhelp"></p>
+      <label class="kh-opt" id="lockrow">
+        <input type="checkbox" id="lock" checked />
+        <span>Tô gọn trong nét: cọ chỉ tô trong ô bạn bắt đầu chạm, không tràn ra ngoài đường viền.</span>
+      </label>
+      <div id="sizerow">
+        <div class="kh-label"><span>Cỡ cọ</span><span id="sizev">18</span></div>
+        <input type="range" id="size" min="4" max="60" value="18" />
+      </div>
+      <div class="kh-curcolor">
+        <div class="dot" id="dot"></div>
+        <div>
+          <div id="cname"></div>
+          <div class="kh-note" id="cnote"></div>
+        </div>
+      </div>
+      <div class="kh-label"><span>Màu truyền thống Kim Hoàng</span></div>
+      <div class="kh-swatches" id="swatches"></div>
+      <div class="kh-label">
+        <span>Bảng màu đầy đủ</span>
+        <input type="color" id="picker" value="#f5c518" title="Chọn màu bất kỳ" />
+      </div>
+      <div class="kh-grid" id="grid"></div>
+      <div class="kh-label"><span>Màu vừa dùng</span></div>
+      <div class="kh-recent" id="recent"></div>
+      <div class="kh-row">
+        <button type="button" class="kh-btn" id="undo">Hoàn tác</button>
+        <button type="button" class="kh-btn" id="clearc">Xoá hết màu</button>
+        <button type="button" class="kh-btn primary" id="finish">Hoàn thành</button>
+      </div>
+    </section>
+    <section id="p-done" class="hidden">
+      <h2>Bức tranh của bạn đã hoàn thành!</h2>
+      <p>Ký tay trực tiếp vào khung bên dưới để lưu dấu ấn lên tranh, sau đó lưu ảnh hoặc treo lên tường.</p>
+      <div class="kh-sig-box">
+        <div class="kh-sig-head">
+          <span>Ký tay trực tiếp (chuột / cảm ứng)</span>
+          <button type="button" class="kh-btn" id="sig-clear">Xoá chữ ký</button>
+        </div>
+        <canvas id="sig-pad" class="kh-sig-pad" width="480" height="140" title="Ký tay trực tiếp vào ô này"></canvas>
+      </div>
+      <div class="kh-row">
+        <button type="button" class="kh-btn primary" id="save">Lưu ảnh PNG</button>
+        <button type="button" class="kh-btn" id="backcolor">Quay lại tô tiếp</button>
+        <button type="button" class="kh-btn" id="hang">Treo lên tường</button>
+        <button type="button" class="kh-btn" id="again">Làm bức khác</button>
+      </div>
+      <p class="kh-note" id="hangmsg"></p>
+    </section>
+  </aside>
+
+  <audio id="bg-audio" src="background.mp3" loop></audio>
+  <audio id="narrator-audio"></audio>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.170.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.170.0/examples/jsm/"
+      }
+    }
+  </script>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+    import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+    import { createKimHoangStation } from './game/kim-hoang-table.js';
+    import {
+      MOSAIC_FONT,
+      GALLERY_URLS,
+      createFadeArtMaterial,
+      createMosaicRotator,
+      hangSharedPainting
+    } from './kim-hoang-museum-showcase.js?v=kim_hoang_v35';
+
+    // =========================================================================
+    // 1. Loading Manager & Progress Tracking (100% Preload & Shader Warmup)
+    // =========================================================================
+    const urlParams = new URLSearchParams(window.location.search);
+    const loadingBarFill = document.getElementById('loading-bar-fill');
+    const loadingPercent = document.getElementById('loading-percent');
+    const loadingStatus = document.getElementById('loading-status');
+    const loadingContainer = document.getElementById('loading-container');
+    const btnEnter = document.getElementById('btn-enter');
+
+    function updateLoadingProgress(percent, statusText) {
+      if (loadingBarFill) loadingBarFill.style.width = `${percent}%`;
+      if (loadingPercent) loadingPercent.textContent = `${percent}%`;
+      if (statusText && loadingStatus) loadingStatus.textContent = statusText;
+    }
+
+    const loadingManager = new THREE.LoadingManager();
+    const gltfLoader = new GLTFLoader(loadingManager);
+    const texLoader = new THREE.TextureLoader(loadingManager);
+
+    let isFullyLoaded = false;
+    let tourDataLoaded = false;
+    let stationLoaded = false;
+    let managerLoaded = false;
+
+    loadingManager.onProgress = (url, loaded, total) => {
+      const pct = Math.min(92, Math.max(10, Math.round((loaded / total) * 82 + 10)));
+      updateLoadingProgress(pct, lang === 'en' ? 'Loading...' : 'Đang tải...');
+    };
+
+    loadingManager.onLoad = () => {
+      managerLoaded = true;
+      checkAllReady();
+    };
+
+    function checkAllReady() {
+      if (tourDataLoaded && stationLoaded && managerLoaded) {
+        finishAndWarmupScene();
+      }
+    }
+
+    function finishAndWarmupScene() {
+      if (isFullyLoaded) return;
+      isFullyLoaded = true;
+
+      updateLoadingProgress(96, lang === 'en' ? 'Loading...' : 'Đang tải...');
+
+      // Force WebGL to pre-compile ALL scene shaders and warm up geometry buffers into VRAM!
+      // This guarantees zero runtime hitch or frame drops when walking into the room!
+      try {
+        renderer.compile(scene, camera);
+        renderer.render(scene, camera);
+      } catch (err) {
+        console.warn('Pre-compile notice:', err);
+      }
+
+      setTimeout(() => {
+        updateLoadingProgress(100, '✓ Triển lãm đã sẵn sàng 100%!');
+        if (loadingContainer) {
+          loadingContainer.style.opacity = '0';
+          setTimeout(() => { loadingContainer.style.display = 'none'; }, 250);
+        }
+        if (btnEnter) {
+          btnEnter.classList.remove('hidden');
+          btnEnter.classList.add('ready');
+        }
+        if (urlParams.get('autostart') === '1') {
+          setTimeout(() => {
+            enterExhibition();
+            const modeParam = urlParams.get('mode');
+            const zoneParam = urlParams.get('zone');
+            if (modeParam) {
+              applyExhibitionMode(modeParam);
+            } else if (zoneParam) {
+              teleportToZone(zoneParam);
+            }
+          }, 150);
+        }
+      }, 350);
+    }
+
+    // Safety watchdog: after 12s, if any background request is slow, enable entry
+    setTimeout(() => {
+      if (!isFullyLoaded) {
+        finishAndWarmupScene();
+      }
+    }, 12000);
+
+    // =========================================================================
+    // 2. State & Constants (Matching User's Circular Exhibition Diagram)
+    // =========================================================================
+    let lang = 'vi';
+    let audioEnabled = true;
+    let albumImages = [];
+    let albumIdx = 0;
+    let currentNarrationUrl = null;
+
+    const PLAYER_HEIGHT = 1.65;
+    const PLAYER_RADIUS = 0.44;
+    const WALK_SPEED = 2.4;    // Calmer, smooth museum walking speed (was 5.2)
+    const SPRINT_MULT = 1.5;   // Moderate brisk pace when holding Shift
+    const TURN_SPEED = 85;     // Smooth rotation speed
+
+    const R_OUT = 20.0;       // Outer circular exhibition wall radius (wide, grand gallery)
+    const R_INNER_RING = 11.2; // Boundary between outer beige walkway & inner plaza
+    const R_CENTER = 5.8;     // Center circular painting studio radius (cozy 11.6m diameter)
+    const WALL_H = 4.6;
+
+    // Doorway into Center Room is on the West side (-X, LEFT side when viewed from lobby)
+    const CENTER_DOOR_HALF = 0.38;
+
+    const ZONES = [
+      { key: 'entrance', labelVi: 'LỐI VÀO & LỄ TÂN',    labelEn: 'ENTRANCE & RECEPTION', spawn: [0, 18.0, 0] },
+      { key: 'walkway',  labelVi: 'ĐƯỜNG ĐI TRIỂN LÃM',  labelEn: 'CIRCULAR GALLERY',     spawn: [14.2, 0, 90] },
+      { key: 'studio',   labelVi: 'PHÒNG VẼ TRANH 3D',   labelEn: 'KIM HOÀNG STUDIO',     spawn: [-4.4, 0, -90] }
+    ];
+
+    // =========================================================================
+    // 2. Scene, Camera, Renderer, Lighting
+    // =========================================================================
+    const container = document.getElementById('viewer-canvas');
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x181411);
+    scene.fog = new THREE.FogExp2(0x181411, 0.0075);
+
+    const camera = new THREE.PerspectiveCamera(68, window.innerWidth / window.innerHeight, 0.1, 120);
+    camera.position.set(0, PLAYER_HEIGHT, 18.0);
+
+    const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || (window.innerWidth < 820);
+    const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    const maxDPR = isMobileDevice 
+      ? Math.min(window.devicePixelRatio, 1.35) 
+      : Math.min(window.devicePixelRatio, 1.75);
+    renderer.setPixelRatio(maxDPR);
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 0.92;
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = isMobileDevice ? THREE.BasicShadowMap : THREE.PCFSoftShadowMap;
+    container.appendChild(renderer.domElement);
+
+    const maxAnisotropy = Math.min(renderer.capabilities.getMaxAnisotropy(), isMobileDevice ? 2 : 4);
+
+    // Realistic IBL reflections via RoomEnvironment (gentle fill, no washed-out highlights)
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+    scene.environmentIntensity = 0.32;
+
+    scene.add(new THREE.HemisphereLight(0xfff2e0, 0x282c32, 0.48));
+    const dirLight = new THREE.DirectionalLight(0xfff5e6, 0.58);
+    dirLight.position.set(6, 16, 16);
+    dirLight.castShadow = true;
+    const shadowRes = isMobileDevice ? 1024 : 1536;
+    dirLight.shadow.mapSize.set(shadowRes, shadowRes);
+    dirLight.shadow.camera.near = 2;
+    dirLight.shadow.camera.far = 48;
+    dirLight.shadow.camera.left = -22;
+    dirLight.shadow.camera.right = 22;
+    dirLight.shadow.camera.top = 22;
+    dirLight.shadow.camera.bottom = -22;
+    dirLight.shadow.bias = -0.0004;
+    dirLight.shadow.normalBias = 0.02;
+    scene.add(dirLight);
+
+    // =========================================================================
+    // 3. Realistic Textures (Museum Palette: Slate Grey Floor, Velvet Crimson Carpet, Clean White Gallery Walls)
+    // =========================================================================
+    function makeMuseumSlateFloorTexture() {
+      const c = document.createElement('canvas');
+      c.width = 512; c.height = 512;
+      const ctx = c.getContext('2d');
+      // Premium matte museum slate concrete/stone (matching reference images)
+      ctx.fillStyle = '#3a3d42';
+      ctx.fillRect(0, 0, 512, 512);
+
+      // Architectural floor tile joints & subtle surface variation
+      const tileS = 128;
+      for (let x = 0; x < 512; x += tileS) {
+        for (let y = 0; y < 512; y += tileS) {
+          const v = Math.floor((Math.random() - 0.5) * 8);
+          ctx.fillStyle = `rgb(${58 + v}, ${61 + v}, ${66 + v})`;
+          ctx.fillRect(x + 1, y + 1, tileS - 2, tileS - 2);
+
+          // Crisp subtle architectural tile seams
+          ctx.strokeStyle = 'rgba(20, 22, 26, 0.40)';
+          ctx.lineWidth = 1.5;
+          ctx.strokeRect(x, y, tileS, tileS);
+        }
+      }
+
+      // Fast subtle mineral speckling
+      for (let i = 0; i < 800; i++) {
+        ctx.fillStyle = Math.random() > 0.5 ? 'rgba(255, 255, 255, 0.04)' : 'rgba(10, 12, 15, 0.06)';
+        ctx.fillRect(Math.random() * 512, Math.random() * 512, 2, 2);
+      }
+
+      const tex = new THREE.CanvasTexture(c);
+      tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+      tex.repeat.set(16, 16);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      tex.anisotropy = Math.min(8, maxAnisotropy);
+      return tex;
+    }
+
+    function makeInnerStoneTexture() {
+      const c = document.createElement('canvas');
+      c.width = 512; c.height = 512;
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = '#3c3e44'; // Deep architectural charcoal stone
+      ctx.fillRect(0, 0, 512, 512);
+
+      for (let x = 0; x < 512; x += 128) {
+        for (let y = 0; y < 512; y += 128) {
+          ctx.strokeStyle = 'rgba(15, 17, 20, 0.45)';
+          ctx.lineWidth = 2;
+          ctx.strokeRect(x, y, 128, 128);
+        }
+      }
+      for (let i = 0; i < 3000; i++) {
+        ctx.fillStyle = Math.random() > 0.5 ? 'rgba(255, 255, 255, 0.03)' : 'rgba(10, 12, 15, 0.06)';
+        ctx.fillRect(Math.random() * 512, Math.random() * 512, 2, 2);
+      }
+      const tex = new THREE.CanvasTexture(c);
+      tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+      tex.repeat.set(6, 6);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      tex.anisotropy = maxAnisotropy;
+      return tex;
+    }
+
+    function makeWallPanelTexture(maxAnisotropy) {
+      const c = document.createElement('canvas');
+      c.width = 512; c.height = 512;
+      const ctx = c.getContext('2d');
+      // Dark slate architectural wall with top wash gradient (contrasting Kim Hoàng mosaic)
+      const grad = ctx.createLinearGradient(0, 0, 0, 512);
+      grad.addColorStop(0, '#5a5c61');
+      grad.addColorStop(0.15, '#484a4f');
+      grad.addColorStop(0.60, '#36383c');
+      grad.addColorStop(0.92, '#282a2d');
+      grad.addColorStop(1, '#1b1c1e');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 512, 512);
+
+      // Vertical architectural panel seams
+      for (let x = 0; x < 512; x += 64) {
+        ctx.fillStyle = 'rgba(12, 12, 16, 0.45)';
+        ctx.fillRect(x, 0, 2, 512);
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.07)';
+        ctx.fillRect(x + 2, 0, 1, 512);
+      }
+      // Top cornice highlight & base shadow
+      ctx.fillStyle = '#787a80';
+      ctx.fillRect(0, 0, 512, 8);
+      ctx.fillStyle = '#141518';
+      ctx.fillRect(0, 498, 512, 14);
+
+      const tex = new THREE.CanvasTexture(c);
+      tex.wrapS = THREE.RepeatWrapping;
+      tex.wrapT = THREE.ClampToEdgeWrapping;
+      tex.repeat.set(8, 1);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      tex.anisotropy = maxAnisotropy;
+      return tex;
+    }
+
+    function makeVelvetCrimsonCarpetTexture() {
+      const c = document.createElement('canvas');
+      c.width = 512; c.height = 512;
+      const ctx = c.getContext('2d');
+      const grad = ctx.createRadialGradient(256, 256, 30, 256, 256, 256);
+      grad.addColorStop(0, '#751320');   // Rich deep crimson velvet center
+      grad.addColorStop(0.65, '#5e0d19'); // Burgundy wine
+      grad.addColorStop(0.92, '#480812'); // Dark mahogany velvet
+      grad.addColorStop(1, '#34050d');   // Deep shadow edge
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 512, 512);
+
+      // Micro-velvet texture
+      for (let i = 0; i < 6000; i++) {
+        ctx.fillStyle = Math.random() > 0.5 ? 'rgba(255, 180, 190, 0.03)' : 'rgba(15, 0, 5, 0.07)';
+        ctx.fillRect(Math.random() * 512, Math.random() * 512, 2, 2);
+      }
+      const tex = new THREE.CanvasTexture(c);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      tex.anisotropy = maxAnisotropy;
+      return tex;
+    }
+
+    function makeMuseumWhiteWallTexture() {
+      const c = document.createElement('canvas');
+      c.width = 256; c.height = 256;
+      const ctx = c.getContext('2d');
+      // Pristine museum plaster alabaster white
+      ctx.fillStyle = '#f4f3ef';
+      ctx.fillRect(0, 0, 256, 256);
+
+      // Fast, lightweight plaster micro-stipple
+      for (let i = 0; i < 900; i++) {
+        const v = (Math.random() - 0.5) * 8;
+        ctx.fillStyle = v > 0 ? 'rgba(255, 255, 255, 0.05)' : 'rgba(20, 20, 25, 0.03)';
+        ctx.fillRect(Math.random() * 256, Math.random() * 256, 2, 2);
+      }
+
+      const tex = new THREE.CanvasTexture(c);
+      tex.wrapS = THREE.RepeatWrapping;
+      tex.wrapT = THREE.RepeatWrapping;
+      tex.repeat.set(48, 6);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      tex.anisotropy = Math.min(8, maxAnisotropy);
+      return tex;
+    }
+
+    function makeWallSpotlightDecalTexture() {
+      const c = document.createElement('canvas');
+      c.width = 256; c.height = 256;
+      const ctx = c.getContext('2d');
+      // Warm gallery downlight cone shining on the white wall
+      const grad = ctx.createRadialGradient(128, 60, 12, 128, 128, 120);
+      grad.addColorStop(0, 'rgba(255, 246, 225, 0.40)');
+      grad.addColorStop(0.35, 'rgba(255, 240, 214, 0.20)');
+      grad.addColorStop(0.70, 'rgba(255, 235, 202, 0.06)');
+      grad.addColorStop(1, 'rgba(255, 230, 190, 0)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 256, 256);
+
+      const tex = new THREE.CanvasTexture(c);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      return tex;
+    }
+
+    function makeStripedRugTexture() {
+      const c = document.createElement('canvas');
+      c.width = 512; c.height = 512;
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = '#2d1610';
+      ctx.fillRect(0, 0, 512, 512);
+      for (let x = 0; x < 512; x += 16) {
+        ctx.fillStyle = (x / 16) % 2 === 0 ? '#4d1b12' : '#26110c';
+        ctx.fillRect(x, 0, 16, 512);
+      }
+      ctx.strokeStyle = '#c89b3c';
+      ctx.lineWidth = 10;
+      ctx.strokeRect(18, 18, 476, 476);
+      const tex = new THREE.CanvasTexture(c);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      return tex;
+    }
+
+    const slateFloorMat = new THREE.MeshStandardMaterial({ map: makeMuseumSlateFloorTexture(), roughness: 0.82, metalness: 0.03 });
+    const innerStoneMat = new THREE.MeshStandardMaterial({ map: makeInnerStoneTexture(), roughness: 0.78, metalness: 0.03 });
+    const outerWallMat = new THREE.MeshStandardMaterial({
+      color: 0xf4f3ef,
+      map: makeMuseumWhiteWallTexture(),
+      roughness: 0.90,
+      metalness: 0.02,
+      side: THREE.BackSide
+    });
+    // Architectural Baseboard (Len chân tường 28cm cao)
+    const baseboardMat = new THREE.MeshStandardMaterial({
+      color: 0x32353a,
+      roughness: 0.62,
+      metalness: 0.08,
+      side: THREE.BackSide
+    });
+    const baseboardCapMat = new THREE.MeshStandardMaterial({
+      color: 0x40444c,
+      roughness: 0.55,
+      metalness: 0.10,
+      side: THREE.BackSide
+    });
+    // Multi-tier Stepped Ceiling Crown Molding (Phào chỉ trần 3 tầng)
+    const corniceFriezeMat = new THREE.MeshStandardMaterial({
+      color: 0x2b2e34,
+      roughness: 0.68,
+      metalness: 0.06,
+      side: THREE.BackSide
+    });
+    const corniceStepMat = new THREE.MeshStandardMaterial({
+      color: 0x383b42,
+      roughness: 0.60,
+      metalness: 0.08,
+      side: THREE.BackSide
+    });
+    const corniceFasciaMat = new THREE.MeshStandardMaterial({
+      color: 0x2e3137,
+      roughness: 0.70,
+      metalness: 0.05,
+      side: THREE.BackSide
+    });
+    const wallSpotlightMat = new THREE.MeshBasicMaterial({
+      map: makeWallSpotlightDecalTexture(),
+      transparent: true,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    });
+    const woodMat = new THREE.MeshStandardMaterial({ color: 0x2c2520, roughness: 0.65, metalness: 0.08 });
+    const darkWoodMat = new THREE.MeshStandardMaterial({ color: 0x1b1511, roughness: 0.60, metalness: 0.12 });
+    const goldMat = new THREE.MeshStandardMaterial({ color: 0xc8923e, roughness: 0.40, metalness: 0.55 });
+    const blackFrameMat = new THREE.MeshStandardMaterial({ color: 0x18191b, roughness: 0.45, metalness: 0.15 });
+    const glassMat = new THREE.MeshPhysicalMaterial({
+      color: 0xcfe0ee, transparent: true, opacity: 0.24, roughness: 0.12, metalness: 0.04, side: THREE.DoubleSide
+    });
+    const ceilingMat = new THREE.MeshStandardMaterial({ color: 0xdcdee3, roughness: 0.92, side: THREE.DoubleSide });
+
+    // =========================================================================
+    // 4. Build Circular Museum Architecture (Matching Diagram 100%)
+    // =========================================================================
+    const segColliders = []; // { x1, z1, x2, z2, halfThick }
+    const interactivePaintings = [];
+    const interactiveReception = [];
+    let receptionistGroup = null;
+    let mosaicRotator = null;
+
+    const videoEl = document.createElement('video');
+    videoEl.src = 'video/Web.mp4';
+    videoEl.loop = true;
+    videoEl.muted = true;
+    videoEl.playsInline = true;
+    videoEl.crossOrigin = 'anonymous';
+    const videoTex = new THREE.VideoTexture(videoEl);
+    videoTex.colorSpace = THREE.SRGBColorSpace;
+    videoTex.generateMipmaps = false;
+    videoTex.minFilter = THREE.LinearFilter;
+    videoTex.magFilter = THREE.LinearFilter;
+
+    function createGalleryPlant(x, z) {
+      const g = new THREE.Group();
+      g.position.set(x, 0, z);
+
+      // Ceramic glazed planter pot (dark teal/slate green matching reference photo)
+      const potMat = new THREE.MeshPhysicalMaterial({
+        color: 0x1d3835,
+        roughness: 0.18,
+        metalness: 0.12,
+        clearcoat: 0.85
+      });
+      const potGeo = new THREE.CylinderGeometry(0.24, 0.16, 0.46, 20);
+      const pot = new THREE.Mesh(potGeo, potMat);
+      pot.position.y = 0.23;
+      pot.castShadow = true;
+      g.add(pot);
+
+      // Dark potting soil
+      const soil = new THREE.Mesh(
+        new THREE.CircleGeometry(0.23, 16),
+        new THREE.MeshStandardMaterial({ color: 0x1b1511, roughness: 0.95 })
+      );
+      soil.rotation.x = -Math.PI / 2;
+      soil.position.y = 0.45;
+      g.add(soil);
+
+      // Leafy plant stems & lush broad foliage (matching photo)
+      const stemMat = new THREE.MeshStandardMaterial({ color: 0x234d26, roughness: 0.7 });
+      const leafMat1 = new THREE.MeshStandardMaterial({ color: 0x2e6f34, roughness: 0.4, side: THREE.DoubleSide });
+      const leafMat2 = new THREE.MeshStandardMaterial({ color: 0x3d8a44, roughness: 0.45, side: THREE.DoubleSide });
+
+      const leafCount = 14;
+      for (let i = 0; i < leafCount; i++) {
+        const ang = (i / leafCount) * Math.PI * 2 + (Math.sin(i) * 0.2);
+        const radius = 0.08 + (i % 3) * 0.05;
+        const stemH = 0.45 + (i / leafCount) * 0.65;
+        const sx = Math.cos(ang) * radius;
+        const sz = Math.sin(ang) * radius;
+
+        const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.012, stemH, 6), stemMat);
+        stem.position.set(sx, 0.45 + stemH / 2, sz);
+        stem.rotation.z = -sx * 1.5;
+        stem.rotation.x = sz * 1.5;
+        g.add(stem);
+
+        const leaf = new THREE.Mesh(new THREE.SphereGeometry(0.14, 8, 8), (i % 2 === 0) ? leafMat1 : leafMat2);
+        leaf.scale.set(0.65, 1.8, 0.15);
+        leaf.position.set(sx * 1.9, 0.45 + stemH, sz * 1.9);
+        leaf.rotation.y = -ang;
+        leaf.rotation.x = 0.6 + (i % 3) * 0.15;
+        // Pot already casts ground shadow, leaves omitted from shadow pass for high FPS
+        g.add(leaf);
+      }
+      return g;
+    }
+
+    function createWorkshopSignTexture() {
+      const c = document.createElement('canvas');
+      c.width = 2048;
+      c.height = 440;
+      const ctx = c.getContext('2d');
+
+      // Clean, elegant matte architectural dark background (no flashy colors / không màu mè)
+      ctx.fillStyle = '#18191c';
+      ctx.fillRect(0, 0, 2048, 440);
+
+      // Subtle minimalist border line
+      ctx.strokeStyle = '#32353c';
+      ctx.lineWidth = 4;
+      ctx.strokeRect(8, 8, 2048 - 16, 440 - 16);
+
+      // Main title: Large, bold, crystal-clear white lettering ("chữ to rõ ràng không màu mè")
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 124px "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      ctx.fillText('PHÒNG TRẢI NGHIỆM VẼ TRANH', 1024, 220);
+
+      const tex = new THREE.CanvasTexture(c);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      tex.anisotropy = maxAnisotropy;
+      return tex;
+    }
+
+    function buildMuseumRouteBarrier() {
+      const barrierGroup = new THREE.Group();
+      scene.add(barrierGroup);
+
+      const stanchionZ = 13.8;
+      const postXs = [-4.6, -7.0, -9.5, -12.0, -14.2];
+
+      const brassMat = new THREE.MeshStandardMaterial({
+        color: 0xd4af37,
+        metalness: 0.90,
+        roughness: 0.16
+      });
+      const velvetMat = new THREE.MeshStandardMaterial({
+        color: 0x8a1215,
+        roughness: 0.85
+      });
+
+      const postBaseGeo = new THREE.CylinderGeometry(0.16, 0.18, 0.04, 24);
+      const postPoleGeo = new THREE.CylinderGeometry(0.024, 0.024, 0.96, 16);
+      const postTopGeo = new THREE.SphereGeometry(0.045, 16, 16);
+
+      // 1. Stanchion Posts along left entrance corridor
+      postXs.forEach((px) => {
+        const post = new THREE.Group();
+        post.position.set(px, 0, stanchionZ);
+
+        const base = new THREE.Mesh(postBaseGeo, brassMat);
+        base.position.y = 0.02;
+        base.castShadow = true;
+        const pole = new THREE.Mesh(postPoleGeo, brassMat);
+        pole.position.y = 0.50;
+        pole.castShadow = true;
+        const top = new THREE.Mesh(postTopGeo, brassMat);
+        top.position.y = 0.99;
+
+        post.add(base, pole, top);
+        barrierGroup.add(post);
+      });
+
+      // 2. Draped Velvet Ropes between posts
+      for (let i = 0; i < postXs.length - 1; i++) {
+        const xA = postXs[i];
+        const xB = postXs[i + 1];
+        const midX = (xA + xB) / 2;
+
+        const curve = new THREE.CatmullRomCurve3([
+          new THREE.Vector3(xA, 0.92, stanchionZ),
+          new THREE.Vector3(midX, 0.72, stanchionZ), // Gentle catenary drape
+          new THREE.Vector3(xB, 0.92, stanchionZ)
+        ]);
+
+        const ropeGeo = new THREE.TubeGeometry(curve, 20, 0.024, 8, false);
+        const rope = new THREE.Mesh(ropeGeo, velvetMat);
+        barrierGroup.add(rope);
+
+        const claspGeo = new THREE.CylinderGeometry(0.03, 0.03, 0.05, 12);
+        const clasp1 = new THREE.Mesh(claspGeo, brassMat);
+        clasp1.position.set(xA, 0.92, stanchionZ);
+        const clasp2 = new THREE.Mesh(claspGeo, brassMat);
+        clasp2.position.set(xB, 0.92, stanchionZ);
+        barrierGroup.add(clasp1, clasp2);
+      }
+
+      // 3. Standing Museum Direction Sign at entrance: "LỐI THAM QUAN ➔ / Vui lòng đi theo hướng bên phải"
+      const standGroup = new THREE.Group();
+      standGroup.position.set(-4.5, 0, 14.5);
+      standGroup.rotation.y = 0.15; // Facing towards incoming visitor
+
+      const standBase = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.24, 0.04, 24), brassMat);
+      standBase.position.y = 0.02;
+      standBase.castShadow = true;
+
+      const standPole = new THREE.Mesh(new THREE.CylinderGeometry(0.028, 0.028, 1.15, 16), brassMat);
+      standPole.position.y = 0.60;
+
+      const boardFrame = new THREE.Mesh(new THREE.BoxGeometry(0.72, 0.92, 0.035), brassMat);
+      boardFrame.position.set(0, 1.25, 0);
+      boardFrame.rotation.x = -0.25;
+
+      const signCanvas = document.createElement('canvas');
+      signCanvas.width = 512;
+      signCanvas.height = 680;
+      const sctx = signCanvas.getContext('2d');
+      sctx.fillStyle = '#1a1b1f';
+      sctx.fillRect(0, 0, 512, 680);
+      sctx.strokeStyle = '#d4af37';
+      sctx.lineWidth = 4;
+      sctx.strokeRect(12, 12, 512 - 24, 680 - 24);
+
+      sctx.textAlign = 'center';
+      sctx.textBaseline = 'middle';
+      sctx.fillStyle = '#f5c842';
+      sctx.font = 'bold 88px sans-serif';
+      sctx.fillText('➔', 256, 120);
+
+      sctx.fillStyle = '#ffffff';
+      sctx.font = 'bold 40px "Montserrat", sans-serif';
+      sctx.fillText('LỐI THAM QUAN', 256, 215);
+
+      sctx.strokeStyle = 'rgba(212, 175, 55, 0.5)';
+      sctx.lineWidth = 2;
+      sctx.beginPath();
+      sctx.moveTo(80, 260);
+      sctx.lineTo(432, 260);
+      sctx.stroke();
+
+      sctx.fillStyle = '#f0cf65';
+      sctx.font = 'bold 30px "Montserrat", sans-serif';
+      sctx.fillText('VUI LÒNG ĐI THEO', 256, 320);
+      sctx.fillText('HƯỚNG BÊN PHẢI', 256, 365);
+
+      sctx.fillStyle = '#b8bac2';
+      sctx.font = '22px "Montserrat", sans-serif';
+      sctx.fillText('EXHIBITION TOUR ROUTE', 256, 440);
+      sctx.fillText('Please proceed to the right', 256, 475);
+
+      sctx.fillStyle = '#e57373';
+      sctx.font = 'bold 24px sans-serif';
+      sctx.fillText('⛔ KHÔNG ĐI LỐI NÀY', 256, 560);
+      sctx.font = '18px sans-serif';
+      sctx.fillText('(DO NOT ENTER)', 256, 595);
+
+      const boardTex = new THREE.CanvasTexture(signCanvas);
+      boardTex.colorSpace = THREE.SRGBColorSpace;
+      const boardFace = new THREE.Mesh(
+        new THREE.PlaneGeometry(0.68, 0.88),
+        new THREE.MeshBasicMaterial({ map: boardTex })
+      );
+      boardFace.position.z = 0.02;
+      boardFrame.add(boardFace);
+
+      standGroup.add(standBase, standPole, boardFrame);
+      barrierGroup.add(standGroup);
+
+      // 4. Direction arrow on the floor pointing right towards exhibition start
+      const arrowCanvas = document.createElement('canvas');
+      arrowCanvas.width = 512; arrowCanvas.height = 256;
+      const actx = arrowCanvas.getContext('2d');
+      actx.fillStyle = 'rgba(240, 207, 101, 0.85)';
+      actx.font = 'bold 120px sans-serif';
+      actx.textAlign = 'center';
+      actx.textBaseline = 'middle';
+      actx.fillText('LỐI ĐI ➔', 256, 128);
+      const arrowTex = new THREE.CanvasTexture(arrowCanvas);
+      arrowTex.colorSpace = THREE.SRGBColorSpace;
+      const arrowFloorDecal = new THREE.Mesh(
+        new THREE.PlaneGeometry(2.2, 1.1),
+        new THREE.MeshBasicMaterial({ map: arrowTex, transparent: true, opacity: 0.65 })
+      );
+      arrowFloorDecal.rotation.x = -Math.PI / 2;
+      arrowFloorDecal.position.set(2.4, 0.018, 15.2);
+      barrierGroup.add(arrowFloorDecal);
+
+      // 5. Collision Barrier blocking the entire left hallway from the entrance lobby
+      segColliders.push({ x1: -4.5, z1: stanchionZ, x2: -15.0, z2: stanchionZ, halfThick: 0.55 });
+    }
+
+    function createTVPlaqueTexture() {
+      const c = document.createElement('canvas');
+      c.width = 1024;
+      c.height = 180;
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = '#1c1b1a';
+      ctx.fillRect(0, 0, 1024, 180);
+
+      ctx.strokeStyle = '#d4af37';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(8, 8, 1024 - 16, 180 - 16);
+
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#ffd700';
+      ctx.font = 'bold 36px "Cinzel", "Times New Roman", serif';
+      ctx.fillText('PHIM TƯ LIỆU: LƯU SẮC KIM HOÀNG', 512, 65);
+
+      ctx.fillStyle = '#b8bac0';
+      ctx.font = '22px "Montserrat", sans-serif';
+      ctx.fillText('▶ Nhấp màn hình để Bật / Tắt âm thanh (Click to Mute / Unmute)', 512, 125);
+
+      const tex = new THREE.CanvasTexture(c);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      return tex;
+    }
+
+    function buildStudioSymmetricalTVs() {
+      const tvGroup = new THREE.Group();
+      scene.add(tvGroup);
+
+      const tvAngles = [
+        { angle: Math.PI / 2 + 1.15 }, // North inner wall (spaced far away from "LƯU SẮC KIM HOÀNG")
+        { angle: Math.PI / 2 - 1.15 }  // South inner wall (spaced far away from "LƯU SẮC KIM HOÀNG")
+      ];
+
+      const tvW = 2.22;
+      const tvH = 1.25;
+      const tvFrameGeo = new THREE.BoxGeometry(tvW + 0.08, tvH + 0.08, 0.07);
+      const tvFrameMat = new THREE.MeshStandardMaterial({
+        color: 0x18191c,
+        roughness: 0.28,
+        metalness: 0.65
+      });
+      const tvScreenGeo = new THREE.PlaneGeometry(tvW, tvH);
+      const tvScreenMat = new THREE.MeshBasicMaterial({ map: videoTex });
+      const tvMountMat = new THREE.MeshStandardMaterial({ color: 0x24262b, roughness: 0.5, metalness: 0.4 });
+      const tvMountGeo = new THREE.BoxGeometry(0.65, 0.45, 0.06);
+      const tvPlaqueTex = createTVPlaqueTexture();
+
+      tvAngles.forEach(({ angle }) => {
+        const rPos = R_CENTER - 0.08;
+        const tx = Math.sin(angle) * rPos;
+        const tz = Math.cos(angle) * rPos;
+        const rotY = angle + Math.PI; // Face inward toward center of room
+
+        const singleTV = new THREE.Group();
+        singleTV.position.set(tx, 2.15, tz);
+        singleTV.rotation.y = rotY;
+
+        // Soft glow wash decal behind TV on white plaster wall
+        const washDecal = new THREE.Mesh(
+          new THREE.PlaneGeometry(tvW + 1.2, tvH + 1.0),
+          wallSpotlightMat
+        );
+        washDecal.position.set(0, 0, -0.04);
+        singleTV.add(washDecal);
+
+        // Wall mount bracket
+        const mount = new THREE.Mesh(tvMountGeo, tvMountMat);
+        mount.position.set(0, 0, -0.02);
+        singleTV.add(mount);
+
+        // TV Chassis / Outer Frame
+        const frame = new THREE.Mesh(tvFrameGeo, tvFrameMat);
+        frame.castShadow = true;
+        singleTV.add(frame);
+
+        // 4K Video Screen playing "Lưu Sắc Kim Hoàng"
+        const screen = new THREE.Mesh(tvScreenGeo, tvScreenMat);
+        screen.position.set(0, 0, 0.038);
+        screen.userData.isTV = true;
+        singleTV.add(screen);
+        interactiveReception.push(screen);
+
+        // Sleek Museum Media Placard under the TV
+        const plaqueMat = new THREE.MeshStandardMaterial({ color: 0x221f1d, roughness: 0.4, metalness: 0.2 });
+        const plaqueMesh = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.22, 0.02), plaqueMat);
+        plaqueMesh.position.set(0, -tvH / 2 - 0.22, 0.01);
+
+        const plaqueFace = new THREE.Mesh(
+          new THREE.PlaneGeometry(1.36, 0.18),
+          new THREE.MeshBasicMaterial({ map: tvPlaqueTex })
+        );
+        plaqueFace.position.z = 0.012;
+        plaqueMesh.add(plaqueFace);
+        singleTV.add(plaqueMesh);
+
+        // Top subtle dark bronze accent light fixture
+        const topAccent = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.04, 0.06, 0.14, 10),
+          darkWoodMat
+        );
+        topAccent.position.set(0, tvH / 2 + 0.26, 0.20);
+        topAccent.rotation.x = 0.55;
+        singleTV.add(topAccent);
+
+        tvGroup.add(singleTV);
+      });
+    }
+
+    function buildCircularMuseum() {
+      // 1. Floors: Outer modern museum slate floor + Inner dark stone plaza (matching reference Image 1 & 2)
+      const outerFloor = new THREE.Mesh(new THREE.CircleGeometry(R_OUT + 0.5, 64), slateFloorMat);
+      outerFloor.rotation.x = -Math.PI / 2;
+      outerFloor.receiveShadow = true;
+      scene.add(outerFloor);
+
+      const innerPlaza = new THREE.Mesh(new THREE.CircleGeometry(R_INNER_RING, 56), innerStoneMat);
+      innerPlaza.rotation.x = -Math.PI / 2;
+      innerPlaza.position.y = 0.008;
+      innerPlaza.receiveShadow = true;
+      scene.add(innerPlaza);
+
+      // 2. Ceiling with circular cove light ring
+      const ceiling = new THREE.Mesh(new THREE.CircleGeometry(R_OUT + 0.5, 64), ceilingMat);
+      ceiling.rotation.x = Math.PI / 2;
+      ceiling.position.y = WALL_H;
+      scene.add(ceiling);
+
+      const coveRing = new THREE.Mesh(
+        new THREE.RingGeometry(R_CENTER - 0.3, R_CENTER + 0.35, 56),
+        new THREE.MeshStandardMaterial({ color: 0xe8e5dc, roughness: 0.78, side: THREE.DoubleSide })
+      );
+      coveRing.rotation.x = Math.PI / 2;
+      coveRing.position.y = WALL_H - 0.03;
+      scene.add(coveRing);
+
+      // 3. Outer Circular Wall (R_OUT = 20.0m) with 3D Baseboard & 3-Tier Stepped Ceiling Molding
+      const entHalf = 0.14;
+      const wallArc = Math.PI * 2 - entHalf * 2;
+
+      // 3.1 Crisp Museum White Plaster Wall (R_OUT = 20.0m, H = 4.6m) - 100% matching photo
+      const outerWallArc = new THREE.Mesh(
+        new THREE.CylinderGeometry(R_OUT, R_OUT, WALL_H, 96, 1, true, entHalf, wallArc),
+        outerWallMat
+      );
+      outerWallArc.position.y = WALL_H / 2;
+      scene.add(outerWallArc);
+
+      // 3.2 3D Architectural Baseboard (Len chân tường 28cm cao) - matching user photo 100%
+      const baseboardH = 0.28;
+      const baseboardMesh = new THREE.Mesh(
+        new THREE.CylinderGeometry(R_OUT - 0.035, R_OUT - 0.035, baseboardH, 96, 1, true, entHalf, wallArc),
+        baseboardMat
+      );
+      baseboardMesh.position.y = baseboardH / 2;
+      scene.add(baseboardMesh);
+
+      // Top bevel lip of baseboard
+      const baseboardCap = new THREE.Mesh(
+        new THREE.CylinderGeometry(R_OUT - 0.045, R_OUT - 0.035, 0.025, 96, 1, true, entHalf, wallArc),
+        baseboardCapMat
+      );
+      baseboardCap.position.y = baseboardH + 0.0125;
+      scene.add(baseboardCap);
+
+      // 3.3 3D Multi-tier Stepped Ceiling Crown Molding (Phào chỉ trần 3 tầng) - matching user photo 100%
+      // Tier 1 (bottom frieze band):
+      const cornice1 = new THREE.Mesh(
+        new THREE.CylinderGeometry(R_OUT - 0.04, R_OUT - 0.04, 0.09, 96, 1, true, entHalf, wallArc),
+        corniceFriezeMat
+      );
+      cornice1.position.y = WALL_H - 0.31;
+      scene.add(cornice1);
+
+      // Tier 2 (middle stepped trim):
+      const cornice2 = new THREE.Mesh(
+        new THREE.CylinderGeometry(R_OUT - 0.09, R_OUT - 0.09, 0.09, 96, 1, true, entHalf, wallArc),
+        corniceStepMat
+      );
+      cornice2.position.y = WALL_H - 0.22;
+      scene.add(cornice2);
+
+      // Tier 3 (top fascia cove):
+      const cornice3 = new THREE.Mesh(
+        new THREE.CylinderGeometry(R_OUT - 0.16, R_OUT - 0.16, 0.13, 96, 1, true, entHalf, wallArc),
+        corniceFasciaMat
+      );
+      cornice3.position.y = WALL_H - 0.11;
+      scene.add(cornice3);
+
+      // Top perimeter ceiling recess border ring
+      const corniceTopRing = new THREE.Mesh(
+        new THREE.RingGeometry(R_OUT - 0.22, R_OUT + 0.1, 96),
+        new THREE.MeshStandardMaterial({ color: 0x222428, roughness: 0.85, side: THREE.DoubleSide })
+      );
+      corniceTopRing.rotation.x = Math.PI / 2;
+      corniceTopRing.position.y = WALL_H - 0.015;
+      scene.add(corniceTopRing);
+
+      // 3.4 Ceiling Recessed Spotlight Track & Twin Downlights along perimeter
+      const spotCanGeo = new THREE.CylinderGeometry(0.045, 0.045, 0.12, 10);
+      const spotCanMat = new THREE.MeshStandardMaterial({ color: 0xdde0e6, roughness: 0.35, metalness: 0.6 });
+      for (let i = 0; i < 32; i++) {
+        const canTheta = entHalf + (i / 31) * wallArc;
+        const cx = Math.sin(canTheta) * (R_OUT - 0.38);
+        const cz = Math.cos(canTheta) * (R_OUT - 0.38);
+        const rotY = canTheta + Math.PI;
+
+        const canGroup = new THREE.Group();
+        canGroup.position.set(cx, WALL_H - 0.08, cz);
+        canGroup.rotation.y = rotY;
+
+        const can1 = new THREE.Mesh(spotCanGeo, spotCanMat);
+        can1.position.set(-0.10, 0, 0);
+        can1.rotation.x = 0.55;
+        const can2 = new THREE.Mesh(spotCanGeo, spotCanMat);
+        can2.position.set(0.10, 0, 0);
+        can2.rotation.x = 0.55;
+        canGroup.add(can1, can2);
+        scene.add(canGroup);
+      }
+
+      // 3.5 Potted Museum Plants flanking entrance area
+      const plantR = createGalleryPlant(Math.sin(0.205) * (R_OUT - 0.65), Math.cos(0.205) * (R_OUT - 0.65));
+      const plantL = createGalleryPlant(Math.sin(Math.PI * 2 - 0.205) * (R_OUT - 0.65), Math.cos(Math.PI * 2 - 0.205) * (R_OUT - 0.65));
+      scene.add(plantR, plantL);
+
+      // Add 2 gallery resting benches along the outer path for visitors to admire the wall
+      function createGalleryBench(x, z, rotY) {
+        const bg = new THREE.Group();
+        bg.position.set(x, 0, z);
+        bg.rotation.y = rotY;
+        const seat = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.12, 0.75), darkWoodMat);
+        seat.position.y = 0.48;
+        seat.castShadow = true;
+        const leg1 = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.42, 0.70), woodMat);
+        leg1.position.set(-0.95, 0.21, 0);
+        const leg2 = leg1.clone();
+        leg2.position.x = 0.95;
+        bg.add(seat, leg1, leg2);
+        return bg;
+      }
+      scene.add(createGalleryBench(Math.sin(1.57) * (R_OUT - 2.8), Math.cos(1.57) * (R_OUT - 2.8), 1.57 + Math.PI));
+      scene.add(createGalleryBench(Math.sin(4.71) * (R_OUT - 2.8), Math.cos(4.71) * (R_OUT - 2.8), 4.71 + Math.PI));
+
+      // Double Glass Entrance Doors at South (+Z, z = R_OUT)
+      const doorFrameL = new THREE.Mesh(new THREE.BoxGeometry(1.4, 3.2, 0.1), glassMat);
+      doorFrameL.position.set(-1.5, 1.6, R_OUT - 0.1);
+      doorFrameL.rotation.y = 0.45;
+      const doorFrameR = new THREE.Mesh(new THREE.BoxGeometry(1.4, 3.2, 0.1), glassMat);
+      doorFrameR.position.set(1.5, 1.6, R_OUT - 0.1);
+      doorFrameR.rotation.y = -0.45;
+      const doorHeader = new THREE.Mesh(new THREE.BoxGeometry(4.8, 1.4, 0.25), woodMat);
+      doorHeader.position.set(0, 3.9, R_OUT - 0.05);
+      scene.add(doorFrameL, doorFrameR, doorHeader);
+
+      // 4. Center Circular Painting Studio (Phòng Vẽ Tranh 3D)
+      // Solid museum white plaster walls (matching outer walls 100%), no cage / no glass.
+      // Doorway located on the WEST side (-X, LEFT side when viewed from lobby).
+      // Looking through the doorway from the left along +X: visitor directly sees the drawing table,
+      // Nghệ nhân Đào Đình Chung seated facing the doorway (-X), and behind him on the East wall
+      // is the glowing "LƯU SẮC KIM HOÀNG" mosaic title!
+      const centerDoorAngle = Math.PI * 1.5; // -X West doorway (LEFT side when viewed from lobby)
+      const centerDoorHalf = CENTER_DOOR_HALF; // 0.38 rad (~5.6m wide grand portal)
+      const centerWallArc = Math.PI * 2 - centerDoorHalf * 2;
+      const centerArcStart = centerDoorAngle + centerDoorHalf;
+
+      // 4.1 Crisp Museum White Plaster Wall (matching outerWallMat 100%, DoubleSide)
+      const centerWallMat = outerWallMat.clone();
+      centerWallMat.side = THREE.DoubleSide;
+
+      const centerWall = new THREE.Mesh(
+        new THREE.CylinderGeometry(R_CENTER, R_CENTER, WALL_H, 64, 1, true, centerArcStart, centerWallArc),
+        centerWallMat
+      );
+      centerWall.position.y = WALL_H / 2;
+      centerWall.receiveShadow = true;
+      scene.add(centerWall);
+
+      // 4.2 3D Architectural Baseboard (Len chân tường 28cm cao, matching outer wall 100%)
+      // Outer face baseboard:
+      const centerBaseboardOut = new THREE.Mesh(
+        new THREE.CylinderGeometry(R_CENTER + 0.035, R_CENTER + 0.035, 0.28, 64, 1, true, centerArcStart, centerWallArc),
+        baseboardMat
+      );
+      centerBaseboardOut.position.y = 0.14;
+      scene.add(centerBaseboardOut);
+
+      // Inner face baseboard:
+      const centerBaseboardIn = new THREE.Mesh(
+        new THREE.CylinderGeometry(R_CENTER - 0.035, R_CENTER - 0.035, 0.28, 64, 1, true, centerArcStart, centerWallArc),
+        baseboardMat
+      );
+      centerBaseboardIn.position.y = 0.14;
+      scene.add(centerBaseboardIn);
+
+      // Outer & Inner baseboard top caps
+      const centerCapOut = new THREE.Mesh(
+        new THREE.CylinderGeometry(R_CENTER + 0.045, R_CENTER + 0.035, 0.025, 64, 1, true, centerArcStart, centerWallArc),
+        baseboardCapMat
+      );
+      centerCapOut.position.y = 0.2925;
+      scene.add(centerCapOut);
+
+      const centerCapIn = new THREE.Mesh(
+        new THREE.CylinderGeometry(R_CENTER - 0.035, R_CENTER - 0.045, 0.025, 64, 1, true, centerArcStart, centerWallArc),
+        baseboardCapMat
+      );
+      centerCapIn.position.y = 0.2925;
+      scene.add(centerCapIn);
+
+      // 4.3 3D Architectural Crown Molding at top of inner & outer wall
+      const centerCorniceOut = new THREE.Mesh(
+        new THREE.CylinderGeometry(R_CENTER + 0.06, R_CENTER + 0.06, 0.18, 64, 1, true, centerArcStart, centerWallArc),
+        corniceFasciaMat
+      );
+      centerCorniceOut.position.y = WALL_H - 0.09;
+      scene.add(centerCorniceOut);
+
+      const centerCorniceIn = new THREE.Mesh(
+        new THREE.CylinderGeometry(R_CENTER - 0.06, R_CENTER - 0.06, 0.18, 64, 1, true, centerArcStart, centerWallArc),
+        corniceFasciaMat
+      );
+      centerCorniceIn.position.y = WALL_H - 0.09;
+      scene.add(centerCorniceIn);
+
+      // 4.4 Architectural Portal Door Jambs / Pilasters at Left & Right of the West Doorway
+      const portalMat = new THREE.MeshStandardMaterial({ color: 0x2c2622, roughness: 0.45, metalness: 0.25 });
+      [centerDoorAngle - centerDoorHalf, centerDoorAngle + centerDoorHalf].forEach((doorTheta) => {
+        const jx = Math.sin(doorTheta) * R_CENTER;
+        const jz = Math.cos(doorTheta) * R_CENTER;
+        const jamb = new THREE.Mesh(new THREE.BoxGeometry(0.18, WALL_H, 0.22), portalMat);
+        jamb.position.set(jx, WALL_H / 2, jz);
+        jamb.rotation.y = doorTheta;
+        scene.add(jamb);
+
+        // Warm museum accent light on door jamb
+        const dl = new THREE.PointLight(0xffecd0, 0.8, 4.0, 2.0);
+        dl.position.set(jx * 0.96, 2.4, jz * 0.96);
+        scene.add(dl);
+      });
+
+      // Sleek portal lintel beam above the doorway opening
+      const lintelArc = new THREE.Mesh(
+        new THREE.CylinderGeometry(R_CENTER + 0.05, R_CENTER + 0.05, 0.52, 32, 1, true, centerDoorAngle - centerDoorHalf, centerDoorHalf * 2),
+        portalMat
+      );
+      lintelArc.position.y = WALL_H - 0.26;
+      scene.add(lintelArc);
+
+      // Signboard: "PHÒNG TRẢI NGHIỆM VẼ TRANH" mounted on outer face of portal lintel
+      const signTex = createWorkshopSignTexture();
+      const signMat = new THREE.MeshBasicMaterial({
+        map: signTex,
+        side: THREE.DoubleSide
+      });
+      const signMeshOut = new THREE.Mesh(
+        new THREE.CylinderGeometry(R_CENTER + 0.065, R_CENTER + 0.065, 0.46, 32, 1, true, centerDoorAngle - centerDoorHalf * 0.94, centerDoorHalf * 1.88),
+        signMat
+      );
+      signMeshOut.position.y = WALL_H - 0.25;
+      scene.add(signMeshOut);
+
+      // Warm spot lights shining down onto the entrance signboard
+      const signLightL = new THREE.PointLight(0xffe8c8, 1.2, 5.0, 2.0);
+      const signLightR = new THREE.PointLight(0xffe8c8, 1.2, 5.0, 2.0);
+      const slAngleL = centerDoorAngle - centerDoorHalf * 0.55;
+      const slAngleR = centerDoorAngle + centerDoorHalf * 0.55;
+      signLightL.position.set(Math.sin(slAngleL) * (R_CENTER + 0.35), WALL_H - 0.05, Math.cos(slAngleL) * (R_CENTER + 0.35));
+      signLightR.position.set(Math.sin(slAngleR) * (R_CENTER + 0.35), WALL_H - 0.05, Math.cos(slAngleR) * (R_CENTER + 0.35));
+      scene.add(signLightL, signLightR);
+
+      // Striped lacquer rug in center of Studio underneath Ông Đồ drawing table
+      const rug = new THREE.Mesh(
+        new THREE.PlaneGeometry(3.8, 3.8),
+        new THREE.MeshBasicMaterial({ map: makeStripedRugTexture() })
+      );
+      rug.rotation.x = -Math.PI / 2;
+      rug.position.set(0, 0.02, 0);
+      scene.add(rug);
+
+      // "LƯU SẮC KIM HOÀNG" Giant Mosaic Wall composed of small Kim Hoàng paintings on East Wall
+      buildCenterRoomMosaicWall();
+
+      // Two Symmetrical 4K Video Displays inside Studio playing "Lưu Sắc Kim Hoàng"
+      buildStudioSymmetricalTVs();
+
+      // 5. Reception Desk + Video Screen (Grand Entrance Lobby, matching diagram)
+      buildReceptionAndVideo();
+
+      // 5.1 Museum Tour Route Barrier (blocks left passage, guiding visitors to proceed right first)
+      buildMuseumRouteBarrier();
+
+      // 6. Wooden Benches along the Circular Walkway (matching diagram)
+      const benchAngles = [0.65, 1.35, 2.05, -0.65, -1.35, -2.05, Math.PI];
+      for (const ang of benchAngles) {
+        const bx = Math.sin(ang) * 14.2;
+        const bz = Math.cos(ang) * 14.2;
+        const bench = new THREE.Mesh(new THREE.BoxGeometry(2.8, 0.45, 0.72), woodMat);
+        bench.position.set(bx, 0.225, bz);
+        bench.rotation.y = ang;
+        scene.add(bench);
+
+        // Bench backrest
+        const back = new THREE.Mesh(new THREE.BoxGeometry(2.8, 0.42, 0.1), darkWoodMat);
+        back.position.set(bx + Math.sin(ang) * 0.31, 0.62, bz + Math.cos(ang) * 0.31);
+        back.rotation.y = ang;
+        scene.add(back);
+
+        const hx = Math.cos(ang) * 1.35, hz = -Math.sin(ang) * 1.35;
+        segColliders.push({ x1: bx - hx, z1: bz - hz, x2: bx + hx, z2: bz + hz, halfThick: 0.42 });
+      }
+
+      // 7. Warm Lighting & 3D Decorative Hanging LED Lamps (from Hanging LED Lamp.glb)
+      const centerLight = new THREE.PointLight(0xffeed6, 5.5, 22, 2.0);
+      centerLight.position.set(0, 4.1, 0);
+      scene.add(centerLight);
+
+      // Top cove wash light above mosaic letters on East wall
+      const mosaicCoveLight = new THREE.SpotLight(0xffecd4, 6.5, 14, Math.PI / 3, 0.45, 2.0);
+      mosaicCoveLight.position.set(2.8, 4.4, 0);
+      mosaicCoveLight.target.position.set(R_CENTER - 0.1, 2.4, 0);
+      scene.add(mosaicCoveLight, mosaicCoveLight.target);
+
+      // Subtle fill lights for gallery walkway
+      for (let i = 0; i < 4; i++) {
+        const a = (i / 4) * Math.PI * 2 + Math.PI / 4;
+        const lx = Math.sin(a) * 14.2;
+        const lz = Math.cos(a) * 14.2;
+        const pl = new THREE.PointLight(0xffeed6, 3.2, 18, 2.0);
+        pl.position.set(lx, 4.1, lz);
+        scene.add(pl);
+      }
+
+      // 8. Load & Place 3D Hanging LED Lamps
+      loadAndPlaceLamps();
+    }
+
+    function loadAndPlaceLamps() {
+      const lampUrl = 'models/lamps/hanging_led_lamp.glb';
+      gltfLoader.load(
+        lampUrl,
+        (gltf) => {
+          const lampTemplate = gltf.scene;
+          const lampScale = 0.015;
+          const lampTopY = 69.73;
+          const posY = WALL_H - lampTopY * lampScale; // ~3.55m
+
+          lampTemplate.traverse((child) => {
+            if (child.isMesh) {
+              child.castShadow = false;
+              child.receiveShadow = false;
+              if (child.material) {
+                // Glowing warm LED diffuser ring
+                if (child.material.name === 'lamp_light_0' || child.name.includes('light')) {
+                  child.material = new THREE.MeshBasicMaterial({
+                    color: 0xfff4df,
+                    toneMapped: false
+                  });
+                } else {
+                  // Elegant dark bronze/copper finish
+                  child.material = new THREE.MeshStandardMaterial({
+                    color: 0x422f20,
+                    metalness: 0.65,
+                    roughness: 0.32
+                  });
+                }
+              }
+            }
+          });
+
+          function createLamp(x, z) {
+            const lamp = lampTemplate.clone(true);
+            lamp.scale.setScalar(lampScale);
+            lamp.position.set(x, posY, z);
+            scene.add(lamp);
+            return lamp;
+          }
+
+          // 1. Two Decorative Pendant Lamps above Reception Desk (Left & Right)
+          createLamp(-2.4, 13.6, 4.2);
+          createLamp( 2.4, 13.6, 4.2);
+
+          // 2. Central Studio Pendant Lamp directly above Ông Đồ table
+          createLamp(0, 0, 5.0);
+
+          // 3. Spaced along Circular Walkway above resting benches
+          const benchAngles = [0.65, 1.35, 2.05, -0.65, -1.35, -2.05, Math.PI];
+          for (const ang of benchAngles) {
+            const bx = Math.sin(ang) * 14.0;
+            const bz = Math.cos(ang) * 14.0;
+            createLamp(bx, bz, 3.4);
+          }
+        },
+        undefined,
+        (err) => {
+          console.warn('Lỗi tải đèn Hanging LED Lamp:', err);
+        }
+      );
+    }
+
+    function buildCenterRoomMosaicWall() {
+      // 3D Curved Mosaic Wall spelling "LƯU SẮC KIM HOÀNG" made entirely of miniature Kim Hoàng paintings
+      const mosaicGroup = new THREE.Group();
+      scene.add(mosaicGroup);
+
+      const mosaicSlots = [];
+      const dx = 0.138;
+      const dy = 0.148;
+      const tileW = 0.116;
+      const tileH = 0.126;
+      const lineTopY = [3.45, 2.05];
+      const lines = [
+        ['L', 'Ư', 'U', ' ', 'S', 'Ắ', 'C'],
+        ['K', 'I', 'M', ' ', 'H', 'O', 'À', 'N', 'G']
+      ];
+
+      const frameGeo = new THREE.PlaneGeometry(tileW + 0.016, tileH + 0.016);
+      const artGeo = new THREE.PlaneGeometry(tileW, tileH);
+      const normalFrameMat = new THREE.MeshBasicMaterial({ color: 0xdfaa48 });
+      const WALL_MOSAIC_R = R_CENTER - 0.04;
+
+      lines.forEach((chars, lineIdx) => {
+        let totalCols = 0;
+        chars.forEach((ch, idx) => {
+          totalCols += ch === ' ' ? 2 : MOSAIC_FONT[ch][0].length + (idx < chars.length - 1 && chars[idx + 1] !== ' ' ? 1 : 0);
+        });
+        let curCol = 0;
+        const startX = -((totalCols - 1) * dx) / 2;
+
+        chars.forEach((ch, idx) => {
+          if (ch === ' ') { curCol += 2; return; }
+          const rows = MOSAIC_FONT[ch];
+          const cols = rows[0].length;
+          for (let r = 0; r < rows.length; r++) {
+            for (let c = 0; c < cols; c++) {
+              if (rows[r][c] !== '1') continue;
+              const arcDist = startX + (curCol + c) * dx;
+              const relTheta = arcDist / WALL_MOSAIC_R;
+              const theta = Math.PI / 2 - relTheta; // East wall (+X) facing West (-X) door
+              const wx = Math.sin(theta) * WALL_MOSAIC_R;
+              const wz = Math.cos(theta) * WALL_MOSAIC_R;
+              const wy = lineTopY[lineIdx] - r * dy;
+              const rotY = theta + Math.PI; // Inward normal towards center & West doorway
+
+              const slotIndex = mosaicSlots.length;
+              const initUrl = GALLERY_URLS[slotIndex % GALLERY_URLS.length];
+
+              const frameMesh = new THREE.Mesh(frameGeo, normalFrameMat);
+              frameMesh.position.set(wx, wy, wz);
+              frameMesh.rotation.y = rotY;
+
+              const artR = WALL_MOSAIC_R - 0.008;
+              const artMesh = new THREE.Mesh(artGeo, createFadeArtMaterial(initUrl, maxAnisotropy));
+              artMesh.position.set(Math.sin(theta) * artR, wy, Math.cos(theta) * artR);
+              artMesh.rotation.y = rotY;
+              artMesh.userData = { isMosaicPainting: true, slotIndex, url: initUrl };
+
+              mosaicGroup.add(frameMesh, artMesh);
+              interactivePaintings.push(artMesh);
+              mosaicSlots.push({
+                frameMesh,
+                artMesh,
+                currentUrl: initUrl,
+                sigName: '',
+                isFeatured: false,
+                _fading: false
+              });
+            }
+          }
+          curCol += cols + (idx < chars.length - 1 && chars[idx + 1] !== ' ' ? 1 : 0);
+        });
+      });
+
+      mosaicRotator = createMosaicRotator(mosaicSlots, maxAnisotropy);
+    }
+
+    function makeRedCarpetTexture() {
+      const c = document.createElement('canvas');
+      c.width = 512; c.height = 512;
+      const ctx = c.getContext('2d');
+      const grad = ctx.createRadialGradient(256, 256, 40, 256, 256, 256);
+      grad.addColorStop(0, '#821817');
+      grad.addColorStop(0.7, '#6d1211');
+      grad.addColorStop(1, '#520c0b');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 512, 512);
+      for (let i = 0; i < 4000; i++) {
+        ctx.fillStyle = Math.random() > 0.5 ? 'rgba(255,200,190,0.03)' : 'rgba(20,0,0,0.08)';
+        ctx.fillRect(Math.random() * 512, Math.random() * 512, 2, 2);
+      }
+      const tex = new THREE.CanvasTexture(c);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      tex.anisotropy = maxAnisotropy;
+      return tex;
+    }
+
+    function makeDeskWoodTexture() {
+      const c = document.createElement('canvas');
+      c.width = 1024; c.height = 256;
+      const ctx = c.getContext('2d');
+      const grad = ctx.createLinearGradient(0, 0, 0, 256);
+      grad.addColorStop(0, '#9d683f');
+      grad.addColorStop(0.5, '#8c5a34');
+      grad.addColorStop(1, '#714524');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 1024, 256);
+
+      // Fine wood grain lines
+      for (let y = 0; y < 256; y += 3) {
+        ctx.fillStyle = (y % 6 === 0) ? 'rgba(40, 18, 6, 0.08)' : 'rgba(255, 220, 185, 0.04)';
+        ctx.fillRect(0, y, 1024, 1);
+      }
+      // Molded rectangular recessed panels
+      for (let x = 16; x < 1024; x += 128) {
+        ctx.strokeStyle = 'rgba(45, 22, 10, 0.45)';
+        ctx.lineWidth = 4;
+        ctx.strokeRect(x, 22, 96, 175);
+        ctx.strokeStyle = 'rgba(255, 225, 190, 0.16)';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(x + 4, 26, 88, 167);
+      }
+      // Bottom shadow trim
+      ctx.fillStyle = 'rgba(30, 14, 6, 0.45)';
+      ctx.fillRect(0, 232, 1024, 24);
+      const tex = new THREE.CanvasTexture(c);
+      tex.wrapS = THREE.RepeatWrapping;
+      tex.repeat.set(2, 1);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      tex.anisotropy = maxAnisotropy;
+      return tex;
+    }
+
+    function makeFlutedSlatTexture() {
+      const c = document.createElement('canvas');
+      c.width = 512; c.height = 128;
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = '#5c381f';
+      ctx.fillRect(0, 0, 512, 128);
+      for (let x = 0; x < 512; x += 12) {
+        ctx.fillStyle = '#7b4e2d';
+        ctx.fillRect(x, 0, 7, 128);
+        ctx.fillStyle = '#3d2211';
+        ctx.fillRect(x + 7, 0, 5, 128);
+      }
+      const tex = new THREE.CanvasTexture(c);
+      tex.wrapS = THREE.RepeatWrapping;
+      tex.repeat.set(6, 1);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      return tex;
+    }
+
+    function createCurvedArcMesh(rInner, rOuter, height, arcAngle, mat) {
+      const shape = new THREE.Shape();
+      const startA = -arcAngle / 2;
+      const endA = arcAngle / 2;
+      shape.absarc(0, 0, rOuter, startA, endA, false);
+      shape.lineTo(Math.cos(endA) * rInner, Math.sin(endA) * rInner);
+      shape.absarc(0, 0, rInner, endA, startA, true);
+      shape.closePath();
+
+      const geo = new THREE.ExtrudeGeometry(shape, {
+        depth: height,
+        bevelEnabled: true,
+        bevelThickness: 0.015,
+        bevelSize: 0.015,
+        bevelSegments: 2,
+        curveSegments: 48
+      });
+      geo.rotateX(-Math.PI / 2);
+      geo.rotateY(-Math.PI / 2);
+      const m = new THREE.Mesh(geo, mat);
+      m.castShadow = true;
+      m.receiveShadow = true;
+      return m;
+    }
+
+    let receptionistMixer = null;
+
+    function buildReceptionAndVideo() {
+      // Grand Reception Area positioned at (0, 0, 13.0) directly facing the South Entrance (z = 18.0)
+      const g = new THREE.Group();
+      g.position.set(0, 0, 13.0);
+
+      // Rich Velvet Crimson Red Carpet underneath reception lobby (matching reference Image 1)
+      const redCarpet = new THREE.Mesh(
+        new THREE.CircleGeometry(6.6, 56),
+        new THREE.MeshStandardMaterial({ map: makeVelvetCrimsonCarpetTexture(), roughness: 0.92, metalness: 0.02 })
+      );
+      redCarpet.rotation.x = -Math.PI / 2;
+      redCarpet.position.set(0, 0.014, 1.4);
+      redCarpet.receiveShadow = true;
+      g.add(redCarpet);
+
+      // 1. Stepped Champagne-Cream Architectural Backdrop Wall with Glowing Vertical LED Strips (matching Image 1)
+      const creamMat = new THREE.MeshStandardMaterial({ color: 0xf0e8da, roughness: 0.80, metalness: 0.02 });
+      const ledMat = new THREE.MeshBasicMaterial({ color: 0xfff6ea, transparent: true, opacity: 0.82 });
+
+      const mainBackdrop = new THREE.Mesh(new THREE.BoxGeometry(5.6, 4.35, 0.18), creamMat);
+      mainBackdrop.position.set(0, 2.175, -1.16);
+      mainBackdrop.receiveShadow = true;
+      g.add(mainBackdrop);
+
+      const wingSpecs = [
+        { x: -3.2, w: 1.0, h: 4.05, z: -1.06 },
+        { x:  3.2, w: 1.0, h: 4.05, z: -1.06 },
+        { x: -4.1, w: 0.9, h: 3.70, z: -0.96 },
+        { x:  4.1, w: 0.9, h: 3.70, z: -0.96 },
+        { x: -4.9, w: 0.8, h: 3.30, z: -0.86 },
+        { x:  4.9, w: 0.8, h: 3.30, z: -0.86 }
+      ];
+      for (const w of wingSpecs) {
+        const panel = new THREE.Mesh(new THREE.BoxGeometry(w.w, w.h, 0.16), creamMat);
+        panel.position.set(w.x, w.h / 2, w.z);
+        panel.castShadow = true;
+        panel.receiveShadow = true;
+        g.add(panel);
+      }
+
+      // Glowing vertical LED strips — crisp white core + warm edge
+      const ledXs = [-3.6, -2.75, -2.05, -1.35, -0.68, 0.68, 1.35, 2.05, 2.75, 3.6];
+      for (const lx of ledXs) {
+        const isCenterZone = Math.abs(lx) < 2.6;
+        const ledH = isCenterZone ? 3.12 : (Math.abs(lx) > 3.2 ? 3.45 : 3.85);
+        const led = new THREE.Mesh(new THREE.BoxGeometry(0.036, ledH, 0.03), ledMat);
+        led.position.set(lx, ledH / 2 + 0.04, -1.045);
+        g.add(led);
+      }
+
+      // Header Typography on Backdrop
+      const titleCanvas = document.createElement('canvas');
+      titleCanvas.width = 2048; titleCanvas.height = 384;
+      const tctx = titleCanvas.getContext('2d');
+      tctx.clearRect(0, 0, 2048, 384);
+      tctx.textAlign = 'center';
+      tctx.textBaseline = 'middle';
+      tctx.fillStyle = '#26170c';
+      tctx.font = 'bold 56px Montserrat, sans-serif';
+      tctx.fillText('VIRTUAL EXHIBITION: VIETNAMESE KIM HOANG PAINTING', 1024, 130, 1880);
+      tctx.fillStyle = '#422c1a';
+      tctx.font = '600 48px Montserrat, sans-serif';
+      tctx.fillText('TRIỂN LÃM TRỰC TUYẾN: TRANH KIM HOÀNG VIỆT NAM', 1024, 240, 1880);
+
+      const titleTex = new THREE.CanvasTexture(titleCanvas);
+      titleTex.colorSpace = THREE.SRGBColorSpace;
+      titleTex.anisotropy = maxAnisotropy;
+      const titleMesh = new THREE.Mesh(
+        new THREE.PlaneGeometry(5.2, 0.96),
+        new THREE.MeshBasicMaterial({ map: titleTex, transparent: true })
+      );
+      titleMesh.position.set(0, 3.68, -1.03);
+      g.add(titleMesh);
+
+      // 2. Widescreen Video Monitor centered on the backdrop
+      const vidFrame = new THREE.Mesh(
+        new THREE.BoxGeometry(3.08, 1.78, 0.09),
+        new THREE.MeshStandardMaterial({ color: 0x16171a, roughness: 0.35, metalness: 0.25 })
+      );
+      vidFrame.position.set(0, 2.34, -1.01);
+      vidFrame.castShadow = true;
+      g.add(vidFrame);
+
+      const vidScreen = new THREE.Mesh(
+        new THREE.PlaneGeometry(2.92, 1.62),
+        new THREE.MeshBasicMaterial({ map: videoTex })
+      );
+      vidScreen.position.set(0, 2.34, -0.96);
+      g.add(vidScreen);
+
+      // 3. Multi-Tier Curved Oak Reception Desk (Fluted base + Paneled fascia + Double-tier top)
+      const slatMat = new THREE.MeshStandardMaterial({ map: makeFlutedSlatTexture(), roughness: 0.65, metalness: 0.05 });
+      const deskWoodMat = new THREE.MeshStandardMaterial({ map: makeDeskWoodTexture(), roughness: 0.45, metalness: 0.08 });
+      const deskTopMat = new THREE.MeshPhysicalMaterial({ color: 0x865430, roughness: 0.34, metalness: 0.06, clearcoat: 0.28, clearcoatRoughness: 0.3 });
+
+      const deskR = 3.2;
+      const deskArc = Math.PI * 0.44;
+
+      // Fluted slat plinth base (y: 0..0.28)
+      const deskPlinth = createCurvedArcMesh(deskR - 0.56, deskR - 0.04, 0.28, deskArc - 0.02, slatMat);
+      deskPlinth.position.set(0, 0, -2.05);
+      deskPlinth.scale.set(1.22, 1, 0.85);
+      g.add(deskPlinth);
+
+      // Main curved paneled oak body (y: 0.26..0.90)
+      const deskBase = createCurvedArcMesh(deskR - 0.52, deskR, 0.64, deskArc, deskWoodMat);
+      deskBase.position.set(0, 0.26, -2.05);
+      deskBase.scale.set(1.22, 1, 0.85);
+      g.add(deskBase);
+
+      // Lower countertop molding (y: 0.90..0.98)
+      const deskTop1 = createCurvedArcMesh(deskR - 0.60, deskR + 0.12, 0.08, deskArc + 0.03, deskTopMat);
+      deskTop1.position.set(0, 0.90, -2.05);
+      deskTop1.scale.set(1.22, 1, 0.85);
+      g.add(deskTop1);
+
+      // Upper raised transaction ledge (y: 0.98..1.05)
+      const deskTop2 = createCurvedArcMesh(deskR - 0.50, deskR + 0.06, 0.07, deskArc - 0.04, deskTopMat);
+      deskTop2.position.set(0, 0.98, -2.05);
+      deskTop2.scale.set(1.22, 1, 0.85);
+      g.add(deskTop2);
+
+      // Curved Gold Lettering "Lưu Sắc Kim Hoàng" hugging the front arc of the desk
+      const logoCanvas = document.createElement('canvas');
+      logoCanvas.width = 1024; logoCanvas.height = 192;
+      const lctx = logoCanvas.getContext('2d');
+      lctx.clearRect(0, 0, 1024, 192);
+      lctx.textAlign = 'center';
+      lctx.textBaseline = 'middle';
+      lctx.shadowColor = 'rgba(0,0,0,0.65)';
+      lctx.shadowBlur = 10;
+      lctx.fillStyle = '#fae08c';
+      lctx.font = 'bold 76px Georgia, serif';
+      lctx.fillText('Lưu Sắc Kim Hoàng', 512, 96);
+
+      const logoTex = new THREE.CanvasTexture(logoCanvas);
+      logoTex.colorSpace = THREE.SRGBColorSpace;
+      logoTex.anisotropy = maxAnisotropy;
+      const logoArc = 0.58;
+      const deskLogo = new THREE.Mesh(
+        new THREE.CylinderGeometry(deskR + 0.035, deskR + 0.035, 0.42, 24, 1, true, -logoArc / 2, logoArc),
+        new THREE.MeshBasicMaterial({ map: logoTex, transparent: true })
+      );
+      deskLogo.position.set(0, 0.58, -2.05);
+      deskLogo.scale.set(1.22, 1, 0.85);
+      g.add(deskLogo);
+
+      // 4. Glazed Ceramic Vase with Layered Pink Lotus Flowers on Right Side of Counter
+      const vaseGroup = new THREE.Group();
+      vaseGroup.position.set(2.15, 1.05, 0.12);
+      const vaseMesh = new THREE.Mesh(
+        new THREE.LatheGeometry([
+          new THREE.Vector2(0, 0),
+          new THREE.Vector2(0.11, 0),
+          new THREE.Vector2(0.15, 0.12),
+          new THREE.Vector2(0.12, 0.24),
+          new THREE.Vector2(0.075, 0.30),
+          new THREE.Vector2(0.095, 0.33)
+        ], 20),
+        new THREE.MeshPhysicalMaterial({ color: 0x3a1c12, roughness: 0.18, metalness: 0.1, clearcoat: 0.8 })
+      );
+      vaseMesh.castShadow = true;
+      vaseGroup.add(vaseMesh);
+
+      const stemMat = new THREE.MeshStandardMaterial({ color: 0x2f6829, roughness: 0.7 });
+      const leafMat = new THREE.MeshStandardMaterial({ color: 0x3b7a33, roughness: 0.65, side: THREE.DoubleSide });
+      const petalMat = new THREE.MeshStandardMaterial({ color: 0xf48fb1, roughness: 0.45, side: THREE.DoubleSide });
+      const petalDarkMat = new THREE.MeshStandardMaterial({ color: 0xec407a, roughness: 0.45, side: THREE.DoubleSide });
+
+      for (let i = 0; i < 7; i++) {
+        const ang = (i / 7) * Math.PI * 2;
+        const r = i === 0 ? 0.01 : 0.09;
+        const sx = Math.cos(ang) * r, sz = Math.sin(ang) * r;
+        const h = 0.26 + (i % 3) * 0.05;
+        const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.007, 0.009, h, 6), stemMat);
+        stem.position.set(sx * 0.6, 0.26 + h * 0.35, sz * 0.6);
+        stem.rotation.z = -sx * 2.0; stem.rotation.x = sz * 2.0;
+        vaseGroup.add(stem);
+
+        // Multi-petal lotus blossom
+        const flower = new THREE.Group();
+        flower.position.set(sx * 1.25, 0.32 + h * 0.75, sz * 1.25);
+        for (let p = 0; p < 6; p++) {
+          const pa = (p / 6) * Math.PI * 2;
+          const petal = new THREE.Mesh(new THREE.SphereGeometry(0.032, 8, 8), p % 2 ? petalMat : petalDarkMat);
+          petal.scale.set(0.65, 1.35, 0.35);
+          petal.position.set(Math.cos(pa) * 0.025, 0.02, Math.sin(pa) * 0.025);
+          petal.rotation.y = -pa;
+          petal.rotation.z = 0.45;
+          flower.add(petal);
+        }
+        vaseGroup.add(flower);
+      }
+      // Lotus leaves around rim
+      for (let i = 0; i < 4; i++) {
+        const a = (i / 4) * Math.PI * 2 + 0.4;
+        const leaf = new THREE.Mesh(new THREE.CircleGeometry(0.08, 12), leafMat);
+        leaf.position.set(Math.cos(a) * 0.14, 0.36, Math.sin(a) * 0.14);
+        leaf.rotation.x = -Math.PI / 2 + 0.35;
+        vaseGroup.add(leaf);
+      }
+      g.add(vaseGroup);
+
+      // 5. Optimized 3D Receptionist standing gracefully behind the reception desk facing visitor
+      receptionistGroup = new THREE.Group();
+      receptionistGroup.position.set(0, 0, -0.22);
+      g.add(receptionistGroup);
+
+      gltfLoader.load(
+        './models/receptionist/vietnamese_ao_dai_woman_opt.glb',
+        (gltf) => {
+          const model = gltf.scene;
+          const box = new THREE.Box3().setFromObject(model);
+          const size = new THREE.Vector3();
+          const center = new THREE.Vector3();
+          box.getSize(size);
+          box.getCenter(center);
+
+          const scale = 1.62 / Math.max(0.01, size.y);
+          model.scale.setScalar(scale);
+          model.position.set(-center.x * scale, -box.min.y * scale, -center.z * scale);
+
+          // Wrap in pivot group and rotate -90 deg (-Math.PI / 2) so she faces directly front towards the visitor
+          const pivot = new THREE.Group();
+          pivot.add(model);
+          pivot.rotation.y = -Math.PI / 2;
+          receptionistGroup.add(pivot);
+
+          if (gltf.animations && gltf.animations.length > 0) {
+            receptionistMixer = new THREE.AnimationMixer(model);
+            receptionistMixer.clipAction(gltf.animations[0]).play();
+          }
+        },
+        undefined,
+        (err) => {
+          console.error('Lỗi tải model Lễ Tân:', err);
+        }
+      );
+
+      // Warm overhead spotlight on the reception desk (soft gallery spotlight)
+      const recLight = new THREE.SpotLight(0xfff0d6, 5.8, 14, Math.PI / 3, 0.5, 2.0);
+      recLight.position.set(0, 4.2, 2.2);
+      recLight.target.position.set(0, 1.2, -0.4);
+      g.add(recLight, recLight.target);
+
+      scene.add(g);
+      // Collision barrier across the reception desk + backdrop so player walks around left/right
+      segColliders.push({ x1: -4.8, z1: 12.4, x2: 4.8, z2: 12.4, halfThick: 1.35 });
+    }
+
+    // =========================================================================
+    // 5. Hang All Kim Hoàng Paintings along the Circular Outer Wall
+    // =========================================================================
+    function extractPaintingTitle(artwork) {
+      const html = artwork.htmlVi || artwork.htmlEn || '';
+      if (!html) return 'Tranh Kim Hoàng';
+      const tmp = document.createElement('div');
+      tmp.innerHTML = html;
+      for (const el of tmp.querySelectorAll('div, span')) {
+        const t = (el.textContent || '').trim();
+        if (/^DÒNG TRANH ĐỎ KIM HOÀNG/i.test(t) && el.children.length === 0) el.remove();
+      }
+      const heading = tmp.querySelector('h1, h2, h3, h4, b, strong, [style*="font-weight:700"], [style*="font-weight:bold"]');
+      let text = (heading ? heading.textContent : tmp.textContent) || '';
+      text = text.replace(/\s+/g, ' ').trim();
+      if (!text) return 'Tranh Kim Hoàng';
+      if (text.length > 42) text = text.slice(0, 40).trim() + '…';
+      return text;
+    }
+
+    function createModernMuseumPlaqueTexture(title) {
+      const c = document.createElement('canvas');
+      c.width = 256; c.height = 170;
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = '#fbfbfa';
+      ctx.fillRect(0, 0, 256, 170);
+      ctx.strokeStyle = '#d0d3d8';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(2, 2, 252, 166);
+
+      // Category Header
+      ctx.fillStyle = '#8b5a2b';
+      ctx.font = 'bold 11px Montserrat, sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText('TRANH DÂN GIAN KIM HOÀNG', 14, 24);
+
+      ctx.strokeStyle = '#e2e0da';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(14, 33);
+      ctx.lineTo(242, 33);
+      ctx.stroke();
+
+      // Artwork Title
+      ctx.fillStyle = '#1c1e22';
+      ctx.font = 'bold 15px Georgia, serif';
+      const words = title.split(' ');
+      let line1 = '', line2 = '';
+      for (const w of words) {
+        const test = line1 ? line1 + ' ' + w : w;
+        if (ctx.measureText(test).width <= 220 && !line2) line1 = test;
+        else line2 = line2 ? line2 + ' ' + w : w;
+      }
+      if (!line2) {
+        ctx.fillText(line1, 14, 60);
+      } else {
+        ctx.fillText(line1, 14, 55);
+        ctx.fillText(line2, 14, 75);
+      }
+
+      // Metadata details
+      ctx.fillStyle = '#555860';
+      ctx.font = '10px Montserrat, sans-serif';
+      ctx.fillText('Khắc gỗ trên giấy đỏ hồng điều', 14, 105);
+      ctx.fillText('Nét vẽ thanh thoát, điểm kim nhũ', 14, 122);
+
+      // Interactive Action Hint
+      ctx.fillStyle = '#a66224';
+      ctx.font = 'bold 9.5px Montserrat, sans-serif';
+      ctx.fillText('▶ Nhấp tranh để xem chi tiết', 14, 150);
+
+      const tex = new THREE.CanvasTexture(c);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      return tex;
+    }
+
+    function placeCircularPaintings(data) {
+      const seen = new Set();
+      const artworks = [];
+      for (const p of Object.values(data.panoramas || {})) {
+        for (const o of p.overlays || []) {
+          if (!o.isNav && o.images && o.images.length > 0) {
+            const key = o.images[0];
+            if (seen.has(key)) continue;
+            // Exclude ALL yellow album introduction banners and any non-Kim Hoang artwork
+            if (key.includes('album_') || !key.startsWith('tranh/')) continue;
+            seen.add(key);
+            artworks.push(o);
+          }
+        }
+      }
+
+      // Prioritize iconic Kim Hoàng masterworks to display them at prominent locations
+      const priority = [
+        'tranh/tranh-01.webp', // Gà Trống Đại Cát Kim Hoàng
+        'tranh/tranh-02.webp', // Lợn Đàn Kim Hoàng
+        'tranh/tranh-05.webp', // Tiến Tài Tiến Lộc
+        'tranh/tranh-06.webp',
+        'tranh/tranh-03.webp',
+        'tranh/tranh-08.webp',
+        'tranh/tranh-09.webp',
+        'tranh/tranh-14.webp',
+        'tranh/tranh-45.webp'
+      ];
+      artworks.sort((a, b) => {
+        const ia = priority.indexOf(a.images[0]);
+        const ib = priority.indexOf(b.images[0]);
+        if (ia !== -1 && ib !== -1) return ia - ib;
+        if (ia !== -1) return -1;
+        if (ib !== -1) return 1;
+        return a.images[0].localeCompare(b.images[0]);
+      });
+
+      function hangPainting(artwork, rWall, theta, isFacingOutward) {
+        const wx = Math.sin(theta) * rWall;
+        const wz = Math.cos(theta) * rWall;
+        const rotY = isFacingOutward ? theta : theta + Math.PI;
+
+        const group = new THREE.Group();
+        group.position.set(wx, 1.98, wz);
+        group.rotation.y = rotY;
+
+        // 1. Soft Warm Spotlight Decal wash on the white plaster wall behind each painting
+        const wallSpotlight = new THREE.Mesh(new THREE.PlaneGeometry(3.0, 2.5), wallSpotlightMat);
+        wallSpotlight.position.set(0, 0.40, -0.015);
+        group.add(wallSpotlight);
+
+        // 2. Modern Museum Black Box Floating Frame
+        const frameMesh = new THREE.Mesh(new THREE.BoxGeometry(1.75, 1.35, 0.08), blackFrameMat);
+        group.add(frameMesh);
+
+        // 3. Artwork Canvas Mesh
+        const artMat = new THREE.MeshStandardMaterial({ color: 0x2a1d14, roughness: 0.45 });
+        const artMesh = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 1.2), artMat);
+        artMesh.position.z = 0.045;
+        artMesh.userData.artwork = artwork;
+        artMesh.userData.frameMesh = frameMesh;
+        group.add(artMesh);
+
+        // 4. Overhead Spotlight Fixture
+        const spotFixture = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.05, 0.08, 0.16, 10),
+          darkWoodMat
+        );
+        spotFixture.position.set(0, 1.15, 0.25);
+        spotFixture.rotation.x = 0.6;
+        group.add(spotFixture);
+
+        // 5. Contemporary Museum Placard mounted on the wall to the right of each frame (matching photo)
+        const titleText = extractPaintingTitle(artwork);
+        const plaque = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.26, 0.02), darkWoodMat);
+        plaque.position.set(1.6 / 2 + 0.32, -0.15, 0.01);
+        const plaqueFace = new THREE.Mesh(
+          new THREE.PlaneGeometry(0.36, 0.24),
+          new THREE.MeshBasicMaterial({ map: createModernMuseumPlaqueTexture(titleText) })
+        );
+        plaqueFace.position.z = 0.012;
+        plaque.add(plaqueFace);
+        group.add(plaque);
+
+        scene.add(group);
+        interactivePaintings.push(artMesh);
+        interactTargetsDirty = true;
+
+        texLoader.load(artwork.images[0], (tex) => {
+          tex.colorSpace = THREE.SRGBColorSpace;
+          tex.anisotropy = maxAnisotropy;
+          artMat.map = tex;
+          artMat.color.setHex(0xffffff);
+          artMat.needsUpdate = true;
+          if (tex.image && tex.image.width && tex.image.height) {
+            const aspect = tex.image.width / tex.image.height;
+            let w = 1.65, h = 1.65 / aspect;
+            if (h > 1.55) { h = 1.55; w = h * aspect; }
+            if (w > 2.2) { w = 2.2; h = w / aspect; }
+            artMesh.geometry.dispose();
+            artMesh.geometry = new THREE.PlaneGeometry(w, h);
+            frameMesh.geometry.dispose();
+            frameMesh.geometry = new THREE.BoxGeometry(w + 0.14, h + 0.14, 0.08);
+
+            // Position placard neatly to the right side of the painting
+            plaque.position.set(w / 2 + 0.30, -h * 0.18, 0.01);
+            spotFixture.position.y = h / 2 + 0.35;
+
+            // Expand soft spotlight cone on the wall
+            wallSpotlight.geometry.dispose();
+            wallSpotlight.geometry = new THREE.PlaneGeometry(w + 1.4, h + 1.6);
+            wallSpotlight.position.y = h * 0.25;
+          }
+        });
+      }
+
+      // 1. Distribute authentic Kim Hoàng paintings along outer circular perimeter wall (R_OUT - 0.12)
+      const usableStart = 0.28;
+      const usableSpan = Math.PI * 2 - 0.56;
+      const countOuter = Math.min(artworks.length, 26);
+      for (let i = 0; i < countOuter; i++) {
+        const theta = usableStart + ((i + 0.5) / countOuter) * usableSpan;
+        hangPainting(artworks[i], R_OUT - 0.12, theta, false);
+      }
+
+      // 2. Distribute Kim Hoàng paintings along outer curved wall of the studio room (R_CENTER + 0.12)
+      // Generously spaced out so each artwork has elegant breathing room without crowding
+      const studioStart = Math.PI * 1.5 + CENTER_DOOR_HALF + 0.30;
+      const studioSpan = Math.PI * 2 - (CENTER_DOOR_HALF * 2 + 0.60);
+      const studioPool = artworks.slice(countOuter).concat(artworks);
+      const countStudio = 12; // Bớt 2 tấm và giãn cách thưa hơn để tranh thoáng đãng, sang trọng
+      for (let j = 0; j < countStudio; j++) {
+        const theta = studioStart + ((j + 0.5) / countStudio) * studioSpan;
+        hangPainting(studioPool[j % studioPool.length], R_CENTER + 0.12, theta, true);
+      }
+    }
+
+    // =========================================================================
+    // 6. Circular Collision Resolution (Smooth Sliding & Butter-smooth Doorway)
+    // =========================================================================
+    function resolvePosition(px, pz) {
+      let x = px, z = pz;
+
+      // 1. Clamp inside outer circular wall (R_OUT)
+      const rOut = Math.hypot(x, z);
+      const maxR = R_OUT - PLAYER_RADIUS - 0.20;
+      if (rOut > maxR) {
+        const k = maxR / rOut;
+        x *= k; z *= k;
+      }
+
+      // 2. Center circular room wall (R_CENTER) with West doorway opening (-X, LEFT side)
+      const rCent = Math.hypot(x, z);
+      const ang = Math.atan2(z, -x); // 0 = -X West doorway
+      const inDoorwayArc = Math.abs(ang) <= CENTER_DOOR_HALF;
+
+      if (!inDoorwayArc) {
+        const minOut = R_CENTER + PLAYER_RADIUS;
+        const maxIn = R_CENTER - PLAYER_RADIUS;
+        if (rCent >= R_CENTER && rCent < minOut) {
+          const k = minOut / rCent;
+          x *= k; z *= k;
+        } else if (rCent < R_CENTER && rCent > maxIn) {
+          const k = maxIn / rCent;
+          x *= k; z *= k;
+        }
+      }
+
+      // Rounded collision on the 2 doorway posts (so player never gets stuck on door edges)
+      const postRadius = PLAYER_RADIUS + 0.10;
+      const postX = -R_CENTER * Math.cos(CENTER_DOOR_HALF);
+      const postZ1 = -R_CENTER * Math.sin(CENTER_DOOR_HALF);
+      const postZ2 = -postZ1;
+
+      const dP1 = Math.hypot(x - postX, z - postZ1);
+      if (dP1 < postRadius && dP1 > 1e-4) {
+        const push = postRadius - dP1;
+        x += ((x - postX) / dP1) * push;
+        z += ((z - postZ1) / dP1) * push;
+      }
+      const dP2 = Math.hypot(x - postX, z - postZ2);
+      if (dP2 < postRadius && dP2 > 1e-4) {
+        const push = postRadius - dP2;
+        x += ((x - postX) / dP2) * push;
+        z += ((z - postZ2) / dP2) * push;
+      }
+
+      // 3. Center Ông Đồ table collider (around (0, 0) with radius 1.55)
+      const distTable = Math.hypot(x, z);
+      if (distTable < 1.55) {
+        const k = 1.55 / Math.max(0.01, distTable);
+        x = x * k;
+        z = z * k;
+      }
+
+      // 4. Push out of reception desk & corridor benches
+      for (const s of segColliders) {
+        const vx = s.x2 - s.x1, vz = s.z2 - s.z1;
+        const lenSq = vx * vx + vz * vz;
+        if (lenSq < 1e-6) continue;
+        let t = ((x - s.x1) * vx + (z - s.z1) * vz) / lenSq;
+        t = Math.max(0, Math.min(1, t));
+        const cx = s.x1 + t * vx, cz = s.z1 + t * vz;
+        const dx = x - cx, dz = z - cz;
+        const dist = Math.hypot(dx, dz);
+        const minDist = PLAYER_RADIUS + s.halfThick;
+        if (dist < minDist && dist > 1e-4) {
+          const push = minDist - dist;
+          x += (dx / dist) * push;
+          z += (dz / dist) * push;
+        }
+      }
+
+      return [x, z];
+    }
+
+    // =========================================================================
+    // 7. Smooth Controls (Laptop WASD/Mouse + Multi-Touch Mobile)
+    // =========================================================================
+    let yaw = 0, targetYaw = 0;
+    let pitch = 0, targetPitch = 0;
+    let velX = 0, velZ = 0;
+    let lookPointerId = null;
+    let sx = 0, sy = 0, syaw = 0, spitch = 0;
+    let walkBob = 0;
+    let isSeatedAtTable = false;
+    let savedPose = null;
+    let kimHoangStation = null;
+
+    // One-time Studio Greeting Dialogue state
+    // Reset on each page session/refresh; during the session it triggers only once when entering the studio.
+    let hasShownStudioGreeting = false;
+    try {
+      sessionStorage.removeItem('kh_studio_dialogue_shown');
+      sessionStorage.removeItem('kh_studio_greeting_shown');
+    } catch (_) {}
+    let isStudioDialogueActive = false;
+    let studioDialogueStep = 1;
+
+    const keys = {};
+    const padState = { fwd: false, back: false, left: false, right: false, sl: false, sr: false };
+
+    window.addEventListener('keydown', (e) => {
+      if (isSeatedAtTable) {
+        if (e.key === 'Escape') standUpFromTable();
+        return;
+      }
+      if (isStudioDialogueActive) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          advanceStudioDialogue();
+          return;
+        }
+        if (e.key === 'Escape') {
+          e.preventDefault();
+          closeStudioDialogue();
+          return;
+        }
+        return;
+      }
+      if (document.getElementById('artwork-modal').classList.contains('open')) {
+        if (e.key === 'Escape') closeArtworkModal();
+        return;
+      }
+      if (document.getElementById('reception-modal').classList.contains('open')) {
+        if (e.key === 'Escape') closeReceptionModal();
+        return;
+      }
+      keys[e.code] = true;
+    });
+    window.addEventListener('keyup', (e) => { keys[e.code] = false; });
+
+    function bindPadButton(id, prop) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const onDown = (e) => {
+        if (isStudioDialogueActive) return;
+        e.preventDefault(); e.stopPropagation(); padState[prop] = true; el.classList.add('pressed');
+      };
+      const onUp = (e) => { if (e) e.stopPropagation(); padState[prop] = false; el.classList.remove('pressed'); };
+      el.addEventListener('pointerdown', onDown);
+      el.addEventListener('pointerup', onUp);
+      el.addEventListener('pointerleave', onUp);
+      el.addEventListener('pointercancel', onUp);
+    }
+    bindPadButton('pad-fwd', 'fwd');
+    bindPadButton('pad-back', 'back');
+    bindPadButton('pad-left', 'left');
+    bindPadButton('pad-right', 'right');
+    bindPadButton('pad-sl', 'sl');
+    bindPadButton('pad-sr', 'sr');
+
+    const btnFps = document.getElementById('btn-fps');
+    btnFps?.addEventListener('click', () => {
+      if (document.pointerLockElement === renderer.domElement) document.exitPointerLock();
+      else renderer.domElement.requestPointerLock();
+    });
+    document.addEventListener('pointerlockchange', () => {
+      btnFps?.classList.toggle('active', document.pointerLockElement === renderer.domElement);
+    });
+
+    let pointerStartTime = 0;
+    const activeTouches = new Map();
+    let initialPinchDist = null;
+    let initialPinchFov = 65;
+
+    renderer.domElement.addEventListener('pointerdown', (e) => {
+      if (isSeatedAtTable) return;
+      if (document.pointerLockElement === renderer.domElement) {
+        tryClickWorld(true);
+        return;
+      }
+
+      activeTouches.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+      // Two-finger pinch-to-zoom on mobile
+      if (activeTouches.size === 2) {
+        const pts = Array.from(activeTouches.values());
+        initialPinchDist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
+        initialPinchFov = camera.fov;
+        lookPointerId = null;
+        return;
+      }
+
+      if (lookPointerId !== null) return;
+      lookPointerId = e.pointerId;
+      sx = e.clientX; sy = e.clientY;
+      syaw = targetYaw; spitch = targetPitch;
+      pointerStartTime = performance.now();
+      try { renderer.domElement.setPointerCapture?.(e.pointerId); } catch (_) {}
+    });
+
+    window.addEventListener('pointermove', (e) => {
+      if (isSeatedAtTable) return;
+      if (activeTouches.has(e.pointerId)) {
+        activeTouches.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      }
+
+      // Handle 2-finger pinch zoom on mobile
+      if (activeTouches.size === 2 && initialPinchDist) {
+        const pts = Array.from(activeTouches.values());
+        const curDist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
+        if (curDist > 10) {
+          camera.fov = Math.max(38, Math.min(86, initialPinchFov * (initialPinchDist / curDist)));
+          camera.updateProjectionMatrix();
+        }
+        return;
+      }
+
+      if (document.pointerLockElement === renderer.domElement) {
+        targetYaw -= e.movementX * 0.12;
+        targetPitch = Math.max(-75, Math.min(75, targetPitch - e.movementY * 0.12));
+        return;
+      }
+
+      if (lookPointerId === e.pointerId) {
+        const dx = e.clientX - sx;
+        const dy = e.clientY - sy;
+        const distMoved = Math.hypot(dx, dy);
+
+        // Small dead-zone threshold so a clean finger tap doesn't jitter camera angle
+        const deadZone = (e.pointerType === 'touch') ? 6 : 2;
+        if (distMoved > deadZone) {
+          const sens = (e.pointerType === 'touch' ? 0.22 : 0.16) * (camera.fov / 65);
+          targetYaw = syaw - dx * sens;
+          targetPitch = Math.max(-75, Math.min(75, spitch - dy * sens));
+        }
+      } else if (lookPointerId === null && e.pointerType !== 'touch') {
+        updateHover(e.clientX, e.clientY);
+      }
+    });
+
+    window.addEventListener('pointerup', (e) => {
+      activeTouches.delete(e.pointerId);
+      if (activeTouches.size < 2) initialPinchDist = null;
+
+      if (isSeatedAtTable) { lookPointerId = null; return; }
+      if (lookPointerId !== e.pointerId) return;
+
+      const elapsed = performance.now() - pointerStartTime;
+      const moved = Math.hypot(e.clientX - sx, e.clientY - sy);
+      const isTouch = (e.pointerType === 'touch');
+      const maxMove = isTouch ? 24 : 10;
+      const maxTime = isTouch ? 450 : 500;
+
+      lookPointerId = null;
+      try { renderer.domElement.releasePointerCapture?.(e.pointerId); } catch (_) {}
+
+      // If it's a tap/click on screen, walk there!
+      if (moved < maxMove && elapsed < maxTime) {
+        tryClickWorld(false, e.clientX, e.clientY);
+      }
+    });
+
+    window.addEventListener('pointercancel', (e) => {
+      activeTouches.delete(e.pointerId);
+      if (activeTouches.size < 2) initialPinchDist = null;
+      if (lookPointerId === e.pointerId) lookPointerId = null;
+    });
+
+    renderer.domElement.addEventListener('wheel', (e) => {
+      if (isSeatedAtTable) return;
+      camera.fov = Math.max(40, Math.min(86, camera.fov + e.deltaY * 0.04));
+      camera.updateProjectionMatrix();
+    }, { passive: true });
+
+    // =========================================================================
+    // 8. Raycasting (Paintings, Receptionist, Ông Đồ Table)
+    // =========================================================================
+    const raycaster = new THREE.Raycaster();
+    const crosshairEl = document.getElementById('crosshair');
+    const hoverHintEl = document.getElementById('hover-hint');
+    let hoveredArt = null;
+
+    function setHoverState(hintText, artMesh = null) {
+      if (hoveredArt && hoveredArt !== artMesh && hoveredArt.userData.frameMesh) {
+        hoveredArt.userData.frameMesh.material = blackFrameMat;
+      }
+      hoveredArt = artMesh;
+      if (artMesh && artMesh.userData.frameMesh) {
+        artMesh.userData.frameMesh.material = new THREE.MeshStandardMaterial({
+          color: 0xffd584, emissive: 0x6b3e08, roughness: 0.25, metalness: 0.7
+        });
+      }
+      if (hintText) {
+        hoverHintEl.textContent = hintText;
+        crosshairEl.classList.add('hovering');
+        hoverHintEl.classList.add('visible');
+      } else {
+        crosshairEl.classList.remove('hovering');
+        hoverHintEl.classList.remove('visible');
+      }
+    }
+
+    let cachedInteractTargets = [];
+    let interactTargetsDirty = true;
+
+    function getInteractTargets() {
+      if (interactTargetsDirty || cachedInteractTargets.length === 0) {
+        cachedInteractTargets = [...interactivePaintings, ...interactiveReception];
+        if (kimHoangStation && kimHoangStation.interactiveMeshes) {
+          cachedInteractTargets.push(...kimHoangStation.interactiveMeshes);
+        }
+        interactTargetsDirty = false;
+      }
+      return cachedInteractTargets;
+    }
+
+    let lastHoverTime = 0;
+    const _hoverNdc = new THREE.Vector2();
+
+    function updateHover(cx, cy) {
+      if (isSeatedAtTable) { setHoverState(''); return; }
+      const now = performance.now();
+      if (now - lastHoverTime < 40) return;
+      lastHoverTime = now;
+
+      if (document.pointerLockElement === renderer.domElement) {
+        _hoverNdc.set(0, 0);
+      } else {
+        _hoverNdc.set((cx / window.innerWidth) * 2 - 1, -(cy / window.innerHeight) * 2 + 1);
+      }
+      raycaster.setFromCamera(_hoverNdc, camera);
+      raycaster.far = 16;
+      const hits = raycaster.intersectObjects(getInteractTargets(), false);
+      if (!hits.length) { setHoverState(''); return; }
+      const obj = hits[0].object;
+      if (obj.userData.artworkId) {
+        setHoverState('Nhấn để ngồi xuống bàn vẽ tranh cùng Ông Đồ');
+      } else if (obj.userData.artwork) {
+        setHoverState('Nhấn để xem chi tiết & ý nghĩa bức tranh', obj);
+      } else if (obj.userData.isMosaicPainting) {
+        setHoverState('Tranh dân gian Kim Hoàng trong chữ Lưu Sắc Kim Hoàng');
+      } else if (obj.userData.isTV) {
+        setHoverState('Nhấn để Bật / Tắt âm thanh phim tư liệu Lưu Sắc Kim Hoàng');
+      }
+    }
+
+    let navTarget = null;
+    let navRingGroup = null;
+
+    function createNavRing() {
+      navRingGroup = new THREE.Group();
+
+      // Outer gold glowing ripple ring
+      const ringGeo = new THREE.RingGeometry(0.24, 0.36, 36);
+      ringGeo.rotateX(-Math.PI / 2);
+      const ringMat = new THREE.MeshBasicMaterial({
+        color: 0xffd266,
+        transparent: true,
+        opacity: 0.90,
+        side: THREE.DoubleSide
+      });
+      const ringMesh = new THREE.Mesh(ringGeo, ringMat);
+
+      // Inner bright center dot
+      const dotGeo = new THREE.CircleGeometry(0.08, 24);
+      dotGeo.rotateX(-Math.PI / 2);
+      const dotMat = new THREE.MeshBasicMaterial({
+        color: 0xfffae0,
+        transparent: true,
+        opacity: 0.96,
+        side: THREE.DoubleSide
+      });
+      const dotMesh = new THREE.Mesh(dotGeo, dotMat);
+
+      navRingGroup.add(ringMesh, dotMesh);
+      navRingGroup.position.set(0, 0.025, 0);
+      navRingGroup.visible = false;
+      scene.add(navRingGroup);
+    }
+
+    function setNavTarget(tx, tz) {
+      const dest = { x: tx, z: tz };
+      navTarget = dest;
+      if (!navRingGroup) createNavRing();
+      navRingGroup.position.set(dest.x, 0.025, dest.z);
+      navRingGroup.scale.set(1, 1, 1);
+      navRingGroup.children[0].material.opacity = 0.90;
+      navRingGroup.children[1].material.opacity = 0.96;
+      navRingGroup.visible = true;
+    }
+
+    function getTapDestination(raycaster) {
+      const ray = raycaster.ray;
+      let targetX = null, targetZ = null;
+
+      // 1. Check if ray hits the floor plane y = 0 in front of camera
+      const groundPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+      const groundHit = new THREE.Vector3();
+      if (ray.intersectPlane(groundPlane, groundHit)) {
+        const toHit = new THREE.Vector3().subVectors(groundHit, camera.position);
+        const camFwd = new THREE.Vector3();
+        camera.getWorldDirection(camFwd);
+
+        // Ray must point in front of camera
+        if (toHit.dot(camFwd) > 0.08) {
+          const dist = Math.hypot(toHit.x, toHit.z);
+          if (dist >= 0.7 && dist <= 16.0) {
+            targetX = groundHit.x;
+            targetZ = groundHit.z;
+          } else if (dist > 16.0) {
+            const step = 7.5 / dist;
+            targetX = camera.position.x + toHit.x * step;
+            targetZ = camera.position.z + toHit.z * step;
+          }
+        }
+      }
+
+      // 2. If user tapped upper half of screen, horizon, walls or distant doorway
+      if (targetX === null) {
+        const hx = ray.direction.x;
+        const hz = ray.direction.z;
+        const hLen = Math.hypot(hx, hz);
+        if (hLen > 0.05) {
+          const stepDist = 4.2; // Walk 4.2m forward in tapped direction
+          targetX = camera.position.x + (hx / hLen) * stepDist;
+          targetZ = camera.position.z + (hz / hLen) * stepDist;
+        }
+      }
+
+      if (targetX !== null) {
+        const r = Math.hypot(targetX, targetZ);
+        if (r > R_OUT - 0.55) {
+          const k = (R_OUT - 0.55) / r;
+          targetX *= k;
+          targetZ *= k;
+        }
+        const [cx, cz] = resolvePosition(targetX, targetZ);
+        return { x: cx, z: cz };
+      }
+
+      return null;
+    }
+
+    function tryClickWorld(fromCenter, cx = 0, cy = 0) {
+      if (isStudioDialogueActive) return;
+      const ndc = fromCenter
+        ? new THREE.Vector2(0, 0)
+        : new THREE.Vector2((cx / window.innerWidth) * 2 - 1, -(cy / window.innerHeight) * 2 + 1);
+      raycaster.setFromCamera(ndc, camera);
+      raycaster.far = 16;
+      const hits = raycaster.intersectObjects(getInteractTargets(), false);
+
+      // 1. Direct hit on interactive scene targets (paintings, table, TV)
+      if (hits.length > 0) {
+        if (document.pointerLockElement) document.exitPointerLock();
+        navTarget = null;
+        if (navRingGroup) navRingGroup.visible = false;
+
+        const obj = hits[0].object;
+        if (obj.userData.artworkId) {
+          sitDownAtTable();
+          return;
+        } else if (obj.userData.artwork) {
+          openArtworkModal(obj.userData.artwork);
+          return;
+        } else if (obj.userData.isTV) {
+          videoEl.muted = !videoEl.muted;
+          if (!videoEl.muted) {
+            videoEl.volume = 0.85;
+            videoEl.play().catch(() => {});
+          }
+          setHoverState(videoEl.muted ? 'Đã tắt tiếng video' : 'Đang phát âm thanh phim tư liệu Lưu Sắc Kim Hoàng');
+          return;
+        }
+      }
+
+      // 2. Tap-to-Move (Mobile & Desktop): Click or tap anywhere on screen to smoothly walk there!
+      const dest = getTapDestination(raycaster);
+      if (dest) {
+        setNavTarget(dest.x, dest.z);
+      }
+    }
+
+    // =========================================================================
+    // 9. Circular Minimap & Zone HUD
+    // =========================================================================
+    const mmCanvas = document.getElementById('minimap');
+    const mmCtx = mmCanvas.getContext('2d');
+    const roomBadge = document.getElementById('room-badge');
+    let activeZoneKey = 'entrance';
+
+    function detectZone() {
+      const r = Math.hypot(camera.position.x, camera.position.z);
+      if (r < R_CENTER) return ZONES[2];
+      if (camera.position.z > 10.5 && Math.abs(camera.position.x) < 8.5) return ZONES[0];
+      return ZONES[1];
+    }
+
+    function drawMinimap() {
+      const wrap = document.getElementById('minimap-wrap');
+      if (!wrap || wrap.offsetParent === null) return;
+      mmCtx.clearRect(0, 0, 136, 136);
+      const cx = 68, cy = 68;
+      const scale = 58 / R_OUT;
+
+      // Outer Circle
+      mmCtx.beginPath();
+      mmCtx.arc(cx, cy, R_OUT * scale, 0, Math.PI * 2);
+      mmCtx.fillStyle = activeZoneKey === 'walkway' ? 'rgba(219, 155, 77, 0.25)' : 'rgba(255,255,255,0.08)';
+      mmCtx.strokeStyle = 'rgba(255,255,255,0.4)';
+      mmCtx.fill(); mmCtx.stroke();
+
+      // Inner Center Room Circle
+      mmCtx.beginPath();
+      mmCtx.arc(cx, cy, R_CENTER * scale, 0, Math.PI * 2);
+      mmCtx.fillStyle = activeZoneKey === 'studio' ? 'rgba(219, 155, 77, 0.45)' : 'rgba(24,18,14,0.85)';
+      mmCtx.fill(); mmCtx.stroke();
+
+      // Player dot & direction
+      const px = cx + camera.position.x * scale;
+      const py = cy + camera.position.z * scale;
+      const rad = THREE.MathUtils.degToRad(yaw);
+
+      mmCtx.beginPath();
+      mmCtx.moveTo(px, py);
+      mmCtx.lineTo(px - Math.sin(rad) * 10, py - Math.cos(rad) * 10);
+      mmCtx.strokeStyle = '#ffd79a';
+      mmCtx.lineWidth = 2;
+      mmCtx.stroke();
+
+      mmCtx.beginPath();
+      mmCtx.arc(px, py, 3.5, 0, Math.PI * 2);
+      mmCtx.fillStyle = '#ff5e3a';
+      mmCtx.fill();
+    }
+
+    function renderZoneBar() {
+      const bar = document.getElementById('zone-bar');
+      bar.innerHTML = '';
+      for (const z of ZONES) {
+        const btn = document.createElement('button');
+        btn.className = 'zone-pill' + (z.key === activeZoneKey ? ' active' : '');
+        btn.textContent = lang === 'vi' ? z.labelVi : z.labelEn;
+        btn.addEventListener('click', () => {
+          if (isSeatedAtTable) standUpFromTable();
+          camera.position.set(z.spawn[0], PLAYER_HEIGHT, z.spawn[1]);
+          yaw = targetYaw = z.spawn[2];
+          pitch = targetPitch = 0;
+          velX = 0; velZ = 0;
+        });
+        bar.appendChild(btn);
+      }
+    }
+
+    // =========================================================================
+    // 10. Modals (Receptionist & Artwork)
+    // =========================================================================
+    const receptionModal = document.getElementById('reception-modal');
+    function openReceptionModal() { receptionModal.classList.add('open'); }
+    function closeReceptionModal() {
+      receptionModal.classList.remove('open');
+      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+    }
+    document.getElementById('btn-reception')?.addEventListener('click', openReceptionModal);
+    document.getElementById('btn-reception-close')?.addEventListener('click', closeReceptionModal);
+    document.getElementById('btn-reception-speak')?.addEventListener('click', () => {
+      if (!('speechSynthesis' in window)) return;
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(
+        'Chào mừng bạn đến với Bảo tàng Tranh dân gian Kim Hoàng. Bạn có thể xem video giới thiệu ngay tại quầy lễ tân, đi vòng quanh hành lang gỗ để ngắm tranh treo tường và nhấn vào từng bức để xem ý nghĩa, sau đó bước vào phòng kính ở chính giữa để trải nghiệm vẽ tranh cùng Ông Đồ.'
+      );
+      u.lang = 'vi-VN';
+      window.speechSynthesis.speak(u);
+    });
+
+    // =========================================================================
+    // 10b. Studio Artisan Greeting Dialogue (Nghệ nhân Đào Đình Chung chào mừng)
+    // =========================================================================
+    const STUDIO_DIALOGUE_DATA = {
+      vi: {
+        speaker: 'Nghệ nhân Đào Đình Chung',
+        badge: 'Nghệ nhân',
+        step1: 'Chào mừng bạn đến với trải nghiệm vẽ tranh dân gian Kim Hoàng!',
+        step1Btn: 'Tiếp tục ➔',
+        step2: 'Sau khi hoàn thiện bức tranh của mình, bạn hãy cùng treo tranh lên bức tường phía sau nhé. Mỗi bức tranh sẽ là một mảnh ghép nhỏ, góp phần tạo nên chữ Lưu Sắc Kim Hoàng. Và cũng từ đây, bạn sẽ trở thành một phần trong hành trình lưu giữ và lan tỏa sắc màu Kim Hoàng cùng chúng tôi.',
+        step2Btn: 'Đồng ý ✓'
+      },
+      en: {
+        speaker: 'Artisan Dao Dinh Chung',
+        badge: 'Master Artisan',
+        step1: 'Welcome to the Kim Hoang Folk Painting Workshop experience!',
+        step1Btn: 'Next ➔',
+        step2: "After completing your artwork, let's hang it on the wall behind! Each painting will be a small mosaic piece creating the words 'Lưu Sắc Kim Hoàng'. And together, you become part of the journey to preserve and spread the colors of Kim Hoang with us.",
+        step2Btn: 'Agree ✓'
+      }
+    };
+
+    function updateStudioDialogueUI() {
+      const d = STUDIO_DIALOGUE_DATA[lang] || STUDIO_DIALOGUE_DATA.vi;
+      const speakerEl = document.getElementById('studio-dialogue-speaker');
+      const badgeEl = document.getElementById('studio-dialogue-badge');
+      const textEl = document.getElementById('studio-dialogue-text');
+      const btnEl = document.getElementById('studio-dialogue-btn');
+      const dot1 = document.getElementById('studio-step-dot-1');
+      const dot2 = document.getElementById('studio-step-dot-2');
+
+      if (speakerEl) speakerEl.textContent = d.speaker;
+      if (badgeEl) badgeEl.textContent = d.badge;
+
+      if (studioDialogueStep === 1) {
+        if (textEl) textEl.textContent = d.step1;
+        if (btnEl) {
+          btnEl.textContent = d.step1Btn;
+          btnEl.classList.remove('agree-btn');
+        }
+        if (dot1) dot1.classList.add('active');
+        if (dot2) dot2.classList.remove('active');
+      } else {
+        if (textEl) textEl.textContent = d.step2;
+        if (btnEl) {
+          btnEl.textContent = d.step2Btn;
+          btnEl.classList.add('agree-btn');
+        }
+        if (dot1) dot1.classList.remove('active');
+        if (dot2) dot2.classList.add('active');
+      }
+    }
+
+    function openStudioDialogue() {
+      if (hasShownStudioGreeting) return;
+      hasShownStudioGreeting = true;
+
+      isStudioDialogueActive = true;
+      studioDialogueStep = 1;
+
+      // Stop player movement
+      velX = 0;
+      velZ = 0;
+      navTarget = null;
+      if (navRingGroup) navRingGroup.visible = false;
+
+      // Gently orient camera towards Ông Đồ & the painting table in the center
+      const dx = -camera.position.x;
+      const dz = -camera.position.z;
+      targetYaw = THREE.MathUtils.radToDeg(Math.atan2(-dx, -dz));
+      targetPitch = 0;
+
+      updateStudioDialogueUI();
+      const overlay = document.getElementById('studio-dialogue-overlay');
+      if (overlay) {
+        overlay.classList.remove('hidden');
+        overlay.classList.add('open');
+      }
+    }
+
+    function advanceStudioDialogue() {
+      if (studioDialogueStep === 1) {
+        studioDialogueStep = 2;
+        updateStudioDialogueUI();
+      } else {
+        closeStudioDialogue();
+      }
+    }
+
+    function closeStudioDialogue() {
+      isStudioDialogueActive = false;
+      const overlay = document.getElementById('studio-dialogue-overlay');
+      if (overlay) {
+        overlay.classList.remove('open');
+        setTimeout(() => {
+          if (!isStudioDialogueActive) overlay.classList.add('hidden');
+        }, 360);
+      }
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+    }
+
+    const studioBtn = document.getElementById('studio-dialogue-btn');
+    if (studioBtn) {
+      studioBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        advanceStudioDialogue();
+      });
+      studioBtn.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        advanceStudioDialogue();
+      });
+    }
+
+    const modalEl = document.getElementById('artwork-modal');
+    const modalImgEl = document.getElementById('modal-img');
+    const modalBodyEl = document.getElementById('modal-body');
+    const narrateBtn = document.getElementById('btn-narrate');
+    const bgAudio = document.getElementById('bg-audio');
+    const narratorAudio = document.getElementById('narrator-audio');
+
+    let currentOpenArtwork = null;
+
+    function renderArtworkModalContent() {
+      if (!currentOpenArtwork) return;
+      const ov = currentOpenArtwork;
+      const isVi = lang === 'vi';
+      const titleEl = document.getElementById('modal-title');
+      if (titleEl) {
+        titleEl.textContent = isVi 
+          ? (extractPaintingTitle(ov) || 'Thông tin tác phẩm')
+          : (ov.titleEn || extractPaintingTitle(ov) || 'Artwork Details');
+      }
+
+      const html = (isVi ? (ov.htmlVi || ov.htmlEn) : (ov.htmlEn || ov.htmlVi)) || '';
+      modalBodyEl.innerHTML = html || (isVi ? '<p>Tác phẩm tranh dân gian Kim Hoàng.</p>' : '<p>Kim Hoang folk art masterpiece.</p>');
+
+      const auds = ov.audios || [];
+      currentNarrationUrl = auds.length ? (isVi ? auds[0] : (auds[1] || auds[0])) : null;
+      narratorAudio.pause();
+      if (narrateBtn) {
+        if (currentNarrationUrl) {
+          narratorAudio.src = currentNarrationUrl;
+          narrateBtn.textContent = isVi ? '🔊 Nghe thuyết minh' : '🔊 Audio Narration';
+          narrateBtn.classList.add('visible');
+        } else {
+          narrateBtn.classList.remove('visible');
+        }
+      }
+    }
+
+    function openArtworkModal(ov) {
+      currentOpenArtwork = ov;
+      albumImages = ov.images || [];
+      albumIdx = 0;
+      modalImgEl.src = albumImages[0] || '';
+      document.getElementById('album-prev').style.display = albumImages.length > 1 ? 'block' : 'none';
+      document.getElementById('album-next').style.display = albumImages.length > 1 ? 'block' : 'none';
+
+      renderArtworkModalContent();
+      modalEl.classList.add('open');
+    }
+
+    function closeArtworkModal() {
+      modalEl.classList.remove('open');
+      currentOpenArtwork = null;
+      narratorAudio.pause();
+      if (audioEnabled) bgAudio.play().catch(() => {});
+    }
+
+    document.getElementById('close-modal')?.addEventListener('click', closeArtworkModal);
+    document.getElementById('album-prev')?.addEventListener('click', () => {
+      if (!albumImages.length) return;
+      albumIdx = (albumIdx - 1 + albumImages.length) % albumImages.length;
+      modalImgEl.src = albumImages[albumIdx];
+    });
+    document.getElementById('album-next')?.addEventListener('click', () => {
+      if (!albumImages.length) return;
+      albumIdx = (albumIdx + 1) % albumImages.length;
+      modalImgEl.src = albumImages[albumIdx];
+    });
+    narrateBtn?.addEventListener('click', () => {
+      if (!currentNarrationUrl) return;
+      if (narratorAudio.paused) {
+        bgAudio.pause();
+        narratorAudio.play().catch(() => {});
+      } else {
+        narratorAudio.pause();
+      }
+    });
+
+    // =========================================================================
+    // 11. Seated Kim Hoàng Painting Studio Mode & Smooth Main Loop
+    // =========================================================================
+    const khSidebarEl = document.getElementById('kh-sidebar');
+    const khLabelsEl = document.getElementById('kh-labels');
+    const khPrintHudEl = document.getElementById('kh-print-hud');
+    const khColorZoombarEl = document.getElementById('kh-color-zoombar');
+
+    function sitDownAtTable() {
+      if (!kimHoangStation || isSeatedAtTable) return;
+      if (isStudioDialogueActive) closeStudioDialogue();
+      isSeatedAtTable = true;
+      setHoverState('');
+      savedPose = {
+        x: camera.position.x, y: camera.position.y, z: camera.position.z,
+        yaw, pitch, fov: camera.fov
+      };
+
+      khSidebarEl.classList.remove('hidden');
+      khLabelsEl.classList.remove('hidden');
+      kimHoangStation.setSeated(true);
+    }
+
+    function standUpFromTable() {
+      if (!isSeatedAtTable) return;
+      isSeatedAtTable = false;
+      if (kimHoangStation) kimHoangStation.setSeated(false);
+
+      khSidebarEl.classList.add('hidden');
+      khLabelsEl.classList.add('hidden');
+      khPrintHudEl.classList.add('hidden');
+      khColorZoombarEl.classList.add('hidden');
+
+      if (savedPose) {
+        camera.position.set(savedPose.x, savedPose.y, savedPose.z);
+        yaw = targetYaw = savedPose.yaw;
+        pitch = targetPitch = savedPose.pitch;
+        velX = 0; velZ = 0;
+        camera.fov = savedPose.fov;
+        camera.updateProjectionMatrix();
+        savedPose = null;
+      }
+    }
+
+    document.getElementById('stand-up-btn')?.addEventListener('click', standUpFromTable);
+
+    function enterExhibition() {
+      document.getElementById('welcome-screen')?.classList.add('hidden');
+      if (audioEnabled) bgAudio.play().catch(() => {});
+      videoEl.play().catch(() => {});
+    }
+
+    document.getElementById('btn-enter')?.addEventListener('click', enterExhibition);
+
+    // Show Back to Site button if in standalone mode (not in iframe)
+    if (window.self === window.top) {
+      const backBtn = document.getElementById('btn-back-site');
+      if (backBtn) backBtn.style.display = 'inline-flex';
+    }
+
+    function teleportToZone(zoneKey) {
+      const z = ZONES.find((item) => item.key === zoneKey);
+      if (z) {
+        if (isSeatedAtTable) standUpFromTable();
+        camera.position.set(z.spawn[0], PLAYER_HEIGHT, z.spawn[1]);
+        yaw = targetYaw = z.spawn[2];
+        pitch = targetPitch = 0;
+        velX = 0; velZ = 0;
+      }
+    }
+
+    function goToWorkshop() {
+      if (isStudioDialogueActive) closeStudioDialogue();
+      teleportToZone('studio');
+      setTimeout(() => {
+        sitDownAtTable();
+      }, 350);
+    }
+
+    function applyExhibitionMode(mode) {
+      if (mode === 'workshop') {
+        goToWorkshop();
+      } else if (mode === 'tour') {
+        if (isSeatedAtTable) standUpFromTable();
+        teleportToZone('walkway');
+      }
+    }
+
+    // Listen for postMessage from parent iframe (e.g. /vi/visit/3d)
+    window.addEventListener('message', (ev) => {
+      if (!ev.data) return;
+      if (ev.data.type === 'kh-3d-mode') {
+        enterExhibition();
+        applyExhibitionMode(ev.data.mode);
+      }
+    });
+
+    // Check URL parameters
+    if (urlParams.get('lang') === 'en') {
+      lang = 'en';
+      setTimeout(() => updateLanguageUI(), 50);
+    }
+
+    // Ensure background music starts reliably upon any user interaction
+    const triggerBgAudio = () => {
+      if (audioEnabled && bgAudio.paused) {
+        bgAudio.play().catch(() => {});
+      }
+    };
+    window.addEventListener('click', triggerBgAudio);
+    window.addEventListener('touchstart', triggerBgAudio);
+    window.addEventListener('keydown', triggerBgAudio);
+
+    function updateLanguageUI() {
+      const isVi = lang === 'vi';
+      document.getElementById('btn-lang-vi')?.classList.toggle('active', isVi);
+      document.getElementById('btn-lang-en')?.classList.toggle('active', !isVi);
+
+      const audioLabel = document.getElementById('audio-label');
+      if (audioLabel) {
+        audioLabel.textContent = audioEnabled 
+          ? (isVi ? 'Nhạc' : 'Music') 
+          : (isVi ? 'Đã tắt' : 'Muted');
+      }
+
+      const enterBtn = document.getElementById('btn-enter');
+      if (enterBtn) {
+        enterBtn.textContent = isVi ? 'BƯỚC VÀO TRIỂN LÃM' : 'ENTER EXHIBITION';
+      }
+
+      const loadLabel = document.getElementById('loading-label');
+      if (loadLabel) {
+        loadLabel.textContent = isVi ? 'ĐANG TẢI KHÔNG GIAN BẢO TÀNG...' : 'LOADING 3D EXHIBITION...';
+      }
+
+      renderArtworkModalContent();
+      renderZoneBar();
+      if (isStudioDialogueActive) {
+        updateStudioDialogueUI();
+      }
+    }
+
+    function toggleAudio() {
+      audioEnabled = !audioEnabled;
+      const audioBtn = document.getElementById('btn-audio');
+      const audioIcon = document.getElementById('audio-icon');
+      const audioLabel = document.getElementById('audio-label');
+
+      if (audioEnabled) {
+        bgAudio.play().catch(() => {});
+        if (audioBtn) audioBtn.classList.remove('muted');
+        if (audioIcon) audioIcon.textContent = '🔊';
+        if (audioLabel) audioLabel.textContent = lang === 'vi' ? 'Nhạc' : 'Music';
+      } else {
+        bgAudio.pause();
+        narratorAudio.pause();
+        if (audioBtn) audioBtn.classList.add('muted');
+        if (audioIcon) audioIcon.textContent = '🔇';
+        if (audioLabel) audioLabel.textContent = lang === 'vi' ? 'Đã tắt' : 'Muted';
+      }
+    }
+
+    document.getElementById('btn-audio')?.addEventListener('click', toggleAudio);
+
+    document.getElementById('btn-lang-vi')?.addEventListener('click', () => {
+      lang = 'vi';
+      updateLanguageUI();
+    });
+
+    document.getElementById('btn-lang-en')?.addEventListener('click', () => {
+      lang = 'en';
+      updateLanguageUI();
+    });
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      const isMob = /Android|webOS|iPhone|iPad|iPod/i.test(navigator.userAgent) || (window.innerWidth < 820);
+      renderer.setPixelRatio(isMob ? Math.min(window.devicePixelRatio, 1.35) : Math.min(window.devicePixelRatio, 1.75));
+    });
+
+    const _seatCamPos = new THREE.Vector3();
+    const _seatLookTarget = new THREE.Vector3();
+
+    let lastTime = performance.now();
+    function animate(now) {
+      requestAnimationFrame(animate);
+      const dt = Math.min(0.05, (now - lastTime) / 1000);
+      lastTime = now;
+
+      if (receptionistMixer) {
+        receptionistMixer.update(dt);
+      } else if (receptionistGroup) {
+        receptionistGroup.position.y = Math.sin(now * 0.0022) * 0.012;
+      }
+
+      // Distance-based station update: Only run complex vertex deformation when player is near or seated
+      const distToCenter = Math.hypot(camera.position.x, camera.position.z);
+      if (kimHoangStation && (isSeatedAtTable || distToCenter < 9.5)) {
+        kimHoangStation.update(dt, now * 0.001);
+      }
+      if (mosaicRotator) mosaicRotator.update(dt);
+
+      if (isSeatedAtTable && kimHoangStation) {
+        const g = kimHoangStation.group;
+        const step = kimHoangStation.getStep();
+        const isPortrait = window.innerHeight > window.innerWidth;
+        let targetFov = 48;
+
+        if (step === 'color') {
+          const cv = kimHoangStation.getColorView?.() || { zoom: 1, panX: 0, panZ: 0 };
+          const baseFov = isPortrait ? 58 : 43;
+          targetFov = baseFov / Math.max(1, cv.zoom);
+          const zt = Math.min(1, Math.max(0, (cv.zoom - 1) / 1.2));
+          const panXm = cv.panX / 120;
+          const panZm = cv.panZ / 120;
+          _seatCamPos.set(0.0375 + panXm, isPortrait ? THREE.MathUtils.lerp(1.02, 0.97, zt) : 0.97, (isPortrait ? THREE.MathUtils.lerp(0.57, 0.47, zt) : 0.47) + panZm);
+          _seatLookTarget.set(0.0375 + panXm, isPortrait ? THREE.MathUtils.lerp(0.15, 0.36, zt) : 0.36, (isPortrait ? THREE.MathUtils.lerp(0.08, 0.056, zt) : 0.056) + panZm);
+        } else {
+          const panVal = isPortrait ? (kimHoangStation.getMobilePanValue?.() ?? 0) : 0;
+          const panCamX = !isPortrait ? 0.054 : (-0.037 + panVal * 0.23);
+          const panLookX = !isPortrait ? 0.029 : (-0.07 + panVal * 0.30);
+          _seatCamPos.set(panCamX, isPortrait ? 1.08 : 1.04, isPortrait ? 1.06 : 0.926);
+          _seatLookTarget.set(panLookX, isPortrait ? 0.14 : 0.355, isPortrait ? -0.04 : -0.073);
+          targetFov = isPortrait ? 64 : 48;
+        }
+
+        g.localToWorld(_seatCamPos);
+        g.localToWorld(_seatLookTarget);
+        camera.position.lerp(_seatCamPos, Math.min(1, dt * 8));
+        camera.lookAt(_seatLookTarget);
+        if (Math.abs(camera.fov - targetFov) > 0.1) {
+          camera.fov += (targetFov - camera.fov) * Math.min(1, dt * 8);
+          camera.updateProjectionMatrix();
+        }
+      } else {
+        if (isStudioDialogueActive) {
+          velX = 0;
+          velZ = 0;
+          navTarget = null;
+          if (navRingGroup) navRingGroup.visible = false;
+        } else {
+          if (keys['ArrowLeft'] || padState.left || keys['KeyQ'])   targetYaw += TURN_SPEED * dt;
+          if (keys['ArrowRight'] || padState.right || keys['KeyE']) targetYaw -= TURN_SPEED * dt;
+
+          let fwdInput = 0, strafeInput = 0;
+          if (keys['KeyW'] || keys['ArrowUp'] || padState.fwd)    fwdInput += 1;
+          if (keys['KeyS'] || keys['ArrowDown'] || padState.back) fwdInput -= 1;
+          if (keys['KeyD'] || padState.sr) strafeInput += 1;
+          if (keys['KeyA'] || padState.sl) strafeInput -= 1;
+
+          let targetVx = 0, targetVz = 0;
+          if (fwdInput !== 0 || strafeInput !== 0) {
+            navTarget = null;
+            if (navRingGroup) navRingGroup.visible = false;
+
+            const rad = THREE.MathUtils.degToRad(yaw);
+            const fx = -Math.sin(rad), fz = -Math.cos(rad);
+            const rx = Math.cos(rad),  rz = -Math.sin(rad);
+            const vx = fx * fwdInput + rx * strafeInput;
+            const vz = fz * fwdInput + rz * strafeInput;
+            const len = Math.hypot(vx, vz) || 1;
+            const speed = WALK_SPEED * ((keys['ShiftLeft'] || keys['ShiftRight']) ? SPRINT_MULT : 1);
+            targetVx = (vx / len) * speed;
+            targetVz = (vz / len) * speed;
+          } else if (navTarget) {
+            const dx = navTarget.x - camera.position.x;
+            const dz = navTarget.z - camera.position.z;
+            const dist = Math.hypot(dx, dz);
+            if (dist > 0.35) {
+              targetVx = (dx / dist) * WALK_SPEED;
+              targetVz = (dz / dist) * WALK_SPEED;
+
+              // Smoothly align camera orientation towards target direction
+              const angleToTarget = THREE.MathUtils.radToDeg(Math.atan2(-dx, -dz));
+              let diff = (angleToTarget - targetYaw) % 360;
+              if (diff > 180) diff -= 360;
+              if (diff < -180) diff += 360;
+              targetYaw += diff * Math.min(1, dt * 3.6);
+
+              if (navRingGroup && navRingGroup.visible) {
+                const pulse = 1 + Math.sin(now * 0.008) * 0.12;
+                navRingGroup.scale.set(pulse, 1, pulse);
+                navRingGroup.children[0].material.opacity = Math.min(0.90, dist * 0.50);
+                navRingGroup.children[1].material.opacity = Math.min(0.96, dist * 0.55);
+              }
+            } else {
+              navTarget = null;
+              if (navRingGroup) navRingGroup.visible = false;
+            }
+          }
+
+          const isDecel = (targetVx === 0 && targetVz === 0);
+          const moveLerp = 1 - Math.exp((isDecel ? -14 : -9) * dt);
+          velX += (targetVx - velX) * moveLerp;
+          velZ += (targetVz - velZ) * moveLerp;
+          const speedMag = Math.hypot(velX, velZ);
+
+          if (speedMag > 0.02) {
+            const [nx, nz] = resolvePosition(camera.position.x + velX * dt, camera.position.z + velZ * dt);
+            camera.position.x = nx;
+            camera.position.z = nz;
+            walkBob += dt * (3.8 + speedMag * 0.8);
+            camera.position.y = PLAYER_HEIGHT + Math.sin(walkBob) * 0.012 * Math.min(1, speedMag / WALK_SPEED);
+          } else {
+            camera.position.y += (PLAYER_HEIGHT - camera.position.y) * 0.15;
+          }
+        }
+
+        const rotLerp = 1 - Math.exp(-22 * dt);
+        yaw += (targetYaw - yaw) * rotLerp;
+        pitch += (targetPitch - pitch) * rotLerp;
+
+        const yRad = THREE.MathUtils.degToRad(yaw);
+        const pRad = THREE.MathUtils.degToRad(pitch);
+        camera.lookAt(
+          camera.position.x - Math.sin(yRad) * Math.cos(pRad),
+          camera.position.y + Math.sin(pRad),
+          camera.position.z - Math.cos(yRad) * Math.cos(pRad)
+        );
+
+        if (document.pointerLockElement === renderer.domElement) {
+          updateHover(0, 0);
+        }
+
+        const z = detectZone();
+        if (z.key !== activeZoneKey) {
+          activeZoneKey = z.key;
+          roomBadge.textContent = lang === 'vi' ? z.labelVi : z.labelEn;
+          renderZoneBar();
+        }
+
+        // Trigger Studio Greeting Dialogue on entry into Studio Room (Resets every page load/refresh)
+        const welcomeEl = document.getElementById('welcome-screen');
+        const hasEnteredExhibition = welcomeEl ? welcomeEl.classList.contains('hidden') : true;
+        const distFromCenter = Math.hypot(camera.position.x, camera.position.z);
+        const doorAng = Math.abs(Math.atan2(camera.position.z, -camera.position.x)); // 0 = West doorway (-X)
+        const isAtDoorway = (doorAng <= CENTER_DOOR_HALF + 0.15) && (distFromCenter < R_CENTER + 0.15);
+        const isInsideStudio = distFromCenter < (R_CENTER - 0.1);
+        if (hasEnteredExhibition && (isAtDoorway || isInsideStudio || activeZoneKey === 'studio') && !hasShownStudioGreeting && !isSeatedAtTable) {
+          openStudioDialogue();
+        }
+
+        drawMinimap();
+      }
+
+      renderer.render(scene, camera);
+    }
+
+    // =========================================================================
+    // 12. Initialize Circular Museum, Ông Đồ Table & Artworks
+    // =========================================================================
+    buildCircularMuseum();
+    renderZoneBar();
+    requestAnimationFrame(animate);
+
+    createKimHoangStation({
+      camera,
+      domElement: renderer.domElement,
+      maxAnisotropy,
+      basePath: './game',
+      onHangPainting: hangSharedPainting
+    }).then((station) => {
+      kimHoangStation = station;
+      interactTargetsDirty = true;
+      station.group.position.set(0, 0.025, 0);
+      station.group.rotation.y = -Math.PI / 2; // Face towards West doorway (-X, LEFT side)
+      station.group.scale.setScalar(1.38);
+      scene.add(station.group);
+      station.group.updateMatrixWorld(true);
+      stationLoaded = true;
+      checkAllReady();
+    }).catch((err) => {
+      console.error('Lỗi tải bàn vẽ Ông Đồ:', err);
+      stationLoaded = true;
+      checkAllReady();
+    });
+
+    fetch('tour-data.json')
+      .then((r) => r.json())
+      .then((data) => {
+        placeCircularPaintings(data);
+        tourDataLoaded = true;
+        checkAllReady();
+      })
+      .catch((err) => {
+        console.error('Lỗi tải tour-data.json:', err);
+        tourDataLoaded = true;
+        checkAllReady();
+      });
+  </script>
+</body>
+</html>
