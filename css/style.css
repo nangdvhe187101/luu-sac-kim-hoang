@@ -20788,6 +20788,10 @@ header.header-shell,
 .header-shell__logo {
   --logo-height: 2.85rem !important;
   overflow: visible !important;
+  width: fit-content !important;
+  max-width: fit-content !important;
+  flex: 0 0 auto !important;
+  justify-self: start !important;
 }
 
 .header-shell__logo .logo-brand {
@@ -20795,6 +20799,7 @@ header.header-shell,
   max-height: none !important;
   position: relative !important;
   inset: auto !important;
+  width: fit-content !important;
 }
 
 .header-shell__logo .logo-brand__icon {
@@ -20806,10 +20811,16 @@ header.header-shell,
 }
 
 @media (min-width: 80rem) {
+  .header-shell__inner {
+    grid-template-columns: auto 1fr !important;
+  }
   .header-shell__logo {
     --logo-height: 3.15rem !important;
     display: flex !important;
     align-items: center !important;
+    width: fit-content !important;
+    max-width: fit-content !important;
+    justify-self: start !important;
   }
   .header-shell__logo .logo-brand__icon {
     height: 3.15rem !important;
