@@ -38,6 +38,15 @@
   ],
   "headers": [
     {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options", "value": "SAMEORIGIN" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" }
+      ]
+    },
+    {
       "source": "/(.*)\\.(css|js|webp|png|jpg|jpeg|svg|woff|woff2|ttf|otf|mp3|mp4|glb)",
       "headers": [
         {
