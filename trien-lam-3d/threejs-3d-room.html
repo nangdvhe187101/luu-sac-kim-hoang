@@ -1326,7 +1326,7 @@
     const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
     renderer.setSize(window.innerWidth, window.innerHeight);
     const maxDPR = isMobileDevice 
-      ? Math.min(window.devicePixelRatio, 1.35) 
+      ? Math.min(window.devicePixelRatio, 1.25) 
       : Math.min(window.devicePixelRatio, 1.75);
     renderer.setPixelRatio(maxDPR);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -1347,7 +1347,7 @@
     const dirLight = new THREE.DirectionalLight(0xfff5e6, 0.58);
     dirLight.position.set(6, 16, 16);
     dirLight.castShadow = true;
-    const shadowRes = isMobileDevice ? 1024 : 1536;
+    const shadowRes = isMobileDevice ? 512 : 1536;
     dirLight.shadow.mapSize.set(shadowRes, shadowRes);
     dirLight.shadow.camera.near = 2;
     dirLight.shadow.camera.far = 48;
@@ -3002,12 +3002,18 @@
     function resolvePosition(px, pz) {
       let x = px, z = pz;
 
-      // 1. Clamp inside outer circular wall (R_OUT)
+      // 1. Clamp inside outer circular wall (R_OUT) with smooth sliding velocity
       const rOut = Math.hypot(x, z);
       const maxR = R_OUT - PLAYER_RADIUS - 0.20;
-      if (rOut > maxR) {
+      if (rOut > maxR && rOut > 1e-4) {
         const k = maxR / rOut;
         x *= k; z *= k;
+        const normX = x / maxR, normZ = z / maxR;
+        const radVel = velX * normX + velZ * normZ;
+        if (radVel > 0) {
+          velX -= radVel * normX;
+          velZ -= radVel * normZ;
+        }
       }
 
       // 2. Center circular room wall (R_CENTER) with West doorway opening (-X, LEFT side)
@@ -3015,15 +3021,26 @@
       const ang = Math.atan2(z, -x); // 0 = -X West doorway
       const inDoorwayArc = Math.abs(ang) <= CENTER_DOOR_HALF;
 
-      if (!inDoorwayArc) {
+      if (!inDoorwayArc && rCent > 1e-4) {
         const minOut = R_CENTER + PLAYER_RADIUS;
         const maxIn = R_CENTER - PLAYER_RADIUS;
+        const normX = x / rCent, normZ = z / rCent;
+        const radVel = velX * normX + velZ * normZ;
+
         if (rCent >= R_CENTER && rCent < minOut) {
           const k = minOut / rCent;
           x *= k; z *= k;
+          if (radVel < 0) {
+            velX -= radVel * normX;
+            velZ -= radVel * normZ;
+          }
         } else if (rCent < R_CENTER && rCent > maxIn) {
           const k = maxIn / rCent;
           x *= k; z *= k;
+          if (radVel > 0) {
+            velX -= radVel * normX;
+            velZ -= radVel * normZ;
+          }
         }
       }
 
@@ -3048,10 +3065,15 @@
 
       // 3. Center Ông Đồ table collider (around (0, 0) with radius 1.55)
       const distTable = Math.hypot(x, z);
-      if (distTable < 1.55) {
-        const k = 1.55 / Math.max(0.01, distTable);
-        x = x * k;
-        z = z * k;
+      if (distTable < 1.55 && distTable > 1e-4) {
+        const k = 1.55 / distTable;
+        x *= k; z *= k;
+        const normX = x / 1.55, normZ = z / 1.55;
+        const radVel = velX * normX + velZ * normZ;
+        if (radVel < 0) {
+          velX -= radVel * normX;
+          velZ -= radVel * normZ;
+        }
       }
 
       // 4. Push out of reception desk & corridor benches
@@ -3164,6 +3186,7 @@
     const activeTouches = new Map();
     let initialPinchDist = null;
     let initialPinchFov = 65;
+    let lastPointerX = 0, lastPointerY = 0;
 
     renderer.domElement.addEventListener('pointerdown', (e) => {
       if (isSeatedAtTable) return;
@@ -3185,7 +3208,8 @@
 
       if (lookPointerId !== null) return;
       lookPointerId = e.pointerId;
-      sx = e.clientX; sy = e.clientY;
+      sx = lastPointerX = e.clientX;
+      sy = lastPointerY = e.clientY;
       syaw = targetYaw; spitch = targetPitch;
       pointerStartTime = performance.now();
       try { renderer.domElement.setPointerCapture?.(e.pointerId); } catch (_) {}
@@ -3215,16 +3239,19 @@
       }
 
       if (lookPointerId === e.pointerId) {
-        const dx = e.clientX - sx;
-        const dy = e.clientY - sy;
-        const distMoved = Math.hypot(dx, dy);
+        const deltaX = e.clientX - lastPointerX;
+        const deltaY = e.clientY - lastPointerY;
+        lastPointerX = e.clientX;
+        lastPointerY = e.clientY;
+
+        const totalMoved = Math.hypot(e.clientX - sx, e.clientY - sy);
 
         // Small dead-zone threshold so a clean finger tap doesn't jitter camera angle
-        const deadZone = (e.pointerType === 'touch') ? 6 : 2;
-        if (distMoved > deadZone) {
-          const sens = (e.pointerType === 'touch' ? 0.22 : 0.16) * (camera.fov / 65);
-          targetYaw = syaw - dx * sens;
-          targetPitch = Math.max(-75, Math.min(75, spitch - dy * sens));
+        const deadZone = (e.pointerType === 'touch') ? 5 : 2;
+        if (totalMoved > deadZone) {
+          const sens = (e.pointerType === 'touch' ? 0.18 : 0.14) * (camera.fov / 65);
+          targetYaw -= deltaX * sens;
+          targetPitch = Math.max(-75, Math.min(75, targetPitch - deltaY * sens));
         }
       } else if (lookPointerId === null && e.pointerType !== 'touch') {
         updateHover(e.clientX, e.clientY);
@@ -4041,7 +4068,7 @@
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
       const isMob = /Android|webOS|iPhone|iPad|iPod/i.test(navigator.userAgent) || (window.innerWidth < 820);
-      renderer.setPixelRatio(isMob ? Math.min(window.devicePixelRatio, 1.35) : Math.min(window.devicePixelRatio, 1.75));
+      renderer.setPixelRatio(isMob ? Math.min(window.devicePixelRatio, 1.25) : Math.min(window.devicePixelRatio, 1.75));
     });
 
     const _seatCamPos = new THREE.Vector3();
@@ -4134,15 +4161,19 @@
             const dz = navTarget.z - camera.position.z;
             const dist = Math.hypot(dx, dz);
             if (dist > 0.35) {
-              targetVx = (dx / dist) * WALK_SPEED;
-              targetVz = (dz / dist) * WALK_SPEED;
+              const curSpeed = (dist < 1.0) ? (WALK_SPEED * Math.max(0.35, dist / 1.0)) : WALK_SPEED;
+              targetVx = (dx / dist) * curSpeed;
+              targetVz = (dz / dist) * curSpeed;
 
-              // Smoothly align camera orientation towards target direction
-              const angleToTarget = THREE.MathUtils.radToDeg(Math.atan2(-dx, -dz));
-              let diff = (angleToTarget - targetYaw) % 360;
-              if (diff > 180) diff -= 360;
-              if (diff < -180) diff += 360;
-              targetYaw += diff * Math.min(1, dt * 3.6);
+              // Only auto-align orientation if user is NOT actively touching/swiping the screen!
+              // And only when sufficiently far from target (dist > 1.2m) to avoid sudden 180-degree flip!
+              if (lookPointerId === null && dist > 1.2) {
+                const angleToTarget = THREE.MathUtils.radToDeg(Math.atan2(-dx, -dz));
+                let diff = (angleToTarget - targetYaw) % 360;
+                if (diff > 180) diff -= 360;
+                if (diff < -180) diff += 360;
+                targetYaw += diff * Math.min(1, dt * 2.0);
+              }
 
               if (navRingGroup && navRingGroup.visible) {
                 const pulse = 1 + Math.sin(now * 0.008) * 0.12;
@@ -4167,13 +4198,13 @@
             camera.position.x = nx;
             camera.position.z = nz;
             walkBob += dt * (3.8 + speedMag * 0.8);
-            camera.position.y = PLAYER_HEIGHT + Math.sin(walkBob) * 0.012 * Math.min(1, speedMag / WALK_SPEED);
+            camera.position.y = PLAYER_HEIGHT + Math.sin(walkBob) * (isMobileDevice ? 0.003 : 0.008) * Math.min(1, speedMag / WALK_SPEED);
           } else {
             camera.position.y += (PLAYER_HEIGHT - camera.position.y) * 0.15;
           }
         }
 
-        const rotLerp = 1 - Math.exp(-22 * dt);
+        const rotLerp = 1 - Math.exp((isMobileDevice ? -26 : -22) * dt);
         yaw += (targetYaw - yaw) * rotLerp;
         pitch += (targetPitch - pitch) * rotLerp;
 
