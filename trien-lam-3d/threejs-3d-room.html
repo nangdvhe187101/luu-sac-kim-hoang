@@ -197,31 +197,32 @@
       box-shadow: 0 2px 10px rgba(216, 150, 72, 0.4);
     }
 
-    /* Top-left Home Button (Always visible on all screen sizes) */
+    /* Top-left Home Button (Always visible on all screen sizes, highest priority) */
     .lskh-home-btn {
       position: fixed;
-      top: 16px;
-      left: 16px;
-      z-index: 120;
+      top: 14px;
+      left: 14px;
+      z-index: 1000000;
       display: inline-flex;
       align-items: center;
-      gap: 8px;
+      gap: 7px;
       padding: 8px 16px;
-      background: rgba(22, 14, 10, 0.88);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(243, 193, 120, 0.65);
+      background: #b41818;
+      border: 1.5px solid #ffe08a;
       border-radius: 999px;
-      color: #ffe08a;
+      color: #ffffff;
       font-family: 'Montserrat', system-ui, -apple-system, sans-serif;
       font-size: 13px;
-      font-weight: 600;
+      font-weight: 700;
       letter-spacing: 0.3px;
       text-decoration: none;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 10px rgba(180, 24, 24, 0.3);
-      transition: all 0.25s ease;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.6), 0 0 10px rgba(180, 24, 24, 0.4);
+      transition: all 0.2s ease;
       pointer-events: auto;
       cursor: pointer;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
     }
     .lskh-home-btn svg {
       width: 16px;
@@ -229,12 +230,12 @@
       stroke: #ffe08a;
       transition: transform 0.2s ease;
     }
-    .lskh-home-btn:hover {
-      background: #b41818;
-      border-color: #ffd584;
-      color: #fff;
-      transform: translateY(-1px);
-      box-shadow: 0 6px 22px rgba(180, 24, 24, 0.65);
+    .lskh-home-btn:hover, .lskh-home-btn:active {
+      background: #8f1212;
+      border-color: #ffffff;
+      color: #ffe08a;
+      transform: scale(1.04);
+      box-shadow: 0 6px 22px rgba(180, 24, 24, 0.7);
     }
     .lskh-home-btn:hover svg {
       stroke: #fff;
@@ -242,11 +243,11 @@
     }
     @media (max-width: 640px) {
       .lskh-home-btn {
-        top: 12px;
-        left: 12px;
-        padding: 6px 12px;
+        top: 10px;
+        left: 10px;
+        padding: 6px 13px;
         font-size: 12px;
-        gap: 6px;
+        gap: 5px;
       }
       .lskh-home-btn svg {
         width: 14px;
@@ -3776,6 +3777,48 @@
     });
     checkOrientation();
 
+    // Instant Back to Home Handler (Frees WebGL and audio threads for immediate navigation)
+    let isExiting = false;
+    let animId = null;
+
+    function fastReturnHome(e) {
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      if (isExiting) return;
+      isExiting = true;
+      if (animId) {
+        try { cancelAnimationFrame(animId); } catch (_) {}
+      }
+
+      // Stop audio & video immediately so browser thread is completely unblocked
+      try {
+        if (bgAudio) {
+          bgAudio.pause();
+          bgAudio.currentTime = 0;
+          bgAudio.src = '';
+        }
+      } catch (_) {}
+      try {
+        if (videoEl) {
+          videoEl.pause();
+          videoEl.currentTime = 0;
+          videoEl.src = '';
+        }
+      } catch (_) {}
+
+      // Fast location transition directly to homepage
+      window.location.replace('/');
+    }
+
+    const homeBtn = document.getElementById('btn-back-home');
+    if (homeBtn) {
+      homeBtn.addEventListener('pointerdown', (e) => e.stopPropagation());
+      homeBtn.addEventListener('touchstart', (e) => e.stopPropagation(), { passive: true });
+      homeBtn.addEventListener('click', fastReturnHome);
+    }
+
     // Ensure background music starts reliably upon any user interaction
     const triggerBgAudio = () => {
       if (audioEnabled && bgAudio.paused) {
@@ -3877,7 +3920,8 @@
 
     let lastTime = performance.now();
     function animate(now) {
-      requestAnimationFrame(animate);
+      if (isExiting) return;
+      animId = requestAnimationFrame(animate);
       const dt = Math.min(0.05, (now - lastTime) / 1000);
       lastTime = now;
 
@@ -4045,7 +4089,7 @@
     // =========================================================================
     buildCircularMuseum();
     renderZoneBar();
-    requestAnimationFrame(animate);
+    animId = requestAnimationFrame(animate);
 
     createKimHoangStation({
       camera,

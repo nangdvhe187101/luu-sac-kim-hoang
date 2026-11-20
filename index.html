@@ -692,256 +692,62 @@
                         </div>
                     </section>
 
+                                        <!-- ======================================================= -->
+                    <!-- 4B. 3D TOUR SECTION (BẢO TÀNG SỐ 3D)                    -->
                     <!-- ======================================================= -->
-                    <!-- 4B. FLAGSHIP 3D EXHIBITION SPOTLIGHT                    -->
-                    <!-- ======================================================= -->
-                    <style>
-                        .kh-3d-spotlight-wrap {
-                            position: relative;
-                            border-radius: 18px;
-                            overflow: hidden;
-                            background: linear-gradient(135deg, #240806 0%, #6b110d 48%, #1d0705 100%);
-                            border: 1.5px solid rgba(255, 224, 138, 0.42);
-                            box-shadow: 0 24px 60px rgba(42, 10, 6, 0.28);
-                        }
-                        .kh-3d-spotlight-wrap::before {
-                            content: "";
-                            position: absolute;
-                            inset: 0;
-                            background-image: url('/images/header-do-paper.webp');
-                            background-repeat: repeat;
-                            background-size: 320px auto;
-                            opacity: 0.16;
-                            pointer-events: none;
-                        }
-                        .kh-3d-spotlight-grid {
-                            position: relative;
-                            z-index: 2;
-                            display: grid;
-                            grid-template-columns: 1fr;
-                            gap: 28px;
-                            padding: 28px 22px;
-                            align-items: center;
-                        }
-                        @media (min-width: 1024px) {
-                            .kh-3d-spotlight-grid {
-                                grid-template-columns: 1.08fr 1fr;
-                                gap: 40px;
-                                padding: 48px 52px;
-                            }
-                        }
-                        .kh-3d-pill {
-                            display: inline-flex;
-                            align-items: center;
-                            gap: 8px;
-                            padding: 6px 14px;
-                            border-radius: 999px;
-                            background: rgba(255, 224, 138, 0.14);
-                            border: 1px solid rgba(255, 224, 138, 0.45);
-                            color: #ffe08a;
-                            font-size: 11px;
-                            font-weight: 700;
-                            letter-spacing: 0.12em;
-                            text-transform: uppercase;
-                        }
-                        .kh-3d-pill-dot {
-                            width: 8px;
-                            height: 8px;
-                            border-radius: 999px;
-                            background: #ffd166;
-                            box-shadow: 0 0 0 4px rgba(255, 209, 102, 0.28);
-                        }
-                        .kh-3d-spotlight-title {
-                            margin-top: 16px;
-                            color: #fff8eb;
-                            font-size: clamp(1.75rem, 3.2vw, 2.75rem);
-                            line-height: 1.18;
-                            font-weight: 600;
-                        }
-                        .kh-3d-spotlight-title span {
-                            color: #ffe08a;
-                        }
-                        .kh-3d-spotlight-desc {
-                            margin-top: 14px;
-                            color: rgba(255, 244, 224, 0.9);
-                            font-size: 15px;
-                            line-height: 1.7;
-                        }
-                        .kh-3d-stats {
-                            display: grid;
-                            grid-template-columns: repeat(3, minmax(0, 1fr));
-                            gap: 10px;
-                            margin-top: 22px;
-                        }
-                        .kh-3d-stat {
-                            padding: 12px 10px;
-                            border-radius: 10px;
-                            background: rgba(15, 5, 3, 0.42);
-                            border: 1px solid rgba(255, 224, 138, 0.22);
-                            text-align: center;
-                        }
-                        .kh-3d-stat-val {
-                            display: block;
-                            color: #ffe08a;
-                            font-size: 18px;
-                            font-weight: 700;
-                            line-height: 1.2;
-                        }
-                        .kh-3d-stat-lbl {
-                            display: block;
-                            margin-top: 4px;
-                            color: rgba(255, 248, 235, 0.85);
-                            font-size: 11px;
-                            line-height: 1.3;
-                        }
-                        .kh-3d-ctas {
-                            display: flex;
-                            flex-wrap: wrap;
-                            gap: 12px;
-                            margin-top: 26px;
-                        }
-                        .kh-3d-cta-primary {
-                            display: inline-flex;
-                            align-items: center;
-                            gap: 8px;
-                            padding: 13px 24px;
-                            border-radius: 999px;
-                            background: linear-gradient(135deg, #ffe08a 0%, #e5b24c 100%);
-                            color: #3d0906;
-                            font-size: 14px;
-                            font-weight: 700;
-                            letter-spacing: 0.03em;
-                            text-decoration: none;
-                            box-shadow: 0 10px 28px rgba(255, 209, 102, 0.32);
-                            transition: transform 0.2s ease, box-shadow 0.2s ease;
-                        }
-                        .kh-3d-cta-primary:hover {
-                            transform: translateY(-2px);
-                            box-shadow: 0 14px 34px rgba(255, 209, 102, 0.48);
-                        }
-                        .kh-3d-cta-secondary {
-                            display: inline-flex;
-                            align-items: center;
-                            gap: 8px;
-                            padding: 13px 22px;
-                            border-radius: 999px;
-                            background: rgba(255, 255, 255, 0.08);
-                            border: 1px solid rgba(255, 224, 138, 0.5);
-                            color: #fff8eb;
-                            font-size: 14px;
-                            font-weight: 600;
-                            text-decoration: none;
-                            transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
-                        }
-                        .kh-3d-cta-secondary:hover {
-                            background: rgba(255, 224, 138, 0.18);
-                            border-color: #ffe08a;
-                            transform: translateY(-2px);
-                        }
-                        .kh-3d-preview-card {
-                            position: relative;
-                            display: block;
-                            border-radius: 14px;
-                            overflow: hidden;
-                            border: 1.5px solid rgba(255, 224, 138, 0.45);
-                            background: #140906;
-                            aspect-ratio: 16 / 10;
-                            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
-                        }
-                        .kh-3d-preview-card img {
-                            width: 100%;
-                            height: 100%;
-                            object-fit: cover;
-                            transition: transform 0.6s ease;
-                        }
-                        .kh-3d-preview-card:hover img {
-                            transform: scale(1.05);
-                        }
-                        .kh-3d-preview-overlay {
-                            position: absolute;
-                            inset: 0;
-                            background: linear-gradient(180deg, rgba(16, 6, 4, 0.12) 0%, rgba(16, 6, 4, 0.58) 100%);
-                            display: flex;
-                            flex-direction: column;
-                            align-items: center;
-                            justify-content: center;
-                            gap: 10px;
-                        }
-                        .kh-3d-play-ring {
-                            width: 66px;
-                            height: 66px;
-                            border-radius: 999px;
-                            background: rgba(180, 24, 24, 0.88);
-                            border: 2px solid #ffe08a;
-                            color: #ffe08a;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            box-shadow: 0 0 0 10px rgba(255, 224, 138, 0.16);
-                            transition: transform 0.25s ease, background 0.25s ease;
-                        }
-                        .kh-3d-preview-card:hover .kh-3d-play-ring {
-                            transform: scale(1.08);
-                            background: #b41818;
-                        }
-                        .kh-3d-preview-tag {
-                            padding: 5px 14px;
-                            border-radius: 999px;
-                            background: rgba(18, 8, 5, 0.78);
-                            border: 1px solid rgba(255, 224, 138, 0.5);
-                            color: #ffe08a;
-                            font-size: 12px;
-                            font-weight: 600;
-                            backdrop-filter: blur(6px);
-                        }
-                    </style>
-                    <section class="container mb-8 md:mb-12" aria-label="Triển lãm thực tế ảo 3D Tranh Kim Hoàng">
-                        <div class="kh-3d-spotlight-wrap">
-                            <div class="kh-3d-spotlight-grid">
+                    <section class="container mb-8 md:mb-12" aria-label="3D Tour Bảo Tàng Tranh Kim Hoàng">
+                        <div class="mb-6 md:mb-8">
+                            <div class="flex items-center justify-between mb-4">
+                                <h2 class="text-neutral-900 text-xl md:text-3xl font-serif tracking-[0.2em] uppercase font-bold">
+                                    3D TOUR
+                                </h2>
+                                <a href="/3d" class="text-xs md:text-sm text-neutral-600 hover:text-black font-semibold uppercase tracking-wider flex items-center gap-1.5 transition-colors">
+                                    <span>Trải nghiệm ngay</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-up-right">
+                                        <path d="M7 7h10v10"></path>
+                                        <path d="M7 17 17 7"></path>
+                                    </svg>
+                                </a>
+                            </div>
+                            <div class="border-t border-neutral-300 w-full"></div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+                            <div class="md:col-span-5 flex flex-col justify-center">
+                                <h3 class="text-xl md:text-2xl font-bold font-serif text-neutral-900 mb-3 uppercase tracking-wide">
+                                    Bảo Tàng Số Tranh Kim Hoàng
+                                </h3>
+                                <p class="text-neutral-600 text-sm md:text-base leading-relaxed mb-6">
+                                    Không gian thực tế ảo 3D đưa người xem dạo bước chiêm ngưỡng bộ sưu tập tranh giấy đỏ Kim Hoàng, gặp gỡ nghệ nhân Đào Đình Chung và tự tay in mộc bản, tô màu tranh truyền thống.
+                                </p>
                                 <div>
-                                    <span class="kh-3d-pill">
-                                        <span class="kh-3d-pill-dot" aria-hidden="true"></span>
-                                        <span>TRẢI NGHIỆM NỔI BẬT · BẢO TÀNG SỐ 3D</span>
-                                    </span>
-                                    <h2 class="kh-3d-spotlight-title font-serif">
-                                        Triển Lãm Thực Tế Ảo 3D <span>Tranh Kim Hoàng</span>
-                                    </h2>
-                                    <p class="kh-3d-spotlight-desc">
-                                        Dạo bước qua 25 điểm đứng 360° sống động trong bảo tàng số, chiêm ngưỡng từng kiệt tác giấy hồng điều và tự tay in mộc bản, tô màu, ký tên rồi treo tác phẩm lên bức tường Lưu Sắc Kim Hoàng.
-                                    </p>
-                                    <div class="kh-3d-stats">
-                                        <div class="kh-3d-stat">
-                                            <span class="kh-3d-stat-val font-serif">25</span>
-                                            <span class="kh-3d-stat-lbl">Điểm đứng 360°</span>
-                                        </div>
-                                        <div class="kh-3d-stat">
-                                            <span class="kh-3d-stat-val font-serif">3D</span>
-                                            <span class="kh-3d-stat-lbl">Xưởng làm tranh tương tác</span>
-                                        </div>
-                                        <div class="kh-3d-stat">
-                                            <span class="kh-3d-stat-val font-serif">VI / EN</span>
-                                            <span class="kh-3d-stat-lbl">Song ngữ &amp; Âm thanh</span>
-                                        </div>
-                                    </div>
-                                    <div class="kh-3d-ctas">
-                                        <a class="kh-3d-cta-primary" href="/3d">
-                                            <span>Khám Phá Triển Lãm 3D Ngay</span>
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
-                                        </a>
-                                        <a class="kh-3d-cta-secondary" href="/3d?mode=workshop">
-                                            <span>Vào Xưởng Làm Tranh 3D</span>
-                                        </a>
-                                    </div>
+                                    <a href="/3d" class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#b41818] text-white font-semibold text-sm hover:bg-[#8f1212] transition-all shadow-sm">
+                                        <span>Khám phá 3D Tour</span>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                                            <polyline points="12 5 19 12 12 19"></polyline>
+                                        </svg>
+                                    </a>
                                 </div>
-                                <div>
-                                    <a class="kh-3d-preview-card" href="/3d" aria-label="Mở Triển Lãm Thực Tế Ảo 3D Tranh Kim Hoàng">
-                                        <img src="/trien-lam-3d/skin/museum-map-3d.png" alt="Không gian bảo tàng số 3D Tranh dân gian Kim Hoàng" loading="lazy" decoding="async" />
-                                        <div class="kh-3d-preview-overlay">
-                                            <div class="kh-3d-play-ring" aria-hidden="true">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"></polygon></svg>
+                            </div>
+                            <div class="md:col-span-7">
+                                <div class="group block overflow-hidden rounded-lg shadow-sm hover:shadow-xl transition-all duration-300">
+                                    <a class="kh-card-media block relative aspect-16/9 bg-neutral-900 overflow-hidden" href="/3d">
+                                        <img src="/trien-lam-3d/skin/museum-map-3d.png" alt="Không gian bảo tàng số 3D Tranh dân gian Kim Hoàng" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" decoding="async" />
+                                        <div class="absolute inset-0 bg-black/25 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+                                            <div class="w-14 h-14 rounded-full bg-[#b41818] text-[#ffe08a] flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"></polygon></svg>
                                             </div>
-                                            <span class="kh-3d-preview-tag">Nhấn để bước vào không gian 360°</span>
                                         </div>
+                                    </a>
+                                    <a class="kh-card-bar flex items-center justify-between gap-2 px-4 py-3.5" href="/3d">
+                                        <span class="kh-card-title min-w-0 truncate text-sm font-bold uppercase tracking-wider md:text-base">
+                                            KHÁM PHÁ KHÔNG GIAN BẢO TÀNG SỐ 3D
+                                        </span>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-up-right shrink-0" style="color:#fdecd2;">
+                                            <path d="M7 7h10v10"></path>
+                                            <path d="M7 17 17 7"></path>
+                                        </svg>
                                     </a>
                                 </div>
                             </div>
