@@ -802,7 +802,7 @@
   </div>
 
   <!-- Top-left Back to Home Button -->
-  <a id="btn-back-home" href="/" class="lskh-home-btn" title="Quay lại trang chủ Lưu Sắc Kim Hoàng">
+  <a id="btn-back-home" href="/" onclick="fastReturnHome(event);" class="lskh-home-btn" title="Quay lại trang chủ Lưu Sắc Kim Hoàng">
     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
       <polyline points="9 22 9 12 15 12 15 22"/>
@@ -3781,13 +3781,13 @@
     let isExiting = false;
     let animId = null;
 
-    function fastReturnHome(e) {
-      if (e) {
-        e.preventDefault();
-        e.stopPropagation();
-      }
+    window.fastReturnHome = function(e) {
       if (isExiting) return;
       isExiting = true;
+      if (e) {
+        try { e.preventDefault(); } catch (_) {}
+        try { e.stopPropagation(); } catch (_) {}
+      }
       if (animId) {
         try { cancelAnimationFrame(animId); } catch (_) {}
       }
@@ -3807,16 +3807,24 @@
           videoEl.src = '';
         }
       } catch (_) {}
+      try {
+        if (renderer) {
+          renderer.setAnimationLoop(null);
+          renderer.dispose();
+          if (renderer.domElement && renderer.domElement.parentNode) {
+            renderer.domElement.parentNode.removeChild(renderer.domElement);
+          }
+        }
+      } catch (_) {}
 
       // Fast location transition directly to homepage
-      window.location.replace('/');
-    }
+      window.location.href = '/';
+    };
 
     const homeBtn = document.getElementById('btn-back-home');
     if (homeBtn) {
       homeBtn.addEventListener('pointerdown', (e) => e.stopPropagation());
       homeBtn.addEventListener('touchstart', (e) => e.stopPropagation(), { passive: true });
-      homeBtn.addEventListener('click', fastReturnHome);
     }
 
     // Ensure background music starts reliably upon any user interaction
