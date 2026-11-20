@@ -224,17 +224,16 @@
       padding: 24px 16px 56px;
     }
     .ht-sheet {
-      max-width: 1180px;
+      max-width: 960px;
       margin: 0 auto;
       background-color: #ffffff;
-      padding: 36px 40px 56px;
+      padding: 36px 48px 56px;
       box-shadow: 0 4px 28px rgba(0, 0, 0, 0.04);
     }
     .ht-layout {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) 290px;
-      gap: 40px;
-      align-items: stretch;
+      display: block;
+      max-width: 860px;
+      margin: 0 auto;
     }
     .breadcrumb {
       font-size: 14px !important;
@@ -340,6 +339,14 @@
       align-items: center;
       justify-content: space-between;
       gap: 12px;
+      flex-wrap: nowrap;
+    }
+    #ht-stage-step {
+      white-space: nowrap !important;
+      flex-shrink: 0 !important;
+      min-width: 50px;
+      text-align: center;
+      display: inline-block;
     }
     .ht-nav-btn {
       padding: 9px 16px;
@@ -353,6 +360,8 @@
       color: #1f1a17;
       cursor: pointer;
       transition: all 0.2s;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
     .ht-nav-btn:hover:not(:disabled) {
       border-color: #9e1c1c;
@@ -370,6 +379,16 @@
     .ht-nav-btn:disabled {
       opacity: 0.4;
       cursor: not-allowed;
+    }
+    @media (max-width: 480px) {
+      .ht-nav-btn {
+        padding: 8px 10px;
+        font-size: 11px;
+        letter-spacing: 0.04em;
+      }
+      .ht-stage-nav {
+        gap: 8px;
+      }
     }
     .ht-sidebar-box {
       border: 1px solid #c9c3b8;
@@ -456,18 +475,10 @@
 
           <div class="ht-stage-nav">
             <button id="ht-stage-prev" type="button" class="ht-nav-btn">&larr; Giai đoạn trước</button>
-            <span id="ht-stage-step" class="text-xs font-semibold uppercase tracking-widest" style="color: #625b55;"></span>
+            <span id="ht-stage-step" class="text-xs font-semibold uppercase tracking-widest whitespace-nowrap shrink-0" style="color: #625b55; white-space: nowrap;"></span>
             <button id="ht-stage-next" type="button" class="ht-nav-btn primary">Giai đoạn tiếp &rarr;</button>
           </div>
         </div>
-
-        <!-- Right Sidebar: 7 Stages -->
-        <aside aria-label="7 giai đoạn hành trình">
-          <div class="ht-sidebar-box">
-            <h2 class="ht-sidebar-heading font-serif">7 Giai Đoạn Hành Trình</h2>
-            <ol id="ht-sidebar-list" class="ht-sidebar-list"></ol>
-          </div>
-        </aside>
       </div>
     </div>
   </div>
@@ -487,18 +498,20 @@
 
       let currentStage = 0;
 
-      // Build sidebar items 1..7
-      CHAPTERS.forEach((ch, idx) => {
-        const li = document.createElement('li');
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'ht-sidebar-btn';
-        btn.textContent = (idx + 1) + '. ' + ch.title;
-        btn.setAttribute('data-stage-idx', String(idx));
-        btn.addEventListener('click', () => selectStage(idx, true));
-        li.appendChild(btn);
-        sidebarListEl.appendChild(li);
-      });
+      // Build sidebar items 1..7 (if present)
+      if (sidebarListEl) {
+        CHAPTERS.forEach((ch, idx) => {
+          const li = document.createElement('li');
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'ht-sidebar-btn';
+          btn.textContent = (idx + 1) + '. ' + ch.title;
+          btn.setAttribute('data-stage-idx', String(idx));
+          btn.addEventListener('click', () => selectStage(idx, true));
+          li.appendChild(btn);
+          sidebarListEl.appendChild(li);
+        });
+      }
 
       function renderGallery(ch) {
         const imgs = ch.images || [];
@@ -563,9 +576,11 @@
         stageNextBtn.disabled = idx === CHAPTERS.length - 1;
         stageStepEl.textContent = (idx + 1) + ' / ' + CHAPTERS.length;
 
-        sidebarListEl.querySelectorAll('.ht-sidebar-btn').forEach((btn, i) => {
-          btn.classList.toggle('active', i === idx);
-        });
+        if (sidebarListEl) {
+          sidebarListEl.querySelectorAll('.ht-sidebar-btn').forEach((btn, i) => {
+            btn.classList.toggle('active', i === idx);
+          });
+        }
 
         try { history.replaceState(null, '', '#phan-' + (idx + 1)); } catch (e) {}
         if (shouldScroll) {
