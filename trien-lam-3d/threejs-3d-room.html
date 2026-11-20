@@ -2741,20 +2741,11 @@
       return tex;
     }
 
-    function placeCircularPaintings(data) {
-      const seen = new Set();
+    function placeCircularPaintings() {
       const artworks = [];
-      for (const p of Object.values(data.panoramas || {})) {
-        for (const o of p.overlays || []) {
-          if (!o.isNav && o.images && o.images.length > 0) {
-            const key = o.images[0];
-            if (seen.has(key)) continue;
-            // Exclude ALL yellow album introduction banners and any non-Kim Hoang artwork
-            if (key.includes('album_') || !key.startsWith('tranh/')) continue;
-            seen.add(key);
-            artworks.push(o);
-          }
-        }
+      for (let i = 1; i <= 49; i++) {
+        const num = String(i).padStart(2, '0');
+        artworks.push({ images: ['tranh/tranh-' + num + '.webp'] });
       }
 
       // Prioritize iconic Kim Hoàng masterworks to display them at prominent locations
@@ -4121,18 +4112,9 @@
       checkAllReady();
     });
 
-    fetch('tour-data.json')
-      .then((r) => r.json())
-      .then((data) => {
-        placeCircularPaintings(data);
-        tourDataLoaded = true;
-        checkAllReady();
-      })
-      .catch((err) => {
-        console.error('Lỗi tải tour-data.json:', err);
-        tourDataLoaded = true;
-        checkAllReady();
-      });
+    placeCircularPaintings();
+    tourDataLoaded = true;
+    checkAllReady();
   </script>
 </body>
 </html>
