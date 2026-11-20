@@ -1342,13 +1342,15 @@
     renderer.setSize(window.innerWidth, window.innerHeight);
     const maxDPR = isMobileDevice 
       ? Math.min(window.devicePixelRatio, 1.25) 
-      : Math.min(window.devicePixelRatio, 1.75);
-    renderer.setPixelRatio(maxDPR);
+      : Math.min(window.devicePixelRatio, 1.5);
+    // Start conservative (1.0 phone / 1.25 desktop); adaptResolution() raises or lowers it from real FPS
+    let _adaptDPR = Math.min(maxDPR, isMobileDevice ? 1.0 : 1.25);
+    renderer.setPixelRatio(_adaptDPR);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 0.92;
     renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = isMobileDevice ? THREE.BasicShadowMap : THREE.PCFSoftShadowMap;
+    renderer.shadowMap.type = isMobileDevice ? THREE.BasicShadowMap : THREE.PCFShadowMap;
     container.appendChild(renderer.domElement);
 
     const maxAnisotropy = Math.min(renderer.capabilities.getMaxAnisotropy(), isMobileDevice ? 2 : 4);
@@ -1362,7 +1364,7 @@
     const dirLight = new THREE.DirectionalLight(0xfff5e6, 0.58);
     dirLight.position.set(6, 16, 16);
     dirLight.castShadow = true;
-    const shadowRes = isMobileDevice ? 512 : 1536;
+    const shadowRes = isMobileDevice ? 512 : 1024;
     dirLight.shadow.mapSize.set(shadowRes, shadowRes);
     dirLight.shadow.camera.near = 2;
     dirLight.shadow.camera.far = 48;
@@ -4083,8 +4085,28 @@
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
       const isMob = /Android|webOS|iPhone|iPad|iPod/i.test(navigator.userAgent) || (window.innerWidth < 820);
-      renderer.setPixelRatio(isMob ? Math.min(window.devicePixelRatio, 1.25) : Math.min(window.devicePixelRatio, 1.75));
+      renderer.setPixelRatio(_adaptDPR);
     });
+
+    // Adaptive resolution: if the scene runs below ~40 fps, render at lower resolution; if there is headroom, raise it again.
+    const _minDPR = 0.75;
+    let _ceilDPR = maxDPR, _adaptAcc = 0, _adaptN = 0, _adaptCool = 0;
+    function adaptResolution(ms) {
+      if (ms > 250) return; // ignore tab switches / loading hitches
+      _adaptAcc += ms; _adaptN++;
+      if (_adaptN < 45) return;
+      const avg = _adaptAcc / _adaptN;
+      _adaptAcc = 0; _adaptN = 0;
+      if (_adaptCool > 0) { _adaptCool--; return; }
+      let next = _adaptDPR;
+      if (avg > 25) {
+        next = Math.max(_minDPR, _adaptDPR - 0.25);
+        if (next < _adaptDPR) _ceilDPR = Math.min(_ceilDPR, _adaptDPR); // don't climb back to a level that was too slow
+      } else if (avg < 18 && _adaptDPR < _ceilDPR) {
+        next = Math.min(_ceilDPR, _adaptDPR + 0.25);
+      }
+      if (next !== _adaptDPR) { _adaptDPR = next; renderer.setPixelRatio(_adaptDPR); _adaptCool = 1; }
+    }
 
     const _seatCamPos = new THREE.Vector3();
     const _seatLookTarget = new THREE.Vector3();
@@ -4093,8 +4115,10 @@
     function animate(now) {
       if (isExiting) return;
       animId = requestAnimationFrame(animate);
-      const dt = Math.min(0.05, (now - lastTime) / 1000);
+      const rawMs = now - lastTime;
+      const dt = Math.min(0.05, rawMs / 1000);
       lastTime = now;
+      adaptResolution(rawMs);
 
       if (receptionistMixer) {
         receptionistMixer.update(dt);
