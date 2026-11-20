@@ -21086,6 +21086,33 @@ header.header-shell,
   color: #921311;
   border: 1px solid rgba(212, 175, 55, 0.6);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22);
+  width: 48px !important;
+  height: 48px !important;
+  min-width: 48px !important;
+  min-height: 48px !important;
+  max-width: 48px !important;
+  max-height: 48px !important;
+  aspect-ratio: 1 / 1 !important;
+  border-radius: 50% !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+  flex-shrink: 0 !important;
+  line-height: 1 !important;
+  text-align: center !important;
+}
+
+@media (min-width: 768px) {
+  .kh-card-badge {
+    width: 56px !important;
+    height: 56px !important;
+    min-width: 56px !important;
+    min-height: 56px !important;
+    max-width: 56px !important;
+    max-height: 56px !important;
+  }
 }
 
 .kh-card-bar {
