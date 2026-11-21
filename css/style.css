@@ -22604,11 +22604,15 @@ html {
   pointer-events: none !important;
 }
 
-/* 3D tour card: giữ nguyên tỉ lệ 16:9 của ảnh, không cắt chữ/nút */
-.kh-card-media--3d {
-  aspect-ratio: 16 / 9;
-  background-color: #1a0907;
-}
-.kh-card-media--3d img {
-  object-fit: contain;
-}
+/* 3D tour card */
+.kh-3d-hero{display:grid;grid-template-columns:1fr 1.1fr;align-items:center;gap:1.5rem;padding:2rem 2rem 0;background:#f3ecdd;color:#3a1410;overflow:hidden;min-height:300px}
+.kh-3d-hero__eyebrow{font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;color:#921311;font-weight:700;margin:0 0 .5rem}
+.kh-3d-hero__title{font-family:inherit;font-size:1.6rem;line-height:1.25;font-weight:700;margin:0 0 .75rem}
+.kh-3d-hero__desc{font-size:.95rem;line-height:1.55;margin:0 0 1.25rem;color:#5a3a33}
+.kh-3d-hero__btn{display:inline-block;background:#b21816;color:#fdecd2;padding:.6rem 1.1rem;font-weight:700;font-size:.85rem;letter-spacing:.06em;text-transform:uppercase;border-radius:4px}
+.kh-3d-hero:hover .kh-3d-hero__btn{background:#921311}
+.kh-3d-hero__art{display:flex;align-items:flex-end;justify-content:center;gap:.5rem;align-self:end}
+.kh-3d-hero__art img{width:30%;height:auto;display:block;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.kh-3d-hero__art img:nth-child(2){width:36%;margin-bottom:1.25rem}
+.kh-3d-hero__art img:nth-child(1),.kh-3d-hero__art img:nth-child(3){margin-bottom:0;transform:translateY(12%)}
+@media (max-width:640px){.kh-3d-hero{grid-template-columns:1fr;padding:1.5rem 1.25rem 0}.kh-3d-hero__title{font-size:1.3rem}}
