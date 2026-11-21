@@ -22616,3 +22616,49 @@ html {
 .kh-3d-hero__art img:nth-child(2){width:36%;margin-bottom:1.25rem}
 .kh-3d-hero__art img:nth-child(1),.kh-3d-hero__art img:nth-child(3){margin-bottom:0;transform:translateY(12%)}
 @media (max-width:640px){.kh-3d-hero{grid-template-columns:1fr;padding:1.5rem 1.25rem 0}.kh-3d-hero__title{font-size:1.3rem}}
+
+/* Hộp kết quả tìm kiếm nhanh: dễ đọc hơn, nhất là trên điện thoại */
+.header-search-dropdown__title {
+  white-space: normal;
+  text-overflow: clip;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  font-size: 1.0625rem;
+  line-height: 1.35;
+}
+.header-search-dropdown__excerpt {
+  -webkit-line-clamp: 2;
+  font-size: .9375rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.header-search-dropdown__heading {
+  padding: .875rem 1rem .625rem;
+}
+.header-search-dropdown__link {
+  padding: .875rem 1rem;
+  gap: .25rem;
+}
+.header-search-dropdown__footer {
+  padding: .875rem 1rem;
+}
+@media (max-width: 39.99rem) {
+  /* ô tìm kiếm trên điện thoại hẹp: cho hộp kết quả rộng gần hết màn hình */
+  .header-search-dropdown {
+    width: calc(100vw - 1rem);
+    max-width: none;
+    left: 0;
+    right: auto;
+    max-height: min(32rem, calc(100vh - 7rem));
+  }
+}
+@media (min-width: 40rem) and (max-width: 79.99rem) {
+  /* màn hình vừa: canh phải theo ô tìm kiếm để hộp kết quả không tràn ra ngoài màn hình */
+  .header-search-dropdown {
+    left: auto;
+    right: 0;
+  }
+}

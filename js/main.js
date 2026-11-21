@@ -107,7 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
 function initGlobalFooter() {
   const container = document.getElementById('site-footer-container');
   if (container && (!container.firstElementChild || container.firstElementChild.tagName !== 'FOOTER')) {
-    fetch('/footer.html')
+    fetch(getSiteLang() === 'en' ? '/en/footer.html' : '/footer.html')
       .then(res => res.ok ? res.text() : '')
       .then(html => {
         if (html) {
@@ -397,11 +397,36 @@ function initMobileMenu() {
  * Helper: Get current site language ('vi' | 'en')
  */
 function getSiteLang() {
-  try {
-    const saved = localStorage.getItem('lskh_lang');
-    if (saved === 'en' || saved === 'vi') return saved;
-  } catch (e) {}
-  return document.documentElement.lang === 'en' ? 'en' : 'vi';
+  // Ngôn ngữ do URL quyết định: /en/... là tiếng Anh, còn lại là tiếng Việt.
+  return /^\/en(\/|$)/.test(window.location.pathname) ? 'en' : 'vi';
+}
+
+/** Tiền tố đường dẫn theo ngôn ngữ hiện tại: '/en' hoặc '/vi' */
+function langPrefix() {
+  return getSiteLang() === 'en' ? '/en' : '/vi';
+}
+
+/** Đổi URL nội bộ dạng /vi/... sang /en/... khi đang ở bản tiếng Anh */
+function localizeUrl(url) {
+  if (getSiteLang() !== 'en' || typeof url !== 'string') return url;
+  if (url === '/' || url === '/vi' || url === '/vi/') return '/en/';
+  return url.startsWith('/vi/') ? '/en/' + url.slice(4) : url;
+}
+
+/** URL của cùng trang ở ngôn ngữ còn lại (giữ query và hash) */
+function counterpartUrl(targetLang) {
+  const { pathname, search, hash } = window.location;
+  let p = pathname;
+  if (targetLang === 'en') {
+    if (p === '/' || p === '/vi' || p === '/vi/') p = '/en/';
+    else if (p.startsWith('/vi/')) p = '/en/' + p.slice(4);
+    else return null;
+  } else {
+    if (p === '/en' || p === '/en/') p = '/';
+    else if (p.startsWith('/en/')) p = '/vi/' + p.slice(4);
+    else return null;
+  }
+  return p + search + hash;
 }
 
 /**
@@ -478,7 +503,7 @@ function initSearch() {
     function goToSearchPage() {
       const q = input.value.trim();
       if (q) {
-        window.location.href = `/vi/search?q=${encodeURIComponent(q)}`;
+        window.location.href = `${langPrefix()}/search?q=${encodeURIComponent(q)}`;
       } else {
         input.focus();
       }
@@ -523,10 +548,25 @@ function initSearch() {
     });
   });
 
+  /** Trên điện thoại: canh hộp kết quả sát hai mép màn hình, không tràn ra ngoài */
+  function placeSearchDropdown(dd) {
+    if (!dd) return;
+    if (window.innerWidth >= 640) { dd.style.marginLeft = ''; return; }
+    dd.style.marginLeft = '0px';
+    const r = dd.getBoundingClientRect();
+    dd.style.marginLeft = (8 - r.left) + 'px';
+  }
+  window.addEventListener('resize', () => {
+    document.querySelectorAll('.header-search-dropdown').forEach(d => {
+      if (d.style.display !== 'none') placeSearchDropdown(d);
+    });
+  });
+
   async function performSearch(query, dropdown) {
     const isEn = getSiteLang() === 'en';
     try {
       dropdown.style.display = 'flex';
+      placeSearchDropdown(dropdown);
       dropdown.innerHTML = `
         <h3 class="header-search-dropdown__heading">${isEn ? 'Search Results' : 'Kết quả tìm kiếm'}</h3>
         <div class="header-search-dropdown__body">
@@ -553,7 +593,7 @@ function initSearch() {
         const highlightedExcerpt = (doc.excerpt || '').replace(qRegex, '<mark>$1</mark>');
         return `
           <li class="header-search-dropdown__item">
-            <a class="header-search-dropdown__link" href="${doc.url}">
+            <a class="header-search-dropdown__link" href="${localizeUrl(doc.url)}">
               <span class="header-search-dropdown__title">${highlightedTitle}</span>
               <p class="header-search-dropdown__excerpt">${highlightedExcerpt}</p>
             </a>
@@ -568,7 +608,7 @@ function initSearch() {
             ${listHtml}
           </ul>
         </div>
-        <a class="header-search-dropdown__footer" href="/vi/search?q=${encodeURIComponent(query)}">
+        <a class="header-search-dropdown__footer" href="${langPrefix()}/search?q=${encodeURIComponent(query)}">
           ${isEn ? 'View all results for' : 'Xem tất cả kết quả cho'} <span class="header-search-dropdown__footer-query">"${query}"</span> →
         </a>
       `;
@@ -651,7 +691,7 @@ function initSearchPage() {
         const highlightedExcerpt = (doc.excerpt || '').replace(qRegex, '<mark>$1</mark>');
         return `
           <li class="search-page__item">
-            <a class="search-page__link" href="${doc.url}">
+            <a class="search-page__link" href="${localizeUrl(doc.url)}">
               <div class="search-page__meta">
                 <span class="search-page__badge search-page__badge--events">${doc.category || doc.badge || (isEn ? 'Article' : 'Bài viết')}</span>
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right search-page__arrow" aria-hidden="true">
@@ -946,7 +986,7 @@ function initLanguageTabs() {
   async function loadEnDict() {
     if (enDict) return enDict;
     if (!enDictPromise) {
-      enDictPromise = fetch('/js/i18n-en.json?v=3')
+      enDictPromise = fetch('/js/i18n-en.json?v=6')
         .then(r => (r.ok ? r.json() : {}))
         .then(data => {
           enDict = data || {};
@@ -1094,9 +1134,6 @@ function initLanguageTabs() {
 
   async function applySiteLanguage(lang) {
     document.documentElement.lang = lang;
-    try {
-      localStorage.setItem('lskh_lang', lang);
-    } catch (e) {}
 
     // Update all VI/EN toggle buttons across desktop & mobile drawer
     document.querySelectorAll('.locale-tabs__tab').forEach(tab => {
@@ -1127,7 +1164,13 @@ function initLanguageTabs() {
     const activate = () => {
       const targetLang = tab.textContent.trim().toLowerCase();
       if (targetLang === 'en' || targetLang === 'vi') {
-        applySiteLanguage(targetLang);
+        if (targetLang === getSiteLang()) return;
+        const dest = counterpartUrl(targetLang);
+        if (dest) {
+          window.location.href = dest;
+        } else {
+          applySiteLanguage(targetLang);
+        }
       }
     };
     tab.addEventListener('click', activate);
@@ -1467,7 +1510,7 @@ function initCreativeProducts() {
     applyFilter(urlFilter);
   }
 
-  document.querySelectorAll('a[href*="/vi/services/souvenirs?filter="]').forEach(a => {
+  document.querySelectorAll('a[href*="/services/souvenirs?filter="]').forEach(a => {
     a.addEventListener('click', (e) => {
       const u = new URL(a.href, window.location.origin);
       const f = u.searchParams.get('filter');
@@ -1526,7 +1569,7 @@ function initCreativeProducts() {
         if (!item || !item.url) return;
         const a = document.createElement('a');
         a.className = 'creative-modal__ext';
-        a.href = item.url;
+        a.href = localizeUrl(item.url);
         a.target = '_blank';
         a.rel = 'noopener noreferrer';
         a.textContent = item.label || 'Xem thêm';

@@ -56,25 +56,6 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  if (req.method === 'POST' && safePath === '/api/save-preview') {
-    let body = '';
-    req.on('data', chunk => { body += chunk; });
-    req.on('end', () => {
-      try {
-        const parsed = JSON.parse(body);
-        const base64Data = (parsed.data || '').replace(/^data:image\/\w+;base64,/, '');
-        const buffer = Buffer.from(base64Data, 'base64');
-        fs.writeFileSync(path.join(ROOT_DIR, 'images/kham-pha-3d-moi.jpg'), buffer);
-        res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
-        res.end(JSON.stringify({ ok: true, size: buffer.length }));
-      } catch (err) {
-        res.writeHead(500, { 'Content-Type': 'application/json; charset=utf-8' });
-        res.end(JSON.stringify({ error: err.message }));
-      }
-    });
-    return;
-  }
-
   if (safePath.startsWith('/api/') || safePath === '/api') {
     res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
     res.end(JSON.stringify({ user: null }));
@@ -188,13 +169,17 @@ function serveFile(filePath, req, res, stats) {
   if (isHtml) {
     try {
       let htmlContent = fs.readFileSync(filePath, 'utf8');
-      const footerPath = path.join(ROOT_DIR, 'footer.html');
+      const isEnPage = path.relative(ROOT_DIR, filePath).split(path.sep)[0] === 'en';
+      const footerPath = path.join(ROOT_DIR, isEnPage ? 'en/footer.html' : 'footer.html');
       if (fs.existsSync(footerPath)) {
         const footerHtml = fs.readFileSync(footerPath, 'utf8');
         if (htmlContent.includes('id="site-footer-container"')) {
+          // Thay cả khối <footer>...</footer> (không dừng ở thẻ </div> đầu tiên bên trong footer,
+          // nếu không phần đuôi footer cũ sẽ bị sót lại và hiện thành footer thứ hai)
+          const containerWithFooter = /<div id="site-footer-container">\s*<footer[\s\S]*?<\/footer>\s*<\/div>/;
           htmlContent = htmlContent.replace(
-            /<div id="site-footer-container">[\s\S]*?<\/div>/,
-            `<div id="site-footer-container">${footerHtml}</div>`
+            containerWithFooter.test(htmlContent) ? containerWithFooter : /<div id="site-footer-container">\s*<\/div>/,
+            () => `<div id="site-footer-container">${footerHtml}</div>`
           );
         } else if (htmlContent.includes('<!-- INCLUDE:FOOTER -->')) {
           htmlContent = htmlContent.replace('<!-- INCLUDE:FOOTER -->', footerHtml);

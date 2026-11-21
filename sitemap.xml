@@ -1,68 +1,228 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://www.luusackimhoang.com/</loc>
     <lastmod>2026-11-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://www.luusackimhoang.com/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.luusackimhoang.com/en/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.luusackimhoang.com/"/>
+  </url>
+  <url>
+    <loc>https://www.luusackimhoang.com/en/</loc>
+    <lastmod>2026-11-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://www.luusackimhoang.com/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.luusackimhoang.com/en/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.luusackimhoang.com/"/>
   </url>
   <url>
     <loc>https://www.luusackimhoang.com/vi/introduction</loc>
     <lastmod>2026-11-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://www.luusackimhoang.com/vi/introduction"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.luusackimhoang.com/en/introduction"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.luusackimhoang.com/vi/introduction"/>
+  </url>
+  <url>
+    <loc>https://www.luusackimhoang.com/en/introduction</loc>
+    <lastmod>2026-11-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://www.luusackimhoang.com/vi/introduction"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.luusackimhoang.com/en/introduction"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.luusackimhoang.com/vi/introduction"/>
   </url>
   <url>
     <loc>https://www.luusackimhoang.com/vi/introduction/nghe-nhan</loc>
     <lastmod>2026-11-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://www.luusackimhoang.com/vi/introduction/nghe-nhan"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.luusackimhoang.com/en/introduction/nghe-nhan"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.luusackimhoang.com/vi/introduction/nghe-nhan"/>
+  </url>
+  <url>
+    <loc>https://www.luusackimhoang.com/en/introduction/nghe-nhan</loc>
+    <lastmod>2026-11-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://www.luusackimhoang.com/vi/introduction/nghe-nhan"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.luusackimhoang.com/en/introduction/nghe-nhan"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.luusackimhoang.com/vi/introduction/nghe-nhan"/>
   </url>
   <url>
     <loc>https://www.luusackimhoang.com/vi/introduction/nghe-nhan/dao-dinh-chung</loc>
     <lastmod>2026-11-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://www.luusackimhoang.com/vi/introduction/nghe-nhan/dao-dinh-chung"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.luusackimhoang.com/en/introduction/nghe-nhan/dao-dinh-chung"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.luusackimhoang.com/vi/introduction/nghe-nhan/dao-dinh-chung"/>
+  </url>
+  <url>
+    <loc>https://www.luusackimhoang.com/en/introduction/nghe-nhan/dao-dinh-chung</loc>
+    <lastmod>2026-11-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://www.luusackimhoang.com/vi/introduction/nghe-nhan/dao-dinh-chung"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.luusackimhoang.com/en/introduction/nghe-nhan/dao-dinh-chung"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.luusackimhoang.com/vi/introduction/nghe-nhan/dao-dinh-chung"/>
   </url>
   <url>
     <loc>https://www.luusackimhoang.com/vi/introduction/nghe-nhan/nguyen-thi-thu-hoa</loc>
     <lastmod>2026-11-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://www.luusackimhoang.com/vi/introduction/nghe-nhan/nguyen-thi-thu-hoa"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.luusackimhoang.com/en/introduction/nghe-nhan/nguyen-thi-thu-hoa"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.luusackimhoang.com/vi/introduction/nghe-nhan/nguyen-thi-thu-hoa"/>
+  </url>
+  <url>
+    <loc>https://www.luusackimhoang.com/en/introduction/nghe-nhan/nguyen-thi-thu-hoa</loc>
+    <lastmod>2026-11-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://www.luusackimhoang.com/vi/introduction/nghe-nhan/nguyen-thi-thu-hoa"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.luusackimhoang.com/en/introduction/nghe-nhan/nguyen-thi-thu-hoa"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.luusackimhoang.com/vi/introduction/nghe-nhan/nguyen-thi-thu-hoa"/>
   </url>
   <url>
     <loc>https://www.luusackimhoang.com/vi/introduction/doi-tac</loc>
     <lastmod>2026-11-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://www.luusackimhoang.com/vi/introduction/doi-tac"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.luusackimhoang.com/en/introduction/doi-tac"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.luusackimhoang.com/vi/introduction/doi-tac"/>
+  </url>
+  <url>
+    <loc>https://www.luusackimhoang.com/en/introduction/doi-tac</loc>
+    <lastmod>2026-11-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://www.luusackimhoang.com/vi/introduction/doi-tac"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.luusackimhoang.com/en/introduction/doi-tac"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.luusackimhoang.com/vi/introduction/doi-tac"/>
   </url>
   <url>
     <loc>https://www.luusackimhoang.com/vi/introduction/doi-tac/nha-tai-tro</loc>
     <lastmod>2026-11-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://www.luusackimhoang.com/vi/introduction/doi-tac/nha-tai-tro"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.luusackimhoang.com/en/introduction/doi-tac/nha-tai-tro"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.luusackimhoang.com/vi/introduction/doi-tac/nha-tai-tro"/>
+  </url>
+  <url>
+    <loc>https://www.luusackimhoang.com/en/introduction/doi-tac/nha-tai-tro</loc>
+    <lastmod>2026-11-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://www.luusackimhoang.com/vi/introduction/doi-tac/nha-tai-tro"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.luusackimhoang.com/en/introduction/doi-tac/nha-tai-tro"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.luusackimhoang.com/vi/introduction/doi-tac/nha-tai-tro"/>
   </url>
   <url>
     <loc>https://www.luusackimhoang.com/vi/introduction/doi-tac/bao-tro-truyen-thong</loc>
     <lastmod>2026-11-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://www.luusackimhoang.com/vi/introduction/doi-tac/bao-tro-truyen-thong"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.luusackimhoang.com/en/introduction/doi-tac/bao-tro-truyen-thong"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.luusackimhoang.com/vi/introduction/doi-tac/bao-tro-truyen-thong"/>
+  </url>
+  <url>
+    <loc>https://www.luusackimhoang.com/en/introduction/doi-tac/bao-tro-truyen-thong</loc>
+    <lastmod>2026-11-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://www.luusackimhoang.com/vi/introduction/doi-tac/bao-tro-truyen-thong"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.luusackimhoang.com/en/introduction/doi-tac/bao-tro-truyen-thong"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.luusackimhoang.com/vi/introduction/doi-tac/bao-tro-truyen-thong"/>
   </url>
   <url>
     <loc>https://www.luusackimhoang.com/vi/visit</loc>
     <lastmod>2026-11-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://www.luusackimhoang.com/vi/visit"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.luusackimhoang.com/en/visit"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.luusackimhoang.com/vi/visit"/>
+  </url>
+  <url>
+    <loc>https://www.luusackimhoang.com/en/visit</loc>
+    <lastmod>2026-11-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://www.luusackimhoang.com/vi/visit"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.luusackimhoang.com/en/visit"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.luusackimhoang.com/vi/visit"/>
   </url>
   <url>
     <loc>https://www.luusackimhoang.com/vi/visit/tranh</loc>
     <lastmod>2026-11-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://www.luusackimhoang.com/vi/visit/tranh"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.luusackimhoang.com/en/visit/tranh"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.luusackimhoang.com/vi/visit/tranh"/>
+  </url>
+  <url>
+    <loc>https://www.luusackimhoang.com/en/visit/tranh</loc>
+    <lastmod>2026-11-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://www.luusackimhoang.com/vi/visit/tranh"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.luusackimhoang.com/en/visit/tranh"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.luusackimhoang.com/vi/visit/tranh"/>
   </url>
   <url>
     <loc>https://www.luusackimhoang.com/vi/visit/hanh-trinh</loc>
     <lastmod>2026-11-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://www.luusackimhoang.com/vi/visit/hanh-trinh"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.luusackimhoang.com/en/visit/hanh-trinh"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.luusackimhoang.com/vi/visit/hanh-trinh"/>
+  </url>
+  <url>
+    <loc>https://www.luusackimhoang.com/en/visit/hanh-trinh</loc>
+    <lastmod>2026-11-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://www.luusackimhoang.com/vi/visit/hanh-trinh"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.luusackimhoang.com/en/visit/hanh-trinh"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.luusackimhoang.com/vi/visit/hanh-trinh"/>
   </url>
   <url>
     <loc>https://www.luusackimhoang.com/vi/visit/hanh-trinh/chi-tiet</loc>
     <lastmod>2026-11-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://www.luusackimhoang.com/vi/visit/hanh-trinh/chi-tiet"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.luusackimhoang.com/en/visit/hanh-trinh/chi-tiet"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.luusackimhoang.com/vi/visit/hanh-trinh/chi-tiet"/>
+  </url>
+  <url>
+    <loc>https://www.luusackimhoang.com/en/visit/hanh-trinh/chi-tiet</loc>
+    <lastmod>2026-11-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://www.luusackimhoang.com/vi/visit/hanh-trinh/chi-tiet"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.luusackimhoang.com/en/visit/hanh-trinh/chi-tiet"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.luusackimhoang.com/vi/visit/hanh-trinh/chi-tiet"/>
   </url>
   <url>
     <loc>https://www.luusackimhoang.com/vi/services</loc>
     <lastmod>2026-11-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://www.luusackimhoang.com/vi/services"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.luusackimhoang.com/en/services"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.luusackimhoang.com/vi/services"/>
+  </url>
+  <url>
+    <loc>https://www.luusackimhoang.com/en/services</loc>
+    <lastmod>2026-11-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://www.luusackimhoang.com/vi/services"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.luusackimhoang.com/en/services"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.luusackimhoang.com/vi/services"/>
   </url>
   <url>
     <loc>https://www.luusackimhoang.com/vi/services/souvenirs</loc>
     <lastmod>2026-11-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://www.luusackimhoang.com/vi/services/souvenirs"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.luusackimhoang.com/en/services/souvenirs"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.luusackimhoang.com/vi/services/souvenirs"/>
+  </url>
+  <url>
+    <loc>https://www.luusackimhoang.com/en/services/souvenirs</loc>
+    <lastmod>2026-11-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://www.luusackimhoang.com/vi/services/souvenirs"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.luusackimhoang.com/en/services/souvenirs"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.luusackimhoang.com/vi/services/souvenirs"/>
   </url>
   <url>
     <loc>https://www.luusackimhoang.com/vi/events</loc>
     <lastmod>2026-11-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://www.luusackimhoang.com/vi/events"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.luusackimhoang.com/en/events"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.luusackimhoang.com/vi/events"/>
+  </url>
+  <url>
+    <loc>https://www.luusackimhoang.com/en/events</loc>
+    <lastmod>2026-11-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://www.luusackimhoang.com/vi/events"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.luusackimhoang.com/en/events"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.luusackimhoang.com/vi/events"/>
   </url>
   <url>
     <loc>https://www.luusackimhoang.com/vi/posts</loc>
     <lastmod>2026-11-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://www.luusackimhoang.com/vi/posts"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.luusackimhoang.com/en/posts"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.luusackimhoang.com/vi/posts"/>
+  </url>
+  <url>
+    <loc>https://www.luusackimhoang.com/en/posts</loc>
+    <lastmod>2026-11-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://www.luusackimhoang.com/vi/posts"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.luusackimhoang.com/en/posts"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.luusackimhoang.com/vi/posts"/>
   </url>
   <url>
     <loc>https://www.luusackimhoang.com/trien-lam-3d/threejs-3d-room</loc>

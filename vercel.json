@@ -8,6 +8,8 @@
     { "source": "/3d", "destination": "/trien-lam-3d/threejs-3d-room.html", "permanent": false },
     { "source": "/3d-tour", "destination": "/trien-lam-3d/threejs-3d-room.html", "permanent": false },
     { "source": "/vi/visit/3d", "destination": "/trien-lam-3d/threejs-3d-room.html", "permanent": false },
+    { "source": "/en/visit/3d", "destination": "/trien-lam-3d/threejs-3d-room.html?lang=en", "permanent": false },
+    { "source": "/en/3d", "destination": "/trien-lam-3d/threejs-3d-room.html?lang=en", "permanent": false },
     { "source": "/vi/3d", "destination": "/trien-lam-3d/threejs-3d-room.html", "permanent": false },
     { "source": "/trien-lam-3d/threejs-museum.html", "destination": "/trien-lam-3d/threejs-3d-room.html", "permanent": true },
     { "source": "/gioi-thieu", "destination": "/vi/introduction", "permanent": false },
@@ -31,6 +33,8 @@
     { "source": "/tim-kiem", "destination": "/vi/search", "permanent": false }
   ],
   "rewrites": [
+    { "source": "/en", "destination": "/en/index.html" },
+    { "source": "/en/", "destination": "/en/index.html" },
     { "source": "/vi", "destination": "/index.html" },
     { "source": "/vi/", "destination": "/index.html" },
     { "source": "/vi/news", "destination": "/vi/posts/index.html" },

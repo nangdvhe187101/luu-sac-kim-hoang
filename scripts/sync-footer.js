@@ -21,6 +21,8 @@ function walkDir(dir, callback) {
 
 let count = 0;
 walkDir(ROOT_DIR, function(filePath) {
+  // Bản /en do scripts/build-en.js sinh (có footer đã dịch) nên bỏ qua ở đây
+  if (filePath.includes(path.sep + 'en' + path.sep)) return;
   if (filePath.endsWith('.html') && !filePath.endsWith('footer.html')) {
     let content = fs.readFileSync(filePath, 'utf8');
     let updated = false;

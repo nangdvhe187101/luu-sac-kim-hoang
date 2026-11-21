@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
-    "sync:footer": "node scripts/sync-footer.js"
+    "sync:footer": "node scripts/sync-footer.js",
+    "build:en": "node scripts/build-en.js"
   },
   "keywords": ["luu-sac-kim-hoang", "tranh-kim-hoang", "di-san-van-hoa"],
   "author": "",
