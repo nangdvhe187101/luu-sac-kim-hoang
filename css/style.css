@@ -22603,3 +22603,12 @@ html {
   display: none !important;
   pointer-events: none !important;
 }
+
+/* 3D tour card: giữ nguyên tỉ lệ 16:9 của ảnh, không cắt chữ/nút */
+.kh-card-media--3d {
+  aspect-ratio: 16 / 9;
+  background-color: #1a0907;
+}
+.kh-card-media--3d img {
+  object-fit: contain;
+}
