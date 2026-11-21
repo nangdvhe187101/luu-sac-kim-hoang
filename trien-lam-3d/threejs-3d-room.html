@@ -107,8 +107,10 @@
     }
     .welcome-sub { font-size: 12px; letter-spacing: 2px; color: #d1c4b8; margin-bottom: 4px; }
     .welcome-title {
+      font-family: 'DFVN-Bropella', 'DFVN Bropella', Georgia, serif;
       font-size: clamp(22px, 3.8vw, 36px); font-weight: 800; color: #fff;
       text-shadow: 0 4px 20px rgba(0,0,0,0.8); margin-bottom: 12px;
+      letter-spacing: 0.04em;
     }
     .welcome-guide {
       width: 100%; max-width: 620px; font-size: 13px; line-height: 1.55; color: #e5dbd1;
@@ -214,8 +216,10 @@
         display: none;
       }
       .welcome-title {
+        font-family: 'DFVN-Bropella', 'DFVN Bropella', Georgia, serif;
         font-size: clamp(16px, 3.2vw, 21px);
         margin-bottom: 5px;
+        letter-spacing: 0.04em;
       }
       .welcome-guide {
         font-size: 11px;
@@ -914,7 +918,7 @@
           • <b>Hành Lang Trưng Bày:</b> Dạo bước theo vòng tròn ngắm các tác phẩm tranh, nhấn để xem chi tiết.
         </div>
         <div class="welcome-guide-item">
-          • <b>Phòng Tròn Trung Tâm:</b> Bước vào phòng kính giữa, nhấn <b>Ông Đồ / bàn vẽ</b> để tự tay in tranh &amp; tô màu.
+          • <b>Phòng Tròn Trung Tâm:</b> Bước vào phòng kính giữa, nhấn <b>Nghệ nhân / bàn vẽ</b> để tự tay in tranh &amp; tô màu.
         </div>
         <div class="welcome-guide-item">
           • <b>Điều Khiển Linh Hoạt:</b> Dùng phím <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> / mũi tên hoặc vuốt màn hình để di chuyển.
@@ -1003,7 +1007,7 @@
 
   <div id="bottom-hint">
     <b>Phím:</b> W/A/S/D hoặc ↑/↓/←/→ • <b>Shift:</b> Đi nhanh<br>
-    <b>Chuột / Touch:</b> Kéo để nhìn • <b>Click tranh / Lễ tân / Ông Đồ</b>
+    <b>Chuột / Touch:</b> Kéo để nhìn • <b>Click tranh / Lễ tân / Nghệ nhân</b>
   </div>
 
   <!-- Receptionist Guide Modal -->
@@ -1014,7 +1018,7 @@
       <ul>
         <li><b>Lối vào &amp; Quầy Lễ Tân:</b> Bạn có thể xem video giới thiệu ngay trên màn hình lớn bên cạnh quầy lễ tân.</li>
         <li><b>Hành lang triển lãm vòng tròn:</b> Đi vòng quanh theo đường gỗ để thưởng lãm các tác phẩm tranh Kim Hoàng kèm bảng tên và đèn rọi từng bức. Nhấn vào tranh để xem chi tiết &amp; ý nghĩa tác phẩm.</li>
-        <li><b>Phòng trải nghiệm ở giữa:</b> Đi qua cửa vào căn phòng kính trung tâm có chữ <i>Lưu Sắc Kim Hoàng</i> để ngồi xuống bàn vẽ cùng Ông Đồ, tự tay in mộc bản và tô màu.</li>
+        <li><b>Phòng trải nghiệm ở giữa:</b> Đi qua cửa vào căn phòng kính trung tâm có chữ <i>Lưu Sắc Kim Hoàng</i> để ngồi xuống bàn vẽ cùng Nghệ nhân, tự tay in mộc bản và tô màu.</li>
       </ul>
       <div class="reception-actions">
         <button class="rc-btn" id="btn-reception-speak">🔊 Nghe giới thiệu</button>
@@ -1103,7 +1107,7 @@
     </div>
     <section id="p-pick">
       <h2>Chọn bản khắc mẫu trên bàn</h2>
-      <p>Bạn đang ngồi tại bàn in tranh cùng Ông Đồ. Chọn một mẫu ván khắc bên dưới để đặt lên bàn và bắt đầu in.</p>
+      <p>Bạn đang ngồi tại bàn in tranh cùng Nghệ nhân. Chọn một mẫu ván khắc bên dưới để đặt lên bàn và bắt đầu in.</p>
       <div class="kh-cards" id="cards"></div>
     </section>
     <section id="p-print" class="hidden">
@@ -2613,19 +2617,24 @@
       const titleCanvas = document.createElement('canvas');
       titleCanvas.width = 2048; titleCanvas.height = 384;
       const tctx = titleCanvas.getContext('2d');
-      tctx.clearRect(0, 0, 2048, 384);
-      tctx.textAlign = 'center';
-      tctx.textBaseline = 'middle';
-      tctx.fillStyle = '#26170c';
-      tctx.font = 'bold 56px Montserrat, sans-serif';
-      tctx.fillText('VIRTUAL EXHIBITION: VIETNAMESE KIM HOANG PAINTING', 1024, 130, 1880);
-      tctx.fillStyle = '#422c1a';
-      tctx.font = '600 48px Montserrat, sans-serif';
-      tctx.fillText('TRIỂN LÃM TRỰC TUYẾN: TRANH KIM HOÀNG VIỆT NAM', 1024, 240, 1880);
-
       const titleTex = new THREE.CanvasTexture(titleCanvas);
       titleTex.colorSpace = THREE.SRGBColorSpace;
       titleTex.anisotropy = maxAnisotropy;
+
+      function renderBackdropTitle() {
+        tctx.clearRect(0, 0, 2048, 384);
+        tctx.textAlign = 'center';
+        tctx.textBaseline = 'middle';
+        tctx.fillStyle = '#26170c';
+        tctx.font = 'bold 52px Montserrat, sans-serif';
+        tctx.fillText('VIRTUAL EXHIBITION: KIM HOANG FOLK PAINTINGS', 1024, 130, 1920);
+        tctx.fillStyle = '#422c1a';
+        tctx.font = 'bold 48px Montserrat, sans-serif';
+        tctx.fillText('TRIỂN LÃM TRỰC TUYẾN: TRANH DÂN GIAN KIM HOÀNG', 1024, 240, 1920);
+        titleTex.needsUpdate = true;
+      }
+      renderBackdropTitle();
+
       const titleMesh = new THREE.Mesh(
         new THREE.PlaneGeometry(5.2, 0.96),
         new THREE.MeshBasicMaterial({ map: titleTex, transparent: true })
@@ -2681,22 +2690,32 @@
       deskTop2.scale.set(1.22, 1, 0.85);
       g.add(deskTop2);
 
-      // Curved Gold Lettering "Lưu Sắc Kim Hoàng" hugging the front arc of the desk
+      // Curved Gold Lettering "Lưu Sắc Kim Hoàng" hugging the front arc of the desk with custom project font
       const logoCanvas = document.createElement('canvas');
       logoCanvas.width = 1024; logoCanvas.height = 192;
       const lctx = logoCanvas.getContext('2d');
-      lctx.clearRect(0, 0, 1024, 192);
-      lctx.textAlign = 'center';
-      lctx.textBaseline = 'middle';
-      lctx.shadowColor = 'rgba(0,0,0,0.65)';
-      lctx.shadowBlur = 10;
-      lctx.fillStyle = '#fae08c';
-      lctx.font = 'bold 76px Georgia, serif';
-      lctx.fillText('Lưu Sắc Kim Hoàng', 512, 96);
-
       const logoTex = new THREE.CanvasTexture(logoCanvas);
       logoTex.colorSpace = THREE.SRGBColorSpace;
       logoTex.anisotropy = maxAnisotropy;
+
+      function renderDeskLogo() {
+        lctx.clearRect(0, 0, 1024, 192);
+        lctx.textAlign = 'center';
+        lctx.textBaseline = 'middle';
+        lctx.shadowColor = 'rgba(0,0,0,0.75)';
+        lctx.shadowBlur = 12;
+        lctx.fillStyle = '#fae08c';
+        lctx.font = 'bold 76px "DFVN-Bropella", "DFVN Bropella", Georgia, serif';
+        lctx.fillText('Lưu Sắc Kim Hoàng', 512, 96, 960);
+        logoTex.needsUpdate = true;
+      }
+      renderDeskLogo();
+      if (document.fonts) {
+        document.fonts.ready.then(() => {
+          renderDeskLogo();
+          renderBackdropTitle();
+        });
+      }
       const logoArc = 0.58;
       const deskLogo = new THREE.Mesh(
         new THREE.CylinderGeometry(deskR + 0.035, deskR + 0.035, 0.42, 24, 1, true, -logoArc / 2, logoArc),
@@ -3371,7 +3390,7 @@
       if (!hits.length) { setHoverState(''); return; }
       const obj = hits[0].object;
       if (obj.userData.artworkId) {
-        setHoverState('Nhấn để ngồi xuống bàn vẽ tranh cùng Ông Đồ');
+        setHoverState('Nhấn để ngồi xuống bàn vẽ tranh cùng Nghệ nhân');
       } else if (obj.userData.artwork) {
         setHoverState('Nhấn để xem chi tiết & ý nghĩa bức tranh', obj);
       } else if (obj.userData.isMosaicPainting) {
@@ -3604,7 +3623,7 @@
       if (!('speechSynthesis' in window)) return;
       window.speechSynthesis.cancel();
       const u = new SpeechSynthesisUtterance(
-        'Chào mừng bạn đến với Bảo tàng Tranh dân gian Kim Hoàng. Bạn có thể xem video giới thiệu ngay tại quầy lễ tân, đi vòng quanh hành lang gỗ để ngắm tranh treo tường và nhấn vào từng bức để xem ý nghĩa, sau đó bước vào phòng kính ở chính giữa để trải nghiệm vẽ tranh cùng Ông Đồ.'
+        'Chào mừng bạn đến với Bảo tàng Tranh dân gian Kim Hoàng. Bạn có thể xem video giới thiệu ngay tại quầy lễ tân, đi vòng quanh hành lang gỗ để ngắm tranh treo tường và nhấn vào từng bức để xem ý nghĩa, sau đó bước vào phòng kính ở chính giữa để trải nghiệm vẽ tranh cùng Nghệ nhân.'
       );
       u.lang = 'vi-VN';
       window.speechSynthesis.speak(u);
