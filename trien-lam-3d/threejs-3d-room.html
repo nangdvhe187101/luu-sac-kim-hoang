@@ -1296,15 +1296,36 @@
           btnEnter.classList.remove('hidden');
           btnEnter.classList.add('ready');
         }
-        if (urlParams.get('autostart') === '1') {
+        if (urlParams.get('autostart') === '1' || urlParams.get('hide_ui') === '1') {
           setTimeout(() => {
             enterExhibition();
-            const modeParam = urlParams.get('mode');
-            const zoneParam = urlParams.get('zone');
-            if (modeParam) {
-              applyExhibitionMode(modeParam);
-            } else if (zoneParam) {
-              teleportToZone(zoneParam);
+            if (urlParams.get('hide_ui') === '1') {
+              document.body.classList.add('hide-ui');
+              const hideStyle = document.createElement('style');
+              hideStyle.textContent = `
+                #header, #footer-hint, #zone-bar, #minimap-wrap, #room-badge,
+                #crosshair, #hover-hint, #welcome-screen, #orientation-gate,
+                #guide-screen, #dialogue-overlay, .joy-base, .touch-look-zone {
+                  display: none !important;
+                }
+              `;
+              document.head.appendChild(hideStyle);
+            }
+            if (urlParams.has('camX') && urlParams.has('camZ')) {
+              const cx = parseFloat(urlParams.get('camX'));
+              const cy = parseFloat(urlParams.get('camY') || PLAYER_HEIGHT);
+              const cz = parseFloat(urlParams.get('camZ'));
+              camera.position.set(cx, cy, cz);
+              if (urlParams.has('yaw')) yaw = targetYaw = parseFloat(urlParams.get('yaw'));
+              if (urlParams.has('pitch')) pitch = targetPitch = parseFloat(urlParams.get('pitch'));
+            } else {
+              const modeParam = urlParams.get('mode');
+              const zoneParam = urlParams.get('zone');
+              if (modeParam) {
+                applyExhibitionMode(modeParam);
+              } else if (zoneParam) {
+                teleportToZone(zoneParam);
+              }
             }
           }, 150);
         }
@@ -1359,7 +1380,11 @@
     camera.position.set(0, PLAYER_HEIGHT, 18.0);
 
     const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || (window.innerWidth < 820);
-    const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+    const renderer = new THREE.WebGLRenderer({
+      antialias: true,
+      powerPreference: 'high-performance',
+      preserveDrawingBuffer: urlParams.has('capture')
+    });
     renderer.setSize(window.innerWidth, window.innerHeight);
     const maxDPR = isMobileDevice 
       ? Math.min(window.devicePixelRatio, 1.25) 
@@ -4423,6 +4448,26 @@
       }
 
       renderer.render(scene, camera);
+
+      if (urlParams.get('capture') === '1' && !window.__captured) {
+        window.__captureFrames = (window.__captureFrames || 0) + 1;
+        if (window.__captureFrames >= 140) {
+          window.__captured = true;
+          try {
+            const dataUrl = renderer.domElement.toDataURL('image/jpeg', 0.95);
+            fetch('/api/save-preview', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ data: dataUrl })
+            }).then(r => r.json()).then(res => {
+              console.log('Capture success:', res);
+              document.title = 'CAPTURED_SUCCESS_' + res.size;
+            });
+          } catch (e) {
+            console.error('Capture failed:', e);
+          }
+        }
+      }
     }
 
     // =========================================================================

@@ -56,6 +56,25 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  if (req.method === 'POST' && safePath === '/api/save-preview') {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', () => {
+      try {
+        const parsed = JSON.parse(body);
+        const base64Data = (parsed.data || '').replace(/^data:image\/\w+;base64,/, '');
+        const buffer = Buffer.from(base64Data, 'base64');
+        fs.writeFileSync(path.join(ROOT_DIR, 'images/kham-pha-3d-moi.jpg'), buffer);
+        res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+        res.end(JSON.stringify({ ok: true, size: buffer.length }));
+      } catch (err) {
+        res.writeHead(500, { 'Content-Type': 'application/json; charset=utf-8' });
+        res.end(JSON.stringify({ error: err.message }));
+      }
+    });
+    return;
+  }
+
   if (safePath.startsWith('/api/') || safePath === '/api') {
     res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
     res.end(JSON.stringify({ user: null }));
