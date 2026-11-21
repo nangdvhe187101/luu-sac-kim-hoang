@@ -2997,11 +2997,18 @@
       "47": { title: "Mẹ Con Nhà Hổ (Hổ Mẫu Tử)", desc: "Khắc họa tình mẫu tử thiêng liêng giữa rừng sâu với nét vẽ vừa uy nghiêm vừa ấm áp, tượng trưng cho sự che chở, bình an và sức mạnh gia đình." },
       "48": { title: "Tiên Nữ Cưỡi Phụng", desc: "Hình ảnh tiên nữ duyên dáng cưỡi chim phượng giữa mây ngũ sắc, biểu trưng cho vẻ đẹp thanh tao, cát tường và những điều tốt lành." },
       "49": { title: "Tiến Tài – Tiến Lộc (Đôi Ông Phúc Lộc)", desc: "Hai vị thần quan mặc triều phục cầm hoa sen và bảng chữ \"Tiến Tài – Tiến Lộc\", là lời chúc kinh điển ngày Tết cầu tài lộc, may mắn gõ cửa quanh năm." },
+      "50": { title: "Thân Thần Tướng (Thần Tướng Tuổi Thân)", desc: "Vị linh thần thủ hộ tuổi Thân trong bộ Thập Nhị Địa Chi Kim Hoàng. Hình tượng Hầu Thần oai phong tay vung kim bổng, khoác giáp chiến bào vàng kim, cưỡi mây cát tường, biểu trưng cho trí tuệ linh hoạt, tài trí mưu lược, trừ tà diệt ác và thăng tiến công danh phong hầu vinh hiển." },
+      "51": { title: "Dần Thần Tướng (Thần Tướng Tuổi Dần)", desc: "Vị linh thần thủ hộ tuổi Dần trong bộ Thập Nhị Địa Chi Kim Hoàng. Hình tượng chúa sơn lâm uy dũng đầu hổ khoác long bào, tay cầm đinh ba hộ pháp đứng trên tường vân, biểu trưng cho uy quyền tối thượng, dũng khí kiên cường, hộ quốc an dân và trấn trạch trừ tà." },
+      "52": { title: "Hợi Thần Tướng (Thần Tướng Tuổi Hợi)", desc: "Vị linh thần thủ hộ tuổi Hợi trong bộ Thập Nhị Địa Chi Kim Hoàng. Hình tượng thần tướng mình mặc giáp vảy cá, tay giương thanh đao uy dũng lướt trên vầng mây hoàng kim, biểu trưng cho sự sung túc, phúc lộc viên mãn, no ấm đủ đầy và bình an gia đạo." },
+      "53": { title: "Mùi Thần Tướng (Thần Tướng Tuổi Mùi)", desc: "Vị linh thần thủ hộ tuổi Mùi trong bộ Thập Nhị Địa Chi Kim Hoàng. Hình tượng thần tướng đầu dê dũng mãnh, hai tay tuốt thanh trường kiếm sắc bén, khoác áo giáp kim sa đứng trên mây lành, biểu trưng cho đức khiêm nhường nhưng cương trực, tam dương khai thái mang lại điềm lành và tài lộc." },
+      "54": { title: "Sửu Thần Tướng (Thần Tướng Tuổi Sửu)", desc: "Vị linh thần thủ hộ tuổi Sửu trong bộ Thập Nhị Địa Chi Kim Hoàng. Thần tướng đầu ngưu dũng mãnh, tay cầm tam xoa kích (đinh ba), một tay giơ cao thi lễ trời đất, biểu trưng cho đức tính bền bỉ, cần cù kiến tạo cơ nghiệp, gia tài hưng thịnh và mùa màng bội thu." },
+      "55": { title: "Tỵ Thần Tướng (Thần Tướng Tuổi Tỵ)", desc: "Vị linh thần thủ hộ tuổi Tỵ trong bộ Thập Nhị Địa Chi Kim Hoàng. Hình tượng linh xà hóa thần tướng uy linh, tay chống thanh bảo kiếm lam ngọc, khoác chiến bào ngũ sắc rực rỡ, biểu trưng cho sự tái sinh, linh hoạt ứng biến, trí tuệ sâu sắc và bảo vệ bình an trường cửu." },
+      "56": { title: "Tuất Thần Tướng (Thần Tướng Tuổi Tuất)", desc: "Vị linh thần thủ hộ tuổi Tuất trong bộ Thập Nhị Địa Chi Kim Hoàng. Thần tướng đầu cẩu trung dũng tay nắm chặt chuôi đại đao, mình khoác giáp bào uy vệ cưỡi tường vân, biểu trưng cho lòng trung thành son sắt, trừ tà xua đuổi ám khí, giữ gìn gia đạo bình an và của cải bền lâu." },
     };
 
     function placeCircularPaintings() {
       const artworks = [];
-      for (let i = 1; i <= 49; i++) {
+      for (let i = 1; i <= 56; i++) {
         const num = String(i).padStart(2, "0");
         const info = KIM_HOANG_CATALOG[num] || { title: "Tranh Kim Hoàng #" + num, desc: "Tác phẩm tranh dân gian Kim Hoàng truyền thống." };
         const cleanTitle = info.title;
