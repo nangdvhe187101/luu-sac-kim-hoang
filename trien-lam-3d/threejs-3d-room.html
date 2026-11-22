@@ -1208,6 +1208,27 @@
   <audio id="bg-audio" src="background.mp3" loop preload="none"></audio>
   <audio id="narrator-audio"></audio>
 
+  <script>
+    // Báo lỗi rõ ràng thay vì đứng im (iOS cũ / hết bộ nhớ / không tải được thư viện 3D)
+    (function () {
+      var shown = false;
+      function show(msg) {
+        if (shown) return; shown = true;
+        var el = document.getElementById('loading-status');
+        var pc = document.getElementById('loading-percent');
+        if (pc) pc.textContent = '';
+        if (el) el.textContent = msg;
+        else alert(msg);
+      }
+      var vi = (new URLSearchParams(location.search).get('lang') || 'vi') !== 'en';
+      var m1 = vi ? 'Không tải được không gian 3D. Hãy cập nhật iOS (từ 16.4 trở lên), mở bằng Safari và thử lại.'
+                  : 'Could not load the 3D space. Please update iOS (16.4+), open in Safari and retry.';
+      if (!(window.HTMLScriptElement && HTMLScriptElement.supports && HTMLScriptElement.supports('importmap'))) show(m1);
+      window.addEventListener('error', function () { setTimeout(function () { if (!window.__tourReady) show(m1); }, 0); });
+      window.addEventListener('unhandledrejection', function () { if (!window.__tourReady) show(m1); });
+    })();
+  </script>
+
   <script type="importmap">
     {
       "imports": {
@@ -1295,6 +1316,7 @@
       }
 
       setTimeout(() => {
+        window.__tourReady = true;
         updateLoadingProgress(100, '✓ Triển lãm đã sẵn sàng 100%!');
         if (loadingContainer) {
           loadingContainer.style.opacity = '0';
