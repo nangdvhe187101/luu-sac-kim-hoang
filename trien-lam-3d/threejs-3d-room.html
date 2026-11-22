@@ -1212,6 +1212,23 @@
     // Báo lỗi rõ ràng thay vì đứng im (iOS cũ / hết bộ nhớ / không tải được thư viện 3D)
     (function () {
       var shown = false;
+      var prev = [];
+      try { prev = JSON.parse(localStorage.getItem('kh3d_log') || '[]'); } catch (e) {}
+      var cur = [];
+      window.khLog = function (t) {
+        cur.push(Math.round(performance.now()) + 'ms ' + t);
+        try { localStorage.setItem('kh3d_log', JSON.stringify(cur.slice(-40))); } catch (e) {}
+      };
+      window.khLog('page start');
+      if (/[?&]debug=1/.test(location.search)) {
+        window.addEventListener('DOMContentLoaded', function () {
+          var d = document.createElement('div');
+          d.style.cssText = 'position:fixed;left:0;top:0;right:0;z-index:99999;background:rgba(0,0,0,.85);color:#9f9;font:11px/1.35 monospace;padding:6px;max-height:45vh;overflow:auto;white-space:pre-wrap';
+          d.textContent = 'LOG LẦN TRƯỚC (dòng cuối = bước cuối trước khi lỗi):\n' + (prev.length ? prev.join('\n') : '(trống)');
+          d.onclick = function () { d.remove(); };
+          document.body.appendChild(d);
+        });
+      }
       function show(msg) {
         if (shown) return; shown = true;
         var el = document.getElementById('loading-status');
@@ -1247,10 +1264,11 @@
       MOSAIC_FONT,
       GALLERY_URLS,
       shrinkTexture,
+      mobileArtUrl,
       createFadeArtMaterial,
       createMosaicRotator,
       hangSharedPainting
-    } from './kim-hoang-museum-showcase.js?v=kim_hoang_v36';
+    } from './kim-hoang-museum-showcase.js?v=kim_hoang_v37';
 
     // =========================================================================
     // 1. Loading Manager & Progress Tracking (100% Preload & Shader Warmup)
@@ -1298,6 +1316,7 @@
     function finishAndWarmupScene() {
       if (isFullyLoaded) return;
       isFullyLoaded = true;
+      window.khLog('assets loaded');
 
       updateLoadingProgress(96, lang === 'en' ? 'Loading...' : 'Đang tải...');
 
@@ -1402,6 +1421,7 @@
     // =========================================================================
     // 2. Scene, Camera, Renderer, Lighting
     // =========================================================================
+    window.khLog('module start');
     const container = document.getElementById('viewer-canvas');
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x181411);
@@ -1435,6 +1455,7 @@
       renderer.shadowMap.type = THREE.PCFShadowMap;
     }
     container.appendChild(renderer.domElement);
+    window.khLog('renderer ok');
 
     // Xử lý mất WebGL Context an toàn
     renderer.domElement.addEventListener('webglcontextlost', (e) => {
@@ -1457,7 +1478,7 @@
     }
 
     // Ánh sáng Hemisphere ấm cúng (trên mobile tăng nhẹ để không gian rạng rỡ khi tắt IBL)
-    scene.add(new THREE.HemisphereLight(0xfff2e0, 0x282c32, isMobileDevice ? 0.76 : 0.48));
+    scene.add(new THREE.HemisphereLight(0xfff2e0, 0x282c32, isMobileDevice ? 0.95 : 0.48));
     const dirLight = new THREE.DirectionalLight(0xfff5e6, isMobileDevice ? 0.72 : 0.58);
     dirLight.position.set(6, 16, 16);
     dirLight.castShadow = !isMobileDevice;
@@ -2384,7 +2405,7 @@
         // Warm museum accent light on door jamb
         const dl = new THREE.PointLight(0xffecd0, 0.8, 4.0, 2.0);
         dl.position.set(jx * 0.96, 2.4, jz * 0.96);
-        scene.add(dl);
+        if (!isMobileDevice) scene.add(dl);
       });
 
       // Sleek portal lintel beam above the doorway opening
@@ -2415,7 +2436,7 @@
       const slAngleR = centerDoorAngle + centerDoorHalf * 0.55;
       signLightL.position.set(Math.sin(slAngleL) * (R_CENTER + 0.35), WALL_H - 0.05, Math.cos(slAngleL) * (R_CENTER + 0.35));
       signLightR.position.set(Math.sin(slAngleR) * (R_CENTER + 0.35), WALL_H - 0.05, Math.cos(slAngleR) * (R_CENTER + 0.35));
-      scene.add(signLightL, signLightR);
+      if (!isMobileDevice) scene.add(signLightL, signLightR);
 
       // Striped lacquer rug in center of Studio underneath Ông Đồ drawing table
       const rug = new THREE.Mesh(
@@ -2467,10 +2488,10 @@
       const mosaicCoveLight = new THREE.SpotLight(0xffecd4, 6.5, 14, Math.PI / 3, 0.45, 2.0);
       mosaicCoveLight.position.set(2.8, 4.4, 0);
       mosaicCoveLight.target.position.set(R_CENTER - 0.1, 2.4, 0);
-      scene.add(mosaicCoveLight, mosaicCoveLight.target);
+      if (!isMobileDevice) scene.add(mosaicCoveLight, mosaicCoveLight.target);
 
       // Subtle fill lights for gallery walkway
-      for (let i = 0; i < 4; i++) {
+      for (let i = 0; i < (isMobileDevice ? 2 : 4); i++) {
         const a = (i / 4) * Math.PI * 2 + Math.PI / 4;
         const lx = Math.sin(a) * 14.2;
         const lz = Math.cos(a) * 14.2;
@@ -2982,7 +3003,7 @@
       const recLight = new THREE.SpotLight(0xfff0d6, 5.8, 14, Math.PI / 3, 0.5, 2.0);
       recLight.position.set(0, 4.2, 2.2);
       recLight.target.position.set(0, 1.2, -0.4);
-      g.add(recLight, recLight.target);
+      if (!isMobileDevice) g.add(recLight, recLight.target);
 
       scene.add(g);
       // Collision barrier across the reception desk + backdrop so player walks around left/right
@@ -3310,7 +3331,7 @@
         batch.forEach((item) => {
           const { artwork, artMesh, frameMesh, artMat, plaque, spotFixture, wallSpotlight } = item;
           artTexLoader.load(
-            artwork.images[0],
+            mobileArtUrl(artwork.images[0]),
             (tex) => {
               if (isMobileDevice) shrinkTexture(tex, 640);
               tex.colorSpace = THREE.SRGBColorSpace;
@@ -4243,6 +4264,7 @@
     }
 
     function enterExhibition() {
+      window.khLog('enter clicked');
       document.getElementById('welcome-screen')?.classList.add('hidden');
       if (audioEnabled) bgAudio.play().catch(() => {});
       if (!isMobileDevice && videoEl && videoEl.src) {
@@ -4674,6 +4696,8 @@
       }
 
       renderer.render(scene, camera);
+      window.__kf = (window.__kf || 0) + 1;
+      if (window.__kf === 1 || window.__kf === 10 || window.__kf === 60 || window.__kf === 300) window.khLog('frame ' + window.__kf);
 
       if (urlParams.get('capture') === '1' && !window.__captured) {
         window.__captureFrames = (window.__captureFrames || 0) + 1;
@@ -4699,7 +4723,9 @@
     // =========================================================================
     // 12. Initialize Circular Museum, Ông Đồ Table & Artworks
     // =========================================================================
+    window.khLog('build start');
     buildCircularMuseum();
+    window.khLog('build done');
     renderZoneBar();
     animId = requestAnimationFrame(animate);
 
@@ -4711,6 +4737,7 @@
       onHangPainting: hangSharedPainting
     }).then((station) => {
       kimHoangStation = station;
+      window.khLog('station ready');
       interactTargetsDirty = true;
       station.group.position.set(0, 0.025, 0);
       station.group.rotation.y = -Math.PI / 2; // Face towards West doorway (-X, LEFT side)

@@ -55,14 +55,54 @@ let r2PaintingsCache = [];
 let r2LastFetch = 0;
 let r2FetchPromise = null;
 
+// Trên điện thoại dùng bản tranh nhỏ (tranh/m/, tối đa 640px) để không phải giải mã ảnh gốc 2048px
+export function mobileArtUrl(url) {
+  if (!IS_LOW_MEM_DEVICE || typeof url !== 'string') return url;
+  return url.replace(/(^|\/)tranh\/(tranh-\d+\.webp)/, '$1tranh/m/$2');
+}
+
+// Giới hạn số ảnh tải cùng lúc trên điện thoại để tránh đỉnh bộ nhớ khi giải mã
+const TEX_MAX_PARALLEL = IS_LOW_MEM_DEVICE ? 3 : 8;
+let texActive = 0;
+const texQueue = [];
+function queuedTexLoad(url, onLoad, onError) {
+  texQueue.push({ url, onLoad, onError });
+  pumpTexQueue();
+}
+function pumpTexQueue() {
+  while (texActive < TEX_MAX_PARALLEL && texQueue.length) {
+    const job = texQueue.shift();
+    texActive++;
+    const done = () => { texActive--; setTimeout(pumpTexQueue, 0); };
+    sharedTexLoader.load(
+      job.url,
+      (tex) => { try { job.onLoad(tex); } finally { done(); } },
+      undefined,
+      (err) => { try { job.onError(err); } finally { done(); } }
+    );
+  }
+}
+
+const sharedTexPending = new Map(); // url -> [onReady...] (gộp các lần tải trùng)
+
 export function getSharedTexture(url, maxAnisotropy = 4, onReady = null) {
   if (sharedTexCache.has(url)) {
     const tex = sharedTexCache.get(url);
     if (onReady) onReady(tex);
     return tex;
   }
-  sharedTexLoader.load(
-    url,
+  if (sharedTexPending.has(url)) {
+    if (onReady) sharedTexPending.get(url).push(onReady);
+    return null;
+  }
+  sharedTexPending.set(url, onReady ? [onReady] : []);
+  const flush = (tex) => {
+    const cbs = sharedTexPending.get(url) || [];
+    sharedTexPending.delete(url);
+    cbs.forEach((cb) => { try { cb(tex); } catch (e) { console.warn(e); } });
+  };
+  queuedTexLoad(
+    mobileArtUrl(url),
     (tex) => {
       if (IS_LOW_MEM_DEVICE) shrinkTexture(tex, 512);
       tex.colorSpace = THREE.SRGBColorSpace;
@@ -70,12 +110,9 @@ export function getSharedTexture(url, maxAnisotropy = 4, onReady = null) {
       tex.generateMipmaps = false;
       tex.minFilter = THREE.LinearFilter;
       sharedTexCache.set(url, tex);
-      if (onReady) onReady(tex);
+      flush(tex);
     },
-    undefined,
-    () => {
-      if (onReady) onReady(null);
-    }
+    () => flush(null)
   );
   return null;
 }
