@@ -1851,9 +1851,16 @@
     const tvPosterTex = makeTVPosterTexture();
     let videoTex = null;
 
-    if (!isMobileDevice) {
+    videoEl.autoplay = true;
+    videoEl.setAttribute('autoplay', '');
+    videoEl.setAttribute('muted', '');
+    videoEl.setAttribute('playsinline', '');
+    videoEl.setAttribute('webkit-playsinline', '');
+    videoEl.preload = 'auto';
+    {
       try {
-        videoEl.src = '/media/video/Web.mp4';
+        // Điện thoại dùng bản 720p giống trang chủ
+        videoEl.src = isMobileDevice ? '/media/video/Web-720.mp4' : '/media/video/Web.mp4';
         videoTex = new THREE.VideoTexture(videoEl);
         videoTex.colorSpace = THREE.SRGBColorSpace;
         videoTex.generateMipmaps = false;
@@ -1864,7 +1871,19 @@
       }
     }
 
-    const tvMaterialMap = (!isMobileDevice && videoTex) ? videoTex : tvPosterTex;
+    const tvMaterialMap = videoTex || tvPosterTex;
+
+    // Luôn giữ video lễ tân đang chạy (iOS có thể chặn autoplay đến khi người dùng chạm lần đầu)
+    function ensureTVPlaying() {
+      if (!videoEl || !videoEl.src) return;
+      if (videoEl.paused) videoEl.play().catch(() => {});
+    }
+    videoEl.play().catch(() => {});
+    ['pointerdown', 'touchstart', 'keydown'].forEach((ev) =>
+      window.addEventListener(ev, ensureTVPlaying, { passive: true })
+    );
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) ensureTVPlaying(); });
+    setInterval(ensureTVPlaying, 3000);
 
     function createGalleryPlant(x, z) {
       const g = new THREE.Group();
@@ -4002,11 +4021,7 @@
           openArtworkModal(obj.userData.artwork);
           return;
         } else if (obj.userData.isTV) {
-          if (isMobileDevice) {
-            playMobileVideoModal();
-            return;
-          }
-          if (!videoEl.src) videoEl.src = '/media/video/Web.mp4';
+          if (!videoEl.src) videoEl.src = isMobileDevice ? '/media/video/Web-720.mp4' : '/media/video/Web.mp4';
           videoEl.muted = !videoEl.muted;
           if (!videoEl.muted) {
             videoEl.volume = 0.85;
@@ -4435,8 +4450,10 @@
       m.querySelector('.tvm-title').textContent = (en ? v.titleEn : v.title) + ' — ' + (en ? v.subEn : v.subVi);
       const vid = m.querySelector('.tvm-video');
       vid.poster = v.images[0];
+      vid.loop = false;
       vid.src = v.videoUrl;
       vid.muted = false;
+      try { vid.currentTime = 0; } catch (_) {}
       // Tắt nhạc nền, thuyết minh và tiếng TV khi xem video
       bgAudio.pause();
       narratorAudio.pause();
@@ -4465,7 +4482,7 @@
       window.khLog('enter clicked');
       document.getElementById('welcome-screen')?.classList.add('hidden');
       if (audioEnabled) bgAudio.play().catch(() => {});
-      if (!isMobileDevice && videoEl && videoEl.src) {
+      if (videoEl && videoEl.src) {
         videoEl.play().catch(() => {});
       }
     }

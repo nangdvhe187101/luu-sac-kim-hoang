@@ -1603,3 +1603,21 @@ function initCreativeProducts() {
     if (e.key === 'Escape' && modal.classList.contains('is-open')) closeModal();
   });
 }
+
+
+// Video trang chủ: luôn tự phát & lặp lại (iOS có thể chặn autoplay đến lần chạm đầu tiên / khi quay lại tab)
+(function () {
+  function kick() {
+    document.querySelectorAll('video.hero-banner__video').forEach(function (v) {
+      v.muted = true;
+      v.loop = true;
+      v.playsInline = true;
+      if (v.paused) { var p = v.play(); if (p && p.catch) p.catch(function () {}); }
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', kick); else kick();
+  ['pointerdown', 'touchstart', 'scroll'].forEach(function (ev) {
+    window.addEventListener(ev, kick, { passive: true });
+  });
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) kick(); });
+})();
