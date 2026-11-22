@@ -5,3 +5,6 @@
 .DS_Store
 node_modules/
 *.log
+
+# Video gốc dung lượng lớn – chỉ đưa bản web/ lên site
+media/video-hanh-trinh/*.mp4

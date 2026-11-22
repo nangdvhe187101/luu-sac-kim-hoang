@@ -636,7 +636,7 @@
 
     /* Receptionist Modal */
     #reception-modal {
-      position: fixed; inset: 0; z-index: 42;
+      position: fixed; inset: 0; z-index: 200;
       background: rgba(0, 0, 0, 0.68); backdrop-filter: blur(6px);
       display: none; align-items: center; justify-content: center; padding: 20px;
     }
@@ -844,8 +844,34 @@
     }
 
     /* Artwork Detail Modal */
+    #tour-video-modal {
+      position: fixed; inset: 0; z-index: 9998;
+      background: rgba(10, 4, 2, 0.88); backdrop-filter: blur(6px);
+      display: none; align-items: center; justify-content: center; padding: 16px;
+    }
+    #tour-video-modal.open { display: flex; }
+    #tour-video-modal .tvm-card {
+      width: 100%; max-width: 960px;
+      background: linear-gradient(180deg, #4a130f, #220906);
+      border: 2px solid #e8c872; border-radius: 14px; padding: 14px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.7);
+    }
+    #tour-video-modal .tvm-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 10px; }
+    #tour-video-modal .tvm-kicker { color: #e8c872; font: 700 11px/1.2 Montserrat, sans-serif; letter-spacing: .12em; }
+    #tour-video-modal .tvm-title { color: #fff; font: 700 17px/1.35 Georgia, serif; margin-top: 4px; }
+    #tour-video-modal .tvm-close {
+      flex: none; width: 38px; height: 38px; border-radius: 50%; cursor: pointer;
+      border: 1px solid #e8c872; background: rgba(232,200,114,0.15); color: #fff; font-size: 18px;
+    }
+    #tour-video-modal .tvm-close:hover { background: #e8c872; color: #3a0f0b; }
+    #tour-video-modal .tvm-video { width: 100%; max-height: 72vh; background: #000; border-radius: 8px; display: block; }
+    @media (orientation: landscape) and (max-height: 500px) {
+      #tour-video-modal { padding: 6px; }
+      #tour-video-modal .tvm-card { padding: 8px; max-width: 92vw; }
+      #tour-video-modal .tvm-video { max-height: 78vh; }
+    }
     #artwork-modal {
-      position: fixed; inset: 0; z-index: 40;
+      position: fixed; inset: 0; z-index: 200;
       background: rgba(0, 0, 0, 0.78); backdrop-filter: blur(6px);
       display: none; align-items: center; justify-content: center; padding: 20px;
     }
@@ -905,6 +931,22 @@
       background: rgba(0,0,0,0.65); color: #fff; border: none;
       width: 32px; height: 32px; border-radius: 50%; font-size: 18px; cursor: pointer;
     }
+    /* Điện thoại: nút ✕ luôn nằm cố định ở góc màn hình (không cuộn mất), to hơn cho dễ bấm */
+    @media (max-width: 760px), (max-height: 500px) {
+      .modal-close {
+        position: fixed;
+        top: max(12px, env(safe-area-inset-top));
+        right: max(12px, env(safe-area-inset-right));
+        width: 42px; height: 42px; font-size: 20px;
+        z-index: 210;
+        background: rgba(0,0,0,0.78);
+        border: 1px solid rgba(255,255,255,0.35);
+      }
+    }
+    /* Ẩn thanh công cụ góc phải khi đang mở cửa sổ xem tranh / lễ tân / video */
+    body:has(#artwork-modal.open) #top-right-tools,
+    body:has(#reception-modal.open) #top-right-tools,
+    body:has(#tour-video-modal.open) #top-right-tools { visibility: hidden; }
 
     #loading-toast {
       position: fixed; bottom: 78px; left: 50%; transform: translateX(-50%);
@@ -1268,7 +1310,7 @@
       createFadeArtMaterial,
       createMosaicRotator,
       hangSharedPainting
-    } from './kim-hoang-museum-showcase.js?v=kim_hoang_v37';
+    } from './kim-hoang-museum-showcase.js?v=kim_hoang_v39';
 
     // =========================================================================
     // 1. Loading Manager & Progress Tracking (100% Preload & Shader Warmup)
@@ -1434,7 +1476,7 @@
       (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
     const isMobileDevice = isIOS || /Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || (window.innerWidth < 820);
     const renderer = new THREE.WebGLRenderer({
-      antialias: !isMobileDevice, // Tắt MSAA trên mobile/iOS để tránh tràn bộ nhớ VRAM framebuffer
+      antialias: true,
       powerPreference: isMobileDevice ? 'default' : 'high-performance',
       precision: isMobileDevice ? 'mediump' : 'highp',
       preserveDrawingBuffer: urlParams.has('capture'),
@@ -1442,10 +1484,10 @@
       depth: true
     });
     renderer.setSize(window.innerWidth, window.innerHeight);
-    const maxDPR = isMobileDevice 
-      ? 1.0 
+    const maxDPR = isMobileDevice
+      ? Math.min(window.devicePixelRatio || 1, 2)
       : Math.min(window.devicePixelRatio, 1.5);
-    let _adaptDPR = isMobileDevice ? 1.0 : Math.min(maxDPR, 1.25);
+    let _adaptDPR = isMobileDevice ? Math.min(maxDPR, 1.75) : Math.min(maxDPR, 1.25);
     renderer.setPixelRatio(_adaptDPR);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -1478,7 +1520,7 @@
     }
 
     // Ánh sáng Hemisphere ấm cúng (trên mobile tăng nhẹ để không gian rạng rỡ khi tắt IBL)
-    scene.add(new THREE.HemisphereLight(0xfff2e0, 0x282c32, isMobileDevice ? 0.95 : 0.48));
+    scene.add(new THREE.HemisphereLight(0xfff2e0, 0x282c32, isMobileDevice ? 0.76 : 0.48));
     const dirLight = new THREE.DirectionalLight(0xfff5e6, isMobileDevice ? 0.72 : 0.58);
     dirLight.position.set(6, 16, 16);
     dirLight.castShadow = !isMobileDevice;
@@ -2405,7 +2447,7 @@
         // Warm museum accent light on door jamb
         const dl = new THREE.PointLight(0xffecd0, 0.8, 4.0, 2.0);
         dl.position.set(jx * 0.96, 2.4, jz * 0.96);
-        if (!isMobileDevice) scene.add(dl);
+        scene.add(dl);
       });
 
       // Sleek portal lintel beam above the doorway opening
@@ -2436,7 +2478,7 @@
       const slAngleR = centerDoorAngle + centerDoorHalf * 0.55;
       signLightL.position.set(Math.sin(slAngleL) * (R_CENTER + 0.35), WALL_H - 0.05, Math.cos(slAngleL) * (R_CENTER + 0.35));
       signLightR.position.set(Math.sin(slAngleR) * (R_CENTER + 0.35), WALL_H - 0.05, Math.cos(slAngleR) * (R_CENTER + 0.35));
-      if (!isMobileDevice) scene.add(signLightL, signLightR);
+      scene.add(signLightL, signLightR);
 
       // Striped lacquer rug in center of Studio underneath Ông Đồ drawing table
       const rug = new THREE.Mesh(
@@ -2488,10 +2530,10 @@
       const mosaicCoveLight = new THREE.SpotLight(0xffecd4, 6.5, 14, Math.PI / 3, 0.45, 2.0);
       mosaicCoveLight.position.set(2.8, 4.4, 0);
       mosaicCoveLight.target.position.set(R_CENTER - 0.1, 2.4, 0);
-      if (!isMobileDevice) scene.add(mosaicCoveLight, mosaicCoveLight.target);
+      scene.add(mosaicCoveLight, mosaicCoveLight.target);
 
       // Subtle fill lights for gallery walkway
-      for (let i = 0; i < (isMobileDevice ? 2 : 4); i++) {
+      for (let i = 0; i < 4; i++) {
         const a = (i / 4) * Math.PI * 2 + Math.PI / 4;
         const lx = Math.sin(a) * 14.2;
         const lz = Math.cos(a) * 14.2;
@@ -3003,7 +3045,7 @@
       const recLight = new THREE.SpotLight(0xfff0d6, 5.8, 14, Math.PI / 3, 0.5, 2.0);
       recLight.position.set(0, 4.2, 2.2);
       recLight.target.position.set(0, 1.2, -0.4);
-      if (!isMobileDevice) g.add(recLight, recLight.target);
+      g.add(recLight, recLight.target);
 
       scene.add(g);
       // Collision barrier across the reception desk + backdrop so player walks around left/right
@@ -3032,6 +3074,60 @@
     }
 
     const plaqueTextureCache = new Map();
+    function createVideoBoardTexture(v) {
+      const c = document.createElement('canvas');
+      c.width = 512; c.height = 384;
+      const ctx = c.getContext('2d');
+      // Nền bảng thông báo: đỏ hồng điều đậm, viền vàng kim
+      const g = ctx.createLinearGradient(0, 0, 0, 384);
+      g.addColorStop(0, '#5a1712'); g.addColorStop(1, '#2a0b08');
+      ctx.fillStyle = g; ctx.fillRect(0, 0, 512, 384);
+      ctx.strokeStyle = '#e8c872'; ctx.lineWidth = 6; ctx.strokeRect(8, 8, 496, 368);
+      ctx.strokeStyle = 'rgba(232,200,114,0.45)'; ctx.lineWidth = 2; ctx.strokeRect(20, 20, 472, 344);
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#e8c872';
+      ctx.font = 'bold 22px Montserrat, sans-serif';
+      ctx.fillText(lang === 'en' ? 'KIM HOANG JOURNEY' : 'HÀNH TRÌNH KIM HOÀNG', 256, 66);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 54px Georgia, serif';
+      ctx.fillText((lang === 'en' ? 'Episode ' : 'Tập ') + v.id.split('-')[1], 256, 136);
+      ctx.fillStyle = '#f3dfc0';
+      ctx.font = 'italic 22px Georgia, serif';
+      ctx.fillText(lang === 'en' ? v.subEn : v.subVi, 256, 180);
+      // Nút "Nhấn để xem video"
+      const bx = 66, by = 222, bw = 380, bh = 72;
+      ctx.fillStyle = '#e8c872';
+      if (ctx.roundRect) { ctx.beginPath(); ctx.roundRect(bx, by, bw, bh, 36); ctx.fill(); } else ctx.fillRect(bx, by, bw, bh);
+      ctx.fillStyle = '#3a0f0b';
+      ctx.beginPath(); ctx.moveTo(bx + 40, by + 20); ctx.lineTo(bx + 40, by + 52); ctx.lineTo(bx + 66, by + 36); ctx.closePath(); ctx.fill();
+      ctx.font = 'bold 26px Montserrat, sans-serif';
+      ctx.fillText(lang === 'en' ? 'Tap to watch' : 'Nhấn để xem video', bx + bw / 2 + 22, by + 46);
+      ctx.fillStyle = 'rgba(243,223,192,0.8)';
+      ctx.font = '17px Montserrat, sans-serif';
+      ctx.fillText(lang === 'en' ? '(background music pauses while playing)' : '(nhạc nền sẽ tạm dừng khi xem)', 256, 338);
+      const t = new THREE.CanvasTexture(c);
+      t.colorSpace = THREE.SRGBColorSpace;
+      t.anisotropy = maxAnisotropy;
+      return t;
+    }
+
+    let _playIconTex = null;
+    function getPlayIconTexture() {
+      if (_playIconTex) return _playIconTex;
+      const c = document.createElement('canvas');
+      c.width = 256; c.height = 256;
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = 'rgba(20,8,6,0.55)';
+      ctx.beginPath(); ctx.arc(128, 128, 118, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = '#e8c872'; ctx.lineWidth = 8;
+      ctx.beginPath(); ctx.arc(128, 128, 112, 0, Math.PI * 2); ctx.stroke();
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath(); ctx.moveTo(100, 76); ctx.lineTo(100, 180); ctx.lineTo(186, 128); ctx.closePath(); ctx.fill();
+      _playIconTex = new THREE.CanvasTexture(c);
+      _playIconTex.colorSpace = THREE.SRGBColorSpace;
+      return _playIconTex;
+    }
+
     function createModernMuseumPlaqueTexture(title) {
       if (plaqueTextureCache.has(title)) {
         return plaqueTextureCache.get(title);
@@ -3208,6 +3304,30 @@
         return a.images[0].localeCompare(b.images[0]);
       });
 
+      // Video "Hành trình Kim Hoàng": thay 3 tranh trùng lặp (#10 = #56, #11 = #55, #12 = #50) theo đúng thứ tự Tập 1 → 3
+      const TOUR_VIDEOS = [
+        { ep: 1, replace: '10', subVi: 'Lưu Sắc Kim Hoàng', subEn: 'Luu Sac Kim Hoang' },
+        { ep: 2, replace: '11', subVi: 'Cùng nghệ nhân Đào Đình Chung', subEn: 'With artisan Dao Dinh Chung' },
+        { ep: 3, replace: '12', subVi: 'Chuyện Nghề – Người', subEn: 'Stories of the craft and its people' }
+      ];
+      const videoSlots = TOUR_VIDEOS
+        .map((v) => artworks.findIndex((a) => a.id === v.replace))
+        .filter((i) => i >= 0)
+        .sort((a, b) => a - b);
+      TOUR_VIDEOS.forEach((v, k) => {
+        if (videoSlots[k] === undefined) return;
+        artworks[videoSlots[k]] = {
+          id: 'video-' + v.ep,
+          isVideo: true,
+          title: 'Hành trình Kim Hoàng – Tập ' + v.ep,
+          titleEn: 'Kim Hoang Journey – Episode ' + v.ep,
+          subVi: v.subVi,
+          subEn: v.subEn,
+          videoUrl: '/media/video-hanh-trinh/web/tap-' + v.ep + '.mp4',
+          images: ['/media/video-hanh-trinh/web/tap-' + v.ep + '.jpg']
+        };
+      });
+
       const paintingLoadQueue = [];
 
       function hangPainting(artwork, rWall, theta, isFacingOutward) {
@@ -3250,13 +3370,29 @@
         group.add(spotFixture);
 
         // 5. Contemporary Museum Placard mounted on the wall to the right of each frame (matching photo)
-        const titleText = extractPaintingTitle(artwork);
-        const plaque = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.26, 0.02), darkWoodMat);
-        plaque.position.set(1.6 / 2 + 0.32, -0.15, 0.01);
-        const plaqueFace = new THREE.Mesh(
-          new THREE.PlaneGeometry(0.36, 0.24),
-          new THREE.MeshBasicMaterial({ map: createModernMuseumPlaqueTexture(titleText) })
+        const isVideo = !!artwork.isVideo;
+        const titleText = isVideo ? '' : extractPaintingTitle(artwork);
+        const plaque = new THREE.Mesh(
+          isVideo ? new THREE.BoxGeometry(0.66, 0.5, 0.025) : new THREE.BoxGeometry(0.38, 0.26, 0.02),
+          darkWoodMat
         );
+        plaque.position.set(1.6 / 2 + (isVideo ? 0.48 : 0.32), -0.15, 0.01);
+        const plaqueFace = new THREE.Mesh(
+          isVideo ? new THREE.PlaneGeometry(0.64, 0.48) : new THREE.PlaneGeometry(0.36, 0.24),
+          new THREE.MeshBasicMaterial({ map: isVideo ? createVideoBoardTexture(artwork) : createModernMuseumPlaqueTexture(titleText) })
+        );
+        if (isVideo) {
+          plaqueFace.userData.artwork = artwork;
+          interactivePaintings.push(plaqueFace);
+          const playIcon = new THREE.Mesh(
+            new THREE.PlaneGeometry(0.42, 0.42),
+            new THREE.MeshBasicMaterial({ map: getPlayIconTexture(), transparent: true, depthWrite: false })
+          );
+          playIcon.position.z = 0.05;
+          playIcon.userData.artwork = artwork;
+          interactivePaintings.push(playIcon);
+          group.add(playIcon);
+        }
         plaqueFace.position.z = 0.012;
         plaque.add(plaqueFace);
         group.add(plaque);
@@ -3333,7 +3469,6 @@
           artTexLoader.load(
             mobileArtUrl(artwork.images[0]),
             (tex) => {
-              if (isMobileDevice) shrinkTexture(tex, 640);
               tex.colorSpace = THREE.SRGBColorSpace;
               tex.anisotropy = maxAnisotropy;
               artMat.map = tex;
@@ -3349,7 +3484,7 @@
                 frameMesh.geometry.dispose();
                 frameMesh.geometry = new THREE.BoxGeometry(w + 0.14, h + 0.14, 0.08);
 
-                plaque.position.set(w / 2 + 0.30, -h * 0.18, 0.01);
+                plaque.position.set(w / 2 + (artwork.isVideo ? 0.46 : 0.30), -h * 0.18, 0.01);
                 spotFixture.position.y = h / 2 + 0.35;
 
                 wallSpotlight.geometry.dispose();
@@ -3513,6 +3648,10 @@
           closeStudioDialogue();
           return;
         }
+        return;
+      }
+      if (tourVideoOpen) {
+        if (e.key === 'Escape') closeTourVideo();
         return;
       }
       if (document.getElementById('artwork-modal').classList.contains('open')) {
@@ -3729,6 +3868,8 @@
       const obj = hits[0].object;
       if (obj.userData.artworkId) {
         setHoverState('Nhấn để ngồi xuống bàn vẽ tranh cùng Nghệ nhân');
+      } else if (obj.userData.artwork && obj.userData.artwork.isVideo) {
+        setHoverState((lang === 'en' ? '▶ Tap to watch: ' + obj.userData.artwork.titleEn : '▶ Nhấn để xem video: ' + obj.userData.artwork.title), obj);
       } else if (obj.userData.artwork) {
         setHoverState('Nhấn để xem chi tiết & ý nghĩa bức tranh', obj);
       } else if (obj.userData.isMosaicPainting) {
@@ -3853,6 +3994,9 @@
         const obj = hits[0].object;
         if (obj.userData.artworkId) {
           sitDownAtTable();
+          return;
+        } else if (obj.userData.artwork && obj.userData.artwork.isVideo) {
+          openTourVideo(obj.userData.artwork);
           return;
         } else if (obj.userData.artwork) {
           openArtworkModal(obj.userData.artwork);
@@ -4261,6 +4405,60 @@
       m.style.display = 'flex';
       const v = m.querySelector('#mobile-popup-video');
       if (v) v.play().catch(() => {});
+    }
+
+    let tourVideoOpen = false;
+    let tvWasMuted = true;
+    function openTourVideo(v) {
+      if (document.pointerLockElement) document.exitPointerLock();
+      let m = document.getElementById('tour-video-modal');
+      if (!m) {
+        m = document.createElement('div');
+        m.id = 'tour-video-modal';
+        m.innerHTML = `
+          <div class="tvm-card">
+            <div class="tvm-head">
+              <div>
+                <div class="tvm-kicker"></div>
+                <div class="tvm-title"></div>
+              </div>
+              <button class="tvm-close" aria-label="Đóng">✕</button>
+            </div>
+            <video class="tvm-video" controls playsinline preload="metadata"></video>
+          </div>`;
+        document.body.appendChild(m);
+        m.querySelector('.tvm-close').addEventListener('click', closeTourVideo);
+        m.addEventListener('click', (e) => { if (e.target === m) closeTourVideo(); });
+      }
+      const en = lang === 'en';
+      m.querySelector('.tvm-kicker').textContent = en ? 'KIM HOANG JOURNEY' : 'HÀNH TRÌNH KIM HOÀNG';
+      m.querySelector('.tvm-title').textContent = (en ? v.titleEn : v.title) + ' — ' + (en ? v.subEn : v.subVi);
+      const vid = m.querySelector('.tvm-video');
+      vid.poster = v.images[0];
+      vid.src = v.videoUrl;
+      vid.muted = false;
+      // Tắt nhạc nền, thuyết minh và tiếng TV khi xem video
+      bgAudio.pause();
+      narratorAudio.pause();
+      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+      if (videoEl) { tvWasMuted = videoEl.muted; videoEl.muted = true; }
+      tourVideoOpen = true;
+      m.classList.add('open');
+      vid.play().catch(() => {});
+    }
+
+    function closeTourVideo() {
+      const m = document.getElementById('tour-video-modal');
+      if (!m || !tourVideoOpen) return;
+      const vid = m.querySelector('.tvm-video');
+      vid.pause();
+      vid.removeAttribute('src');
+      vid.load(); // giải phóng bộ nhớ video
+      m.classList.remove('open');
+      tourVideoOpen = false;
+      if (videoEl) videoEl.muted = tvWasMuted;
+      // Bật lại nhạc nền
+      if (audioEnabled) bgAudio.play().catch(() => {});
     }
 
     function enterExhibition() {
