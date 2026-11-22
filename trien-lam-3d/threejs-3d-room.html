@@ -1434,7 +1434,12 @@
 
       // Chờ tất cả, tối đa 60 giây (mạng quá chậm thì vẫn cho vào thay vì kẹt mãi)
       await Promise.race([
-        Promise.all([paintingsReady, whenSharedTexturesIdle(), tvReady]),
+        Promise.all([paintingsReady, whenSharedTexturesIdle(), tvReady, ...wallVideos.map((w) => new Promise((resolve) => {
+          if (w.el.readyState >= 2) return resolve();
+          w.el.addEventListener('loadeddata', resolve, { once: true });
+          w.el.addEventListener('error', resolve, { once: true });
+          setTimeout(resolve, 12000);
+        }))]),
         new Promise((r) => setTimeout(r, 60000))
       ]);
       finished = true;
@@ -3149,6 +3154,84 @@
     }
 
     const plaqueTextureCache = new Map();
+    const wallVideos = [];
+
+    function createVideoStandee(v) {
+      const g = new THREE.Group();
+      const base = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.24, 0.04, 24), goldMat);
+      base.position.y = 0.02;
+      const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.028, 0.028, 1.15, 16), goldMat);
+      pole.position.y = 0.6;
+      const frame = new THREE.Mesh(new THREE.BoxGeometry(0.72, 0.92, 0.035), goldMat);
+      frame.position.set(0, 1.25, 0);
+      frame.rotation.x = -0.25;
+
+      const c = document.createElement('canvas');
+      c.width = 512; c.height = 680;
+      const x = c.getContext('2d');
+      const en = lang === 'en';
+      x.fillStyle = '#1a1b1f'; x.fillRect(0, 0, 512, 680);
+      x.strokeStyle = '#d4af37'; x.lineWidth = 4; x.strokeRect(12, 12, 488, 656);
+      x.textAlign = 'center'; x.textBaseline = 'middle';
+      // nút play tròn
+      x.fillStyle = '#f5c842';
+      x.beginPath(); x.arc(256, 118, 62, 0, Math.PI * 2); x.fill();
+      x.fillStyle = '#1a1b1f';
+      x.beginPath(); x.moveTo(234, 82); x.lineTo(234, 154); x.lineTo(296, 118); x.closePath(); x.fill();
+      x.fillStyle = '#f0cf65';
+      x.font = 'bold 26px "Montserrat", sans-serif';
+      x.fillText(en ? 'KIM HOANG JOURNEY' : 'HÀNH TRÌNH KIM HOÀNG', 256, 222);
+      x.fillStyle = '#ffffff';
+      x.font = 'bold 64px "Montserrat", sans-serif';
+      x.fillText((en ? 'EPISODE ' : 'TẬP ') + v.id.split('-')[1], 256, 290);
+      x.strokeStyle = 'rgba(212, 175, 55, 0.5)'; x.lineWidth = 2;
+      x.beginPath(); x.moveTo(80, 340); x.lineTo(432, 340); x.stroke();
+      x.fillStyle = '#e8e2d4';
+      x.font = 'italic 26px Georgia, serif';
+      x.fillText(en ? v.subEn : v.subVi, 256, 385);
+      // nút "Nhấn để xem video"
+      x.fillStyle = '#c62828';
+      if (x.roundRect) { x.beginPath(); x.roundRect(70, 440, 372, 76, 38); x.fill(); } else x.fillRect(70, 440, 372, 76);
+      x.strokeStyle = '#f5c842'; x.lineWidth = 3;
+      if (x.roundRect) { x.beginPath(); x.roundRect(70, 440, 372, 76, 38); x.stroke(); }
+      x.fillStyle = '#ffffff';
+      x.font = 'bold 30px "Montserrat", sans-serif';
+      x.fillText(en ? '▶  TAP TO WATCH' : '▶  NHẤN ĐỂ XEM', 256, 479);
+      x.fillStyle = '#b8bac2';
+      x.font = '21px "Montserrat", sans-serif';
+      x.fillText(en ? 'Full episode with sound' : 'Xem trọn tập, có âm thanh', 256, 565);
+      x.fillText(en ? 'Music pauses while playing' : 'Nhạc nền tạm dừng khi xem', 256, 600);
+
+      const tex = new THREE.CanvasTexture(c);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      tex.anisotropy = maxAnisotropy;
+      const face = new THREE.Mesh(new THREE.PlaneGeometry(0.68, 0.88), new THREE.MeshBasicMaterial({ map: tex }));
+      face.position.z = 0.02;
+      face.userData.artwork = v;
+      interactivePaintings.push(face);
+      frame.add(face);
+      g.add(base, pole, frame);
+      return g;
+    }
+
+    // Chỉ chạy video tường khi người xem ở gần (tiết kiệm pin & bộ nhớ trên điện thoại)
+    const _wvPos = new THREE.Vector3();
+    let _wvTimer = 0;
+    function updateWallVideos(dt) {
+      _wvTimer += dt;
+      if (_wvTimer < 0.5) return;
+      _wvTimer = 0;
+      wallVideos.forEach((w) => {
+        w.group.getWorldPosition(_wvPos);
+        const near = camera.position.distanceTo(_wvPos) < 12;
+        if (near && !tourVideoOpen) {
+          if (w.el.paused) w.el.play().catch(() => {});
+        } else if (!w.el.paused) {
+          w.el.pause();
+        }
+      });
+    }
+
     function createVideoBoardTexture(v) {
       const c = document.createElement('canvas');
       c.width = 512; c.height = 384;
@@ -3399,6 +3482,7 @@
           subVi: v.subVi,
           subEn: v.subEn,
           videoUrl: '/media/video-hanh-trinh/web/tap-' + v.ep + '.mp4',
+          previewUrl: '/media/video-hanh-trinh/web/tap-' + v.ep + '-preview.mp4',
           images: ['/media/video-hanh-trinh/web/tap-' + v.ep + '.jpg']
         };
       });
@@ -3424,11 +3508,13 @@
         group.add(frameMesh);
 
         // 3. Artwork Canvas Mesh (Khởi tạo sẵn với màu đỏ hồng điều Kim Hoàng sang trọng)
-        const artMat = new THREE.MeshStandardMaterial({
-          color: 0x9e241d,
-          roughness: 0.55,
-          metalness: 0.05
-        });
+        const artMat = artwork.isVideo
+          ? new THREE.MeshBasicMaterial({ color: 0x9e241d })
+          : new THREE.MeshStandardMaterial({
+              color: 0x9e241d,
+              roughness: 0.55,
+              metalness: 0.05
+            });
         const artMesh = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 1.2), artMat);
         artMesh.position.z = 0.045;
         artMesh.userData.artwork = artwork;
@@ -3465,8 +3551,36 @@
           );
           playIcon.position.z = 0.05;
           playIcon.userData.artwork = artwork;
+          playIcon.scale.setScalar(0.62);
           interactivePaintings.push(playIcon);
           group.add(playIcon);
+
+          // Video xem trước tự chiếu, không tiếng, lặp lại (bản 360p nhẹ)
+          const pv = document.createElement('video');
+          pv.muted = true; pv.loop = true; pv.playsInline = true; pv.autoplay = false;
+          pv.setAttribute('muted', ''); pv.setAttribute('playsinline', ''); pv.setAttribute('webkit-playsinline', '');
+          pv.preload = 'auto';
+          pv.crossOrigin = 'anonymous';
+          pv.src = artwork.previewUrl;
+          const pvTex = new THREE.VideoTexture(pv);
+          pvTex.colorSpace = THREE.SRGBColorSpace;
+          pvTex.generateMipmaps = false;
+          pvTex.minFilter = THREE.LinearFilter;
+          artwork._artMat = artMat;
+          artwork._videoTex = pvTex;
+          pv.addEventListener('playing', () => {
+            artwork._videoPlaying = true;
+            artMat.map = pvTex;
+            artMat.color.setHex(0xffffff);
+            artMat.needsUpdate = true;
+          });
+          wallVideos.push({ el: pv, group, artwork });
+
+          // Biển đứng chân vàng trước video: "Nhấn để xem video"
+          const standee = createVideoStandee(artwork);
+          standee.position.set(-1.35, -1.98, 1.35);
+          standee.rotation.y = 0.42;
+          group.add(standee);
         }
         plaqueFace.position.z = 0.012;
         plaque.add(plaqueFace);
@@ -3552,7 +3666,7 @@
             (tex) => {
               tex.colorSpace = THREE.SRGBColorSpace;
               tex.anisotropy = maxAnisotropy;
-              artMat.map = tex;
+              artMat.map = (artwork._videoPlaying && artwork._videoTex) ? artwork._videoTex : tex;
               artMat.color.setHex(0xffffff);
               artMat.needsUpdate = true;
               if (tex.image && tex.image.width && tex.image.height) {
@@ -4527,6 +4641,7 @@
       if ('speechSynthesis' in window) window.speechSynthesis.cancel();
       if (videoEl) { tvWasMuted = videoEl.muted; videoEl.muted = true; }
       tourVideoOpen = true;
+      wallVideos.forEach((w) => w.el.pause());
       m.classList.add('open');
       vid.play().catch(() => {});
     }
@@ -4990,6 +5105,7 @@
         drawMinimap();
       }
 
+      if (isFullyLoaded) updateWallVideos(dt || 0.016);
       renderer.render(scene, camera);
       window.__kf = (window.__kf || 0) + 1;
       if (window.__kf === 1 || window.__kf === 10 || window.__kf === 60 || window.__kf === 300) window.khLog('frame ' + window.__kf);

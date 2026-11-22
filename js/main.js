@@ -549,6 +549,13 @@ function initSearch() {
   });
 
   /** Trên điện thoại: canh hộp kết quả sát hai mép màn hình, không tràn ra ngoài */
+  // Mã hoá ký tự đặc biệt trước khi chèn từ khoá người dùng vào HTML (chống XSS)
+  function escHtmlSafe(str) {
+    return String(str == null ? '' : str)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
   function placeSearchDropdown(dd) {
     if (!dd) return;
     if (window.innerWidth >= 640) { dd.style.marginLeft = ''; return; }
@@ -609,7 +616,7 @@ function initSearch() {
           </ul>
         </div>
         <a class="header-search-dropdown__footer" href="${langPrefix()}/search?q=${encodeURIComponent(query)}">
-          ${isEn ? 'View all results for' : 'Xem tất cả kết quả cho'} <span class="header-search-dropdown__footer-query">"${query}"</span> →
+          ${isEn ? 'View all results for' : 'Xem tất cả kết quả cho'} <span class="header-search-dropdown__footer-query">"${escHtmlSafe(query)}"</span> →
         </a>
       `;
     } catch (err) {
@@ -678,7 +685,7 @@ function initSearchPage() {
         container.innerHTML = `
           <div class="py-16 text-center">
             <h3 class="text-lg font-serif text-gray-800">${isEn ? 'No results found' : 'Không tìm thấy kết quả nào'}</h3>
-            <p class="text-sm text-gray-500 mt-2">${isEn ? `No content matches "${query}". Please try different keywords.` : `Không có nội dung nào phù hợp với từ khóa "${query}". Vui lòng thử từ khóa khác.`}</p>
+            <p class="text-sm text-gray-500 mt-2">${isEn ? `No content matches "${escHtmlSafe(query)}". Please try different keywords.` : `Không có nội dung nào phù hợp với từ khóa "${escHtmlSafe(query)}". Vui lòng thử từ khóa khác.`}</p>
           </div>
         `;
         return;
