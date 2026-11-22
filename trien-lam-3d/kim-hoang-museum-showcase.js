@@ -83,6 +83,20 @@ function pumpTexQueue() {
   }
 }
 
+// Cho biết khi nào toàn bộ tranh dùng chung (mosaic) đã tải xong
+export function getSharedTexStats() {
+  return { pending: sharedTexPending.size + texQueue.length + texActive, loaded: sharedTexCache.size };
+}
+export function whenSharedTexturesIdle() {
+  return new Promise((resolve) => {
+    const check = () => {
+      if (sharedTexPending.size === 0 && texQueue.length === 0 && texActive === 0) resolve();
+      else setTimeout(check, 120);
+    };
+    setTimeout(check, 50);
+  });
+}
+
 const sharedTexPending = new Map(); // url -> [onReady...] (gộp các lần tải trùng)
 
 export function getSharedTexture(url, maxAnisotropy = 4, onReady = null) {

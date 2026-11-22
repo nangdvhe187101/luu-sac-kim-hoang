@@ -1306,11 +1306,13 @@
       MOSAIC_FONT,
       GALLERY_URLS,
       shrinkTexture,
+      getSharedTexStats,
+      whenSharedTexturesIdle,
       mobileArtUrl,
       createFadeArtMaterial,
       createMosaicRotator,
       hangSharedPainting
-    } from './kim-hoang-museum-showcase.js?v=kim_hoang_v39';
+    } from './kim-hoang-museum-showcase.js?v=kim_hoang_v40';
 
     // =========================================================================
     // 1. Loading Manager & Progress Tracking (100% Preload & Shader Warmup)
@@ -1340,7 +1342,7 @@
     let managerLoaded = false;
 
     loadingManager.onProgress = (url, loaded, total) => {
-      const pct = Math.min(92, Math.max(10, Math.round((loaded / total) * 82 + 10)));
+      const pct = Math.min(55, Math.max(5, Math.round((loaded / total) * 50 + 5)));
       updateLoadingProgress(pct, lang === 'en' ? 'Loading...' : 'Đang tải...');
     };
 
@@ -1360,26 +1362,11 @@
       isFullyLoaded = true;
       window.khLog('assets loaded');
 
-      updateLoadingProgress(96, lang === 'en' ? 'Loading...' : 'Đang tải...');
+      if (typeof startLoadingPaintingsQueue === 'function') startLoadingPaintingsQueue();
 
-      // Pre-compile shaders chỉ thực hiện trên Desktop (tránh GPU timeout / OOM crash trên WebKit iOS)
-      if (!isMobileDevice) {
-        try {
-          renderer.compile(scene, camera);
-          renderer.render(scene, camera);
-        } catch (err) {
-          console.warn('Pre-compile notice:', err);
-        }
-      }
-
-      // Kích hoạt hàng đợi tải tranh tuần tự thông minh
-      if (typeof startLoadingPaintingsQueue === 'function') {
-        startLoadingPaintingsQueue();
-      }
-
-      setTimeout(() => {
+      preloadEverything().then(() => setTimeout(() => {
         window.__tourReady = true;
-        updateLoadingProgress(100, '✓ Triển lãm đã sẵn sàng 100%!');
+        updateLoadingProgress(100, lang === 'en' ? '✓ Exhibition ready!' : '✓ Triển lãm đã sẵn sàng 100%!');
         if (loadingContainer) {
           loadingContainer.style.opacity = '0';
           setTimeout(() => { loadingContainer.style.display = 'none'; }, 250);
@@ -1421,15 +1408,84 @@
             }
           }, 150);
         }
-      }, 350);
+      }, 200));
     }
 
-    // Safety watchdog: after 3.5s, if any background asset is slow on mobile, enable entry immediately
+    // Tải trọn vẹn: tranh trên tường + tranh mosaic + video lễ tân, rồi đưa toàn bộ texture lên GPU
+    // và biên dịch shader trước, để khi bước vào là cảnh đã nét, sáng và mượt ngay.
+    async function preloadEverything() {
+      const vi = lang !== 'en';
+      const t0 = performance.now();
+      let finished = false;
+      const tick = setInterval(() => {
+        if (finished) return;
+        const st = getSharedTexStats();
+        const mosaicTotal = st.loaded + st.pending || 1;
+        const frac = 0.75 * (paintingsTotal ? paintingsDone / paintingsTotal : 0) + 0.25 * (st.loaded / mosaicTotal);
+        updateLoadingProgress(Math.min(90, Math.round(55 + frac * 35)), vi ? 'Đang tải tranh triển lãm...' : 'Loading artworks...');
+      }, 150);
+
+      const tvReady = new Promise((resolve) => {
+        if (!videoEl || !videoEl.src || videoEl.readyState >= 3) return resolve();
+        videoEl.addEventListener('canplay', resolve, { once: true });
+        videoEl.addEventListener('error', resolve, { once: true });
+        setTimeout(resolve, 12000);
+      });
+
+      // Chờ tất cả, tối đa 60 giây (mạng quá chậm thì vẫn cho vào thay vì kẹt mãi)
+      await Promise.race([
+        Promise.all([paintingsReady, whenSharedTexturesIdle(), tvReady]),
+        new Promise((r) => setTimeout(r, 60000))
+      ]);
+      finished = true;
+      clearInterval(tick);
+      window.khLog('all assets ' + Math.round(performance.now() - t0) + 'ms');
+
+      updateLoadingProgress(92, vi ? 'Đang chuẩn bị không gian 3D...' : 'Preparing 3D space...');
+      await new Promise((r) => setTimeout(r, 30));
+
+      // Đưa mọi texture lên GPU ngay bây giờ (tránh giật khi quay đầu nhìn chỗ mới)
+      const seen = new Set();
+      scene.traverse((o) => {
+        const mats = o.material ? (Array.isArray(o.material) ? o.material : [o.material]) : [];
+        mats.forEach((m) => {
+          ['map', 'normalMap', 'roughnessMap', 'metalnessMap', 'aoMap', 'emissiveMap', 'alphaMap', 'bumpMap'].forEach((k) => {
+            const t = m[k];
+            if (t && !t.isVideoTexture && !seen.has(t)) {
+              seen.add(t);
+              try { renderer.initTexture(t); } catch (_) {}
+            }
+          });
+        });
+      });
+      updateLoadingProgress(96, vi ? 'Đang tối ưu hiển thị...' : 'Optimizing rendering...');
+      await new Promise((r) => setTimeout(r, 30));
+
+      // Biên dịch sẵn toàn bộ shader
+      try {
+        if (renderer.compileAsync) await renderer.compileAsync(scene, camera);
+        else renderer.compile(scene, camera);
+      } catch (err) { console.warn('Pre-compile notice:', err); }
+
+      // Vẽ thử vài khung hình quanh 4 hướng để mọi thứ sẵn sàng
+      const savedYaw = camera.rotation.y;
+      for (let i = 0; i < 4; i++) {
+        camera.rotation.y = savedYaw + i * Math.PI / 2;
+        camera.updateMatrixWorld();
+        try { renderer.render(scene, camera); } catch (_) {}
+        await new Promise((r) => requestAnimationFrame(r));
+      }
+      camera.rotation.y = savedYaw;
+      camera.updateMatrixWorld();
+      window.khLog('warmup done ' + Math.round(performance.now() - t0) + 'ms');
+    }
+
+    // Lưới an toàn: nếu một model bị lỗi tải và không bao giờ báo xong, vẫn tiếp tục sau 45 giây
     setTimeout(() => {
       if (!isFullyLoaded) {
         finishAndWarmupScene();
       }
-    }, 3500);
+    }, 45000);
 
     // =========================================================================
     // 2. State & Constants (Matching User's Circular Exhibition Diagram)
@@ -1478,7 +1534,7 @@
     const renderer = new THREE.WebGLRenderer({
       antialias: true,
       powerPreference: isMobileDevice ? 'default' : 'high-performance',
-      precision: isMobileDevice ? 'mediump' : 'highp',
+      precision: 'highp',
       preserveDrawingBuffer: urlParams.has('capture'),
       stencil: false,
       depth: true
@@ -1508,7 +1564,7 @@
     const maxAnisotropy = Math.min(renderer.capabilities.getMaxAnisotropy(), isMobileDevice ? 1 : 4);
 
     // Realistic IBL reflections via RoomEnvironment (chỉ bật trên Desktop đủ VRAM, tắt trên iOS/mobile để chống crash WebKit)
-    if (!isMobileDevice) {
+    {
       try {
         const pmrem = new THREE.PMREMGenerator(renderer);
         scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
@@ -1520,8 +1576,8 @@
     }
 
     // Ánh sáng Hemisphere ấm cúng (trên mobile tăng nhẹ để không gian rạng rỡ khi tắt IBL)
-    scene.add(new THREE.HemisphereLight(0xfff2e0, 0x282c32, isMobileDevice ? 0.76 : 0.48));
-    const dirLight = new THREE.DirectionalLight(0xfff5e6, isMobileDevice ? 0.72 : 0.58);
+    scene.add(new THREE.HemisphereLight(0xfff2e0, 0x282c32, 0.48));
+    const dirLight = new THREE.DirectionalLight(0xfff5e6, 0.58);
     dirLight.position.set(6, 16, 16);
     dirLight.castShadow = !isMobileDevice;
     if (!isMobileDevice) {
@@ -3459,11 +3515,15 @@
     }
 
     let hasStartedPaintingQueue = false;
+    let paintingsTotal = 0, paintingsDone = 0;
+    let resolvePaintings;
+    const paintingsReady = new Promise((r) => { resolvePaintings = r; });
     function startLoadingPaintingsQueue() {
       if (hasStartedPaintingQueue) return;
       const queue = window._paintingLoadQueue;
-      if (!queue || queue.length === 0) return;
+      if (!queue || queue.length === 0) { resolvePaintings(); return; }
       hasStartedPaintingQueue = true;
+      paintingsTotal = queue.length;
 
       // Batch size: trên mobile tải 2 tranh/đợt để VRAM luôn dưới ngưỡng an toàn, desktop tải 4 tranh/đợt
       const batchSize = isMobileDevice ? 2 : 4;
@@ -3475,6 +3535,8 @@
         let pending = batch.length;
 
         function step() {
+          paintingsDone++;
+          if (paintingsDone >= paintingsTotal) resolvePaintings();
           pending--;
           if (pending <= 0) {
             if (queue.length > 0) {
@@ -3784,6 +3846,7 @@
           const sens = (e.pointerType === 'touch' ? 0.18 : 0.14) * (camera.fov / 65);
           targetYaw -= deltaX * sens;
           targetPitch = Math.max(-75, Math.min(75, targetPitch - deltaY * sens));
+          if (navTarget) navUserTurned = true;
         }
       } else if (lookPointerId === null && e.pointerType !== 'touch') {
         updateHover(e.clientX, e.clientY);
@@ -3900,6 +3963,8 @@
 
     let navTarget = null;
     let navRingGroup = null;
+    let navUserTurned = false; // người dùng đã tự xoay trong lúc đang đi → không tự xoay camera nữa
+    let navStuckTime = 0;      // thời gian bị tường / bàn chặn khi đang đi tới điểm chạm
 
     function createNavRing() {
       navRingGroup = new THREE.Group();
@@ -3935,6 +4000,8 @@
     function setNavTarget(tx, tz) {
       const dest = { x: tx, z: tz };
       navTarget = dest;
+      navUserTurned = false;
+      navStuckTime = 0;
       if (!navRingGroup) createNavRing();
       navRingGroup.position.set(dest.x, 0.025, dest.z);
       navRingGroup.scale.set(1, 1, 1);
@@ -4802,8 +4869,8 @@
           navTarget = null;
           if (navRingGroup) navRingGroup.visible = false;
         } else {
-          if (keys['ArrowLeft'] || padState.left || keys['KeyQ'])   targetYaw += TURN_SPEED * dt;
-          if (keys['ArrowRight'] || padState.right || keys['KeyE']) targetYaw -= TURN_SPEED * dt;
+          if (keys['ArrowLeft'] || padState.left || keys['KeyQ'])   { targetYaw += TURN_SPEED * dt; navUserTurned = true; }
+          if (keys['ArrowRight'] || padState.right || keys['KeyE']) { targetYaw -= TURN_SPEED * dt; navUserTurned = true; }
 
           let fwdInput = 0, strafeInput = 0;
           if (keys['KeyW'] || keys['ArrowUp'] || padState.fwd)    fwdInput += 1;
@@ -4836,7 +4903,7 @@
 
               // Only auto-align orientation if user is NOT actively touching/swiping the screen!
               // And only when sufficiently far from target (dist > 1.2m) to avoid sudden 180-degree flip!
-              if (lookPointerId === null && dist > 1.2) {
+              if (lookPointerId === null && !navUserTurned && dist > 1.2) {
                 const angleToTarget = THREE.MathUtils.radToDeg(Math.atan2(-dx, -dz));
                 let diff = (angleToTarget - targetYaw) % 360;
                 if (diff > 180) diff -= 360;
@@ -4863,9 +4930,22 @@
           const speedMag = Math.hypot(velX, velZ);
 
           if (speedMag > 0.02) {
-            const [nx, nz] = resolvePosition(camera.position.x + velX * dt, camera.position.z + velZ * dt);
+            const px = camera.position.x, pz = camera.position.z;
+            const [nx, nz] = resolvePosition(px + velX * dt, pz + velZ * dt);
             camera.position.x = nx;
             camera.position.z = nz;
+            if (navTarget) {
+              const actual = Math.hypot(nx - px, nz - pz);
+              const intended = speedMag * dt;
+              navStuckTime = (actual < intended * 0.35) ? navStuckTime + dt : 0;
+              if (navStuckTime > 0.35) {
+                // Đích nằm sau tường / bàn lễ tân: dừng lại, trả quyền xoay cho người dùng
+                navTarget = null;
+                navStuckTime = 0;
+                velX = 0; velZ = 0;
+                if (navRingGroup) navRingGroup.visible = false;
+              }
+            }
             walkBob += dt * (3.8 + speedMag * 0.8);
             camera.position.y = PLAYER_HEIGHT + Math.sin(walkBob) * (isMobileDevice ? 0.003 : 0.008) * Math.min(1, speedMag / WALK_SPEED);
           } else {
