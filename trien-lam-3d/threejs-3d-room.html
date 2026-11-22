@@ -1249,6 +1249,8 @@
     const loadingManager = new THREE.LoadingManager();
     const gltfLoader = new GLTFLoader(loadingManager);
     const texLoader = new THREE.TextureLoader(loadingManager);
+    // TextureLoader độc lập cho tranh để tải tuần tự theo hàng đợi, không làm đứng màn hình loading và không tràn RAM iOS
+    const artTexLoader = new THREE.TextureLoader();
 
     let isFullyLoaded = false;
     let tourDataLoaded = false;
@@ -1277,13 +1279,19 @@
 
       updateLoadingProgress(96, lang === 'en' ? 'Loading...' : 'Đang tải...');
 
-      // Force WebGL to pre-compile ALL scene shaders and warm up geometry buffers into VRAM!
-      // This guarantees zero runtime hitch or frame drops when walking into the room!
-      try {
-        renderer.compile(scene, camera);
-        renderer.render(scene, camera);
-      } catch (err) {
-        console.warn('Pre-compile notice:', err);
+      // Pre-compile shaders chỉ thực hiện trên Desktop (tránh GPU timeout / OOM crash trên WebKit iOS)
+      if (!isMobileDevice) {
+        try {
+          renderer.compile(scene, camera);
+          renderer.render(scene, camera);
+        } catch (err) {
+          console.warn('Pre-compile notice:', err);
+        }
+      }
+
+      // Kích hoạt hàng đợi tải tranh tuần tự thông minh
+      if (typeof startLoadingPaintingsQueue === 'function') {
+        startLoadingPaintingsQueue();
       }
 
       setTimeout(() => {
@@ -1379,47 +1387,68 @@
     const camera = new THREE.PerspectiveCamera(68, window.innerWidth / window.innerHeight, 0.1, 120);
     camera.position.set(0, PLAYER_HEIGHT, 18.0);
 
-    const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || (window.innerWidth < 820);
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    const isMobileDevice = isIOS || /Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || (window.innerWidth < 820);
     const renderer = new THREE.WebGLRenderer({
-      antialias: true,
-      powerPreference: 'high-performance',
-      preserveDrawingBuffer: urlParams.has('capture')
+      antialias: !isMobileDevice, // Tắt MSAA trên mobile/iOS để tránh tràn bộ nhớ VRAM framebuffer
+      powerPreference: isMobileDevice ? 'default' : 'high-performance',
+      precision: isMobileDevice ? 'mediump' : 'highp',
+      preserveDrawingBuffer: urlParams.has('capture'),
+      stencil: false,
+      depth: true
     });
     renderer.setSize(window.innerWidth, window.innerHeight);
     const maxDPR = isMobileDevice 
-      ? Math.min(window.devicePixelRatio, 1.25) 
+      ? 1.0 
       : Math.min(window.devicePixelRatio, 1.5);
-    // Start conservative (1.0 phone / 1.25 desktop); adaptResolution() raises or lowers it from real FPS
-    let _adaptDPR = Math.min(maxDPR, isMobileDevice ? 1.0 : 1.25);
+    let _adaptDPR = isMobileDevice ? 1.0 : Math.min(maxDPR, 1.25);
     renderer.setPixelRatio(_adaptDPR);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 0.92;
-    renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = isMobileDevice ? THREE.BasicShadowMap : THREE.PCFShadowMap;
+    renderer.shadowMap.enabled = !isMobileDevice;
+    if (renderer.shadowMap.enabled) {
+      renderer.shadowMap.type = THREE.PCFShadowMap;
+    }
     container.appendChild(renderer.domElement);
 
-    const maxAnisotropy = Math.min(renderer.capabilities.getMaxAnisotropy(), isMobileDevice ? 2 : 4);
+    // Xử lý mất WebGL Context an toàn
+    renderer.domElement.addEventListener('webglcontextlost', (e) => {
+      e.preventDefault();
+      console.warn('WebGL context lost - bảo vệ tài nguyên');
+    }, false);
 
-    // Realistic IBL reflections via RoomEnvironment (gentle fill, no washed-out highlights)
-    const pmrem = new THREE.PMREMGenerator(renderer);
-    scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
-    scene.environmentIntensity = 0.32;
+    const maxAnisotropy = Math.min(renderer.capabilities.getMaxAnisotropy(), isMobileDevice ? 1 : 4);
 
-    scene.add(new THREE.HemisphereLight(0xfff2e0, 0x282c32, 0.48));
-    const dirLight = new THREE.DirectionalLight(0xfff5e6, 0.58);
+    // Realistic IBL reflections via RoomEnvironment (chỉ bật trên Desktop đủ VRAM, tắt trên iOS/mobile để chống crash WebKit)
+    if (!isMobileDevice) {
+      try {
+        const pmrem = new THREE.PMREMGenerator(renderer);
+        scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+        scene.environmentIntensity = 0.32;
+        pmrem.dispose();
+      } catch (e) {
+        console.warn('IBL notice:', e);
+      }
+    }
+
+    // Ánh sáng Hemisphere ấm cúng (trên mobile tăng nhẹ để không gian rạng rỡ khi tắt IBL)
+    scene.add(new THREE.HemisphereLight(0xfff2e0, 0x282c32, isMobileDevice ? 0.76 : 0.48));
+    const dirLight = new THREE.DirectionalLight(0xfff5e6, isMobileDevice ? 0.72 : 0.58);
     dirLight.position.set(6, 16, 16);
-    dirLight.castShadow = true;
-    const shadowRes = isMobileDevice ? 512 : 1024;
-    dirLight.shadow.mapSize.set(shadowRes, shadowRes);
-    dirLight.shadow.camera.near = 2;
-    dirLight.shadow.camera.far = 48;
-    dirLight.shadow.camera.left = -22;
-    dirLight.shadow.camera.right = 22;
-    dirLight.shadow.camera.top = 22;
-    dirLight.shadow.camera.bottom = -22;
-    dirLight.shadow.bias = -0.0004;
-    dirLight.shadow.normalBias = 0.02;
+    dirLight.castShadow = !isMobileDevice;
+    if (!isMobileDevice) {
+      dirLight.shadow.mapSize.set(1024, 1024);
+      dirLight.shadow.camera.near = 2;
+      dirLight.shadow.camera.far = 48;
+      dirLight.shadow.camera.left = -22;
+      dirLight.shadow.camera.right = 22;
+      dirLight.shadow.camera.top = 22;
+      dirLight.shadow.camera.bottom = -22;
+      dirLight.shadow.bias = -0.0004;
+      dirLight.shadow.normalBias = 0.02;
+    }
     scene.add(dirLight);
 
     // =========================================================================
@@ -1673,16 +1702,83 @@
     let mosaicRotator = null;
 
     const videoEl = document.createElement('video');
-    videoEl.src = '/media/video/Web.mp4';
     videoEl.loop = true;
     videoEl.muted = true;
     videoEl.playsInline = true;
     videoEl.crossOrigin = 'anonymous';
-    const videoTex = new THREE.VideoTexture(videoEl);
-    videoTex.colorSpace = THREE.SRGBColorSpace;
-    videoTex.generateMipmaps = false;
-    videoTex.minFilter = THREE.LinearFilter;
-    videoTex.magFilter = THREE.LinearFilter;
+
+    // Màn hình TV: Trên iOS/Mobile dùng Poster texture canvas nhẹ, đẹp, sắc nét; trên Desktop có thể dùng VideoTexture
+    function makeTVPosterTexture() {
+      const c = document.createElement('canvas');
+      c.width = 1024; c.height = 576;
+      const ctx = c.getContext('2d');
+
+      // Nền đen than đá sang trọng
+      ctx.fillStyle = '#121316';
+      ctx.fillRect(0, 0, 1024, 576);
+
+      // Gradient nền ấm
+      const grad = ctx.createRadialGradient(512, 288, 50, 512, 288, 500);
+      grad.addColorStop(0, '#2d1814');
+      grad.addColorStop(1, '#0c0d0f');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 1024, 576);
+
+      // Viền khung vàng kim thanh lịch
+      ctx.strokeStyle = '#d4af37';
+      ctx.lineWidth = 4;
+      ctx.strokeRect(28, 28, 1024 - 56, 576 - 56);
+
+      // Tiêu đề
+      ctx.fillStyle = '#e8c872';
+      ctx.font = 'bold 36px "Cinzel", "Bropella", serif, Georgia';
+      ctx.textAlign = 'center';
+      ctx.fillText('LƯU SẮC KIM HOÀNG', 512, 180);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 22px "Montserrat", sans-serif';
+      ctx.fillText('PHIM TƯ LIỆU: BẢO TỒN TRANH DÂN GIAN ĐỎ', 512, 230);
+
+      // Nút Play tròn
+      ctx.beginPath();
+      ctx.arc(512, 340, 50, 0, Math.PI * 2);
+      ctx.fillStyle = '#d4af37';
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(502, 318);
+      ctx.lineTo(530, 340);
+      ctx.lineTo(502, 362);
+      ctx.closePath();
+      ctx.fillStyle = '#121316';
+      ctx.fill();
+
+      ctx.fillStyle = '#c5a059';
+      ctx.font = 'italic 18px "Montserrat", sans-serif';
+      ctx.fillText('▶ Chạm vào màn hình để xem phim tư liệu', 512, 440);
+
+      const tex = new THREE.CanvasTexture(c);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      return tex;
+    }
+
+    const tvPosterTex = makeTVPosterTexture();
+    let videoTex = null;
+
+    if (!isMobileDevice) {
+      try {
+        videoEl.src = '/media/video/Web.mp4';
+        videoTex = new THREE.VideoTexture(videoEl);
+        videoTex.colorSpace = THREE.SRGBColorSpace;
+        videoTex.generateMipmaps = false;
+        videoTex.minFilter = THREE.LinearFilter;
+        videoTex.magFilter = THREE.LinearFilter;
+      } catch (e) {
+        console.warn('VideoTexture init notice:', e);
+      }
+    }
+
+    const tvMaterialMap = (!isMobileDevice && videoTex) ? videoTex : tvPosterTex;
 
     function createGalleryPlant(x, z) {
       const g = new THREE.Group();
@@ -1969,7 +2065,7 @@
         metalness: 0.65
       });
       const tvScreenGeo = new THREE.PlaneGeometry(tvW, tvH);
-      const tvScreenMat = new THREE.MeshBasicMaterial({ map: videoTex });
+      const tvScreenMat = new THREE.MeshBasicMaterial({ map: tvMaterialMap });
       const tvMountMat = new THREE.MeshStandardMaterial({ color: 0x24262b, roughness: 0.5, metalness: 0.4 });
       const tvMountGeo = new THREE.BoxGeometry(0.65, 0.45, 0.06);
       const tvPlaqueTex = createTVPlaqueTexture();
@@ -2695,7 +2791,7 @@
 
       const vidScreen = new THREE.Mesh(
         new THREE.PlaneGeometry(2.92, 1.62),
-        new THREE.MeshBasicMaterial({ map: videoTex })
+        new THREE.MeshBasicMaterial({ map: tvMaterialMap })
       );
       vidScreen.position.set(0, 2.34, -0.96);
       g.add(vidScreen);
@@ -2891,15 +2987,19 @@
       return text;
     }
 
+    const plaqueTextureCache = new Map();
     function createModernMuseumPlaqueTexture(title) {
+      if (plaqueTextureCache.has(title)) {
+        return plaqueTextureCache.get(title);
+      }
       const c = document.createElement('canvas');
-      c.width = 256; c.height = 170;
+      c.width = 256; c.height = 160;
       const ctx = c.getContext('2d');
       ctx.fillStyle = '#fbfbfa';
-      ctx.fillRect(0, 0, 256, 170);
+      ctx.fillRect(0, 0, 256, 160);
       ctx.strokeStyle = '#d0d3d8';
       ctx.lineWidth = 1.5;
-      ctx.strokeRect(2, 2, 252, 166);
+      ctx.strokeRect(2, 2, 252, 156);
 
       // Category Header
       ctx.fillStyle = '#8b5a2b';
@@ -2934,16 +3034,17 @@
       // Metadata details
       ctx.fillStyle = '#555860';
       ctx.font = '10px Montserrat, sans-serif';
-      ctx.fillText('Khắc gỗ trên giấy đỏ hồng điều', 14, 105);
-      ctx.fillText('Nét vẽ thanh thoát, điểm kim nhũ', 14, 122);
+      ctx.fillText('Khắc gỗ trên giấy đỏ hồng điều', 14, 102);
+      ctx.fillText('Nét vẽ thanh thoát, điểm kim nhũ', 14, 118);
 
       // Interactive Action Hint
       ctx.fillStyle = '#a66224';
       ctx.font = 'bold 9.5px Montserrat, sans-serif';
-      ctx.fillText('▶ Nhấp tranh để xem chi tiết', 14, 150);
+      ctx.fillText('▶ Nhấp tranh để xem chi tiết', 14, 142);
 
       const tex = new THREE.CanvasTexture(c);
       tex.colorSpace = THREE.SRGBColorSpace;
+      plaqueTextureCache.set(title, tex);
       return tex;
     }
 
@@ -3063,6 +3164,8 @@
         return a.images[0].localeCompare(b.images[0]);
       });
 
+      const paintingLoadQueue = [];
+
       function hangPainting(artwork, rWall, theta, isFacingOutward) {
         const wx = Math.sin(theta) * rWall;
         const wz = Math.cos(theta) * rWall;
@@ -3081,8 +3184,12 @@
         const frameMesh = new THREE.Mesh(new THREE.BoxGeometry(1.75, 1.35, 0.08), blackFrameMat);
         group.add(frameMesh);
 
-        // 3. Artwork Canvas Mesh
-        const artMat = new THREE.MeshStandardMaterial({ color: 0x2a1d14, roughness: 0.45 });
+        // 3. Artwork Canvas Mesh (Khởi tạo sẵn với màu đỏ hồng điều Kim Hoàng sang trọng)
+        const artMat = new THREE.MeshStandardMaterial({
+          color: 0x9e241d,
+          roughness: 0.55,
+          metalness: 0.05
+        });
         const artMesh = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 1.2), artMat);
         artMesh.position.z = 0.045;
         artMesh.userData.artwork = artwork;
@@ -3114,31 +3221,15 @@
         interactivePaintings.push(artMesh);
         interactTargetsDirty = true;
 
-        texLoader.load(artwork.images[0], (tex) => {
-          tex.colorSpace = THREE.SRGBColorSpace;
-          tex.anisotropy = maxAnisotropy;
-          artMat.map = tex;
-          artMat.color.setHex(0xffffff);
-          artMat.needsUpdate = true;
-          if (tex.image && tex.image.width && tex.image.height) {
-            const aspect = tex.image.width / tex.image.height;
-            let w = 1.65, h = 1.65 / aspect;
-            if (h > 1.55) { h = 1.55; w = h * aspect; }
-            if (w > 2.2) { w = 2.2; h = w / aspect; }
-            artMesh.geometry.dispose();
-            artMesh.geometry = new THREE.PlaneGeometry(w, h);
-            frameMesh.geometry.dispose();
-            frameMesh.geometry = new THREE.BoxGeometry(w + 0.14, h + 0.14, 0.08);
-
-            // Position placard neatly to the right side of the painting
-            plaque.position.set(w / 2 + 0.30, -h * 0.18, 0.01);
-            spotFixture.position.y = h / 2 + 0.35;
-
-            // Expand soft spotlight cone on the wall
-            wallSpotlight.geometry.dispose();
-            wallSpotlight.geometry = new THREE.PlaneGeometry(w + 1.4, h + 1.6);
-            wallSpotlight.position.y = h * 0.25;
-          }
+        // Đưa vào hàng đợi để tải tranh tuần tự, bảo vệ RAM thiết bị di động / iOS Safari
+        paintingLoadQueue.push({
+          artwork,
+          artMesh,
+          frameMesh,
+          artMat,
+          plaque,
+          spotFixture,
+          wallSpotlight
         });
       }
 
@@ -3152,15 +3243,86 @@
       }
 
       // 2. Distribute Kim Hoàng paintings along outer curved wall of the studio room (R_CENTER + 0.12)
-      // Generously spaced out so each artwork has elegant breathing room without crowding
       const studioStart = Math.PI * 1.5 + CENTER_DOOR_HALF + 0.30;
       const studioSpan = Math.PI * 2 - (CENTER_DOOR_HALF * 2 + 0.60);
       const studioPool = artworks.slice(countOuter).concat(artworks);
-      const countStudio = 12; // Bớt 2 tấm và giãn cách thưa hơn để tranh thoáng đãng, sang trọng
+      const countStudio = 12;
       for (let j = 0; j < countStudio; j++) {
         const theta = studioStart + ((j + 0.5) / countStudio) * studioSpan;
         hangPainting(studioPool[j % studioPool.length], R_CENTER + 0.12, theta, true);
       }
+
+      // Khởi chạy hàng đợi tải ảnh tuần tự
+      window._paintingLoadQueue = paintingLoadQueue;
+      if (typeof startLoadingPaintingsQueue === 'function') {
+        startLoadingPaintingsQueue();
+      }
+    }
+
+    let hasStartedPaintingQueue = false;
+    function startLoadingPaintingsQueue() {
+      if (hasStartedPaintingQueue) return;
+      const queue = window._paintingLoadQueue;
+      if (!queue || queue.length === 0) return;
+      hasStartedPaintingQueue = true;
+
+      // Batch size: trên mobile tải 2 tranh/đợt để VRAM luôn dưới ngưỡng an toàn, desktop tải 4 tranh/đợt
+      const batchSize = isMobileDevice ? 2 : 4;
+      const delayBetweenBatches = isMobileDevice ? 100 : 50;
+
+      function loadNextBatch() {
+        if (queue.length === 0) return;
+        const batch = queue.splice(0, batchSize);
+        let pending = batch.length;
+
+        function step() {
+          pending--;
+          if (pending <= 0) {
+            if (queue.length > 0) {
+              setTimeout(loadNextBatch, delayBetweenBatches);
+            }
+          }
+        }
+
+        batch.forEach((item) => {
+          const { artwork, artMesh, frameMesh, artMat, plaque, spotFixture, wallSpotlight } = item;
+          artTexLoader.load(
+            artwork.images[0],
+            (tex) => {
+              tex.colorSpace = THREE.SRGBColorSpace;
+              tex.anisotropy = maxAnisotropy;
+              artMat.map = tex;
+              artMat.color.setHex(0xffffff);
+              artMat.needsUpdate = true;
+              if (tex.image && tex.image.width && tex.image.height) {
+                const aspect = tex.image.width / tex.image.height;
+                let w = 1.65, h = 1.65 / aspect;
+                if (h > 1.55) { h = 1.55; w = h * aspect; }
+                if (w > 2.2) { w = 2.2; h = w / aspect; }
+                artMesh.geometry.dispose();
+                artMesh.geometry = new THREE.PlaneGeometry(w, h);
+                frameMesh.geometry.dispose();
+                frameMesh.geometry = new THREE.BoxGeometry(w + 0.14, h + 0.14, 0.08);
+
+                plaque.position.set(w / 2 + 0.30, -h * 0.18, 0.01);
+                spotFixture.position.y = h / 2 + 0.35;
+
+                wallSpotlight.geometry.dispose();
+                wallSpotlight.geometry = new THREE.PlaneGeometry(w + 1.4, h + 1.6);
+                wallSpotlight.position.y = h * 0.25;
+              }
+              step();
+            },
+            undefined,
+            (err) => {
+              console.warn('Lỗi tải tranh:', artwork.images[0], err);
+              step();
+            }
+          );
+        });
+      }
+
+      setTimeout(loadNextBatch, 80);
     }
 
     // =========================================================================
@@ -3651,6 +3813,11 @@
           openArtworkModal(obj.userData.artwork);
           return;
         } else if (obj.userData.isTV) {
+          if (isMobileDevice) {
+            playMobileVideoModal();
+            return;
+          }
+          if (!videoEl.src) videoEl.src = '/media/video/Web.mp4';
           videoEl.muted = !videoEl.muted;
           if (!videoEl.muted) {
             videoEl.volume = 0.85;
@@ -4024,10 +4191,39 @@
 
     document.getElementById('stand-up-btn')?.addEventListener('click', standUpFromTable);
 
+    function playMobileVideoModal() {
+      let m = document.getElementById('mobile-video-modal');
+      if (!m) {
+        m = document.createElement('div');
+        m.id = 'mobile-video-modal';
+        m.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.92);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;';
+        m.innerHTML = `
+          <div style="width:100%;max-width:640px;position:relative;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+              <span style="color:#e8c872;font-family:sans-serif;font-weight:bold;font-size:14px;">Phim Tư Liệu: Lưu Sắc Kim Hoàng</span>
+              <button id="close-mobile-video" style="background:rgba(255,255,255,0.2);border:none;color:#fff;width:32px;height:32px;border-radius:50%;font-size:18px;cursor:pointer;">✕</button>
+            </div>
+            <video id="mobile-popup-video" controls playsinline style="width:100%;border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,0.5);" src="/media/video/Web.mp4"></video>
+          </div>
+        `;
+        document.body.appendChild(m);
+        m.querySelector('#close-mobile-video').addEventListener('click', () => {
+          const v = m.querySelector('#mobile-popup-video');
+          if (v) v.pause();
+          m.style.display = 'none';
+        });
+      }
+      m.style.display = 'flex';
+      const v = m.querySelector('#mobile-popup-video');
+      if (v) v.play().catch(() => {});
+    }
+
     function enterExhibition() {
       document.getElementById('welcome-screen')?.classList.add('hidden');
       if (audioEnabled) bgAudio.play().catch(() => {});
-      videoEl.play().catch(() => {});
+      if (!isMobileDevice && videoEl && videoEl.src) {
+        videoEl.play().catch(() => {});
+      }
     }
 
     document.getElementById('btn-enter')?.addEventListener('click', enterExhibition);
@@ -4258,7 +4454,6 @@
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
-      const isMob = /Android|webOS|iPhone|iPad|iPod/i.test(navigator.userAgent) || (window.innerWidth < 820);
       renderer.setPixelRatio(_adaptDPR);
     });
 
