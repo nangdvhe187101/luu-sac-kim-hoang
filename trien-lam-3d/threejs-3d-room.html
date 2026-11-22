@@ -1246,10 +1246,11 @@
     import {
       MOSAIC_FONT,
       GALLERY_URLS,
+      shrinkTexture,
       createFadeArtMaterial,
       createMosaicRotator,
       hangSharedPainting
-    } from './kim-hoang-museum-showcase.js?v=kim_hoang_v35';
+    } from './kim-hoang-museum-showcase.js?v=kim_hoang_v36';
 
     // =========================================================================
     // 1. Loading Manager & Progress Tracking (100% Preload & Shader Warmup)
@@ -3311,6 +3312,7 @@
           artTexLoader.load(
             artwork.images[0],
             (tex) => {
+              if (isMobileDevice) shrinkTexture(tex, 640);
               tex.colorSpace = THREE.SRGBColorSpace;
               tex.anisotropy = maxAnisotropy;
               artMat.map = tex;

@@ -26,6 +26,23 @@ export const WORKSHOP_PANO_ID = 'panorama_16387645_5039_B9F4_41A6_72D0266851A3';
 export const R2_API_BASE = 'https://kim-hoang-gallery-api.chibtkhs180128.workers.dev';
 
 // Shared caches across both showcase and 3D room so textures, materials, and GLTF station are only created ONCE!
+// Thu nhỏ texture trên điện thoại để tránh Safari iOS hết bộ nhớ và kill tab
+export const IS_LOW_MEM_DEVICE = /iPad|iPhone|iPod|Android/i.test(navigator.userAgent) ||
+  (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) || window.innerWidth < 820;
+export function shrinkTexture(tex, maxSide = 640) {
+  const img = tex && tex.image;
+  if (!img || !img.width || !img.height) return tex;
+  const k = Math.min(1, maxSide / Math.max(img.width, img.height));
+  if (k >= 1) return tex;
+  const c = document.createElement('canvas');
+  c.width = Math.max(1, Math.round(img.width * k));
+  c.height = Math.max(1, Math.round(img.height * k));
+  c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+  tex.image = c;
+  tex.needsUpdate = true;
+  return tex;
+}
+
 const sharedTexLoader = new THREE.TextureLoader();
 sharedTexLoader.setCrossOrigin('anonymous');
 const sharedTexCache = new Map();
@@ -47,6 +64,7 @@ export function getSharedTexture(url, maxAnisotropy = 4, onReady = null) {
   sharedTexLoader.load(
     url,
     (tex) => {
+      if (IS_LOW_MEM_DEVICE) shrinkTexture(tex, 512);
       tex.colorSpace = THREE.SRGBColorSpace;
       tex.anisotropy = maxAnisotropy;
       tex.generateMipmaps = false;
