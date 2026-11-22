@@ -121,8 +121,10 @@ export function getSharedTexture(url, maxAnisotropy = 4, onReady = null) {
       if (IS_LOW_MEM_DEVICE) shrinkTexture(tex, 512);
       tex.colorSpace = THREE.SRGBColorSpace;
       tex.anisotropy = maxAnisotropy;
-      tex.generateMipmaps = false;
-      tex.minFilter = THREE.LinearFilter;
+      // Mipmap + lọc dị hướng: ô tranh mosaic ở xa vẫn mịn, không nhoè/nhấp nháy
+      tex.generateMipmaps = true;
+      tex.minFilter = THREE.LinearMipmapLinearFilter;
+      tex.anisotropy = Math.max(maxAnisotropy, 4);
       sharedTexCache.set(url, tex);
       flush(tex);
     },

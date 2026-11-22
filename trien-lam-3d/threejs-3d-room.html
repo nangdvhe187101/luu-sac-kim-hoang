@@ -1312,7 +1312,7 @@
       createFadeArtMaterial,
       createMosaicRotator,
       hangSharedPainting
-    } from './kim-hoang-museum-showcase.js?v=kim_hoang_v40';
+    } from './kim-hoang-museum-showcase.js?v=kim_hoang_v41';
 
     // =========================================================================
     // 1. Loading Manager & Progress Tracking (100% Preload & Shader Warmup)
@@ -1543,7 +1543,7 @@
     const maxDPR = isMobileDevice
       ? Math.min(window.devicePixelRatio || 1, 2)
       : Math.min(window.devicePixelRatio, 1.5);
-    let _adaptDPR = isMobileDevice ? Math.min(maxDPR, 1.75) : Math.min(maxDPR, 1.25);
+    let _adaptDPR = isMobileDevice ? maxDPR : Math.min(maxDPR, 1.25);
     renderer.setPixelRatio(_adaptDPR);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -1561,7 +1561,7 @@
       console.warn('WebGL context lost - bảo vệ tài nguyên');
     }, false);
 
-    const maxAnisotropy = Math.min(renderer.capabilities.getMaxAnisotropy(), isMobileDevice ? 1 : 4);
+    const maxAnisotropy = Math.min(renderer.capabilities.getMaxAnisotropy(), 8);
 
     // Realistic IBL reflections via RoomEnvironment (chỉ bật trên Desktop đủ VRAM, tắt trên iOS/mobile để chống crash WebKit)
     {
@@ -4786,7 +4786,7 @@
     });
 
     // Adaptive resolution: if the scene runs below ~40 fps, render at lower resolution; if there is headroom, raise it again.
-    const _minDPR = 0.75;
+    const _minDPR = isMobileDevice ? Math.min(maxDPR, 1.5) : 0.75;
     let _ceilDPR = maxDPR, _adaptAcc = 0, _adaptN = 0, _adaptCool = 0;
     function adaptResolution(ms) {
       if (ms > 250) return; // ignore tab switches / loading hitches
@@ -4796,7 +4796,7 @@
       _adaptAcc = 0; _adaptN = 0;
       if (_adaptCool > 0) { _adaptCool--; return; }
       let next = _adaptDPR;
-      if (avg > 25) {
+      if (avg > (isMobileDevice ? 40 : 25)) { // iPhone thường khoá 30 fps → 33ms là bình thường, không phải giật
         next = Math.max(_minDPR, _adaptDPR - 0.25);
         if (next < _adaptDPR) _ceilDPR = Math.min(_ceilDPR, _adaptDPR); // don't climb back to a level that was too slow
       } else if (avg < 18 && _adaptDPR < _ceilDPR) {
