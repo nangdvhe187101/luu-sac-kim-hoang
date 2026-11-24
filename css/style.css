@@ -22596,8 +22596,19 @@ html {
 }
 
 /* ========================================================= */
-/* MENU XỔ XUỐNG: mũi tên báo mục có trang con                */
+/* MENU THẢ XUỐNG NHỎ DƯỚI TỪNG MỤC (thay cho dải mega to)   */
 /* ========================================================= */
+.header-panel,
+#header-mega-panel {
+  display: none !important;
+  pointer-events: none !important;
+}
+
+.header-nav__item[data-menu] {
+  position: relative;
+}
+
+/* Mũi tên báo mục có trang con */
 .header-nav__item[data-menu] > .header-nav__trigger::before {
   content: "";
   order: 2;
@@ -22611,8 +22622,69 @@ html {
   transition: transform var(--dur-fast) var(--easing-out);
 }
 
-.header-nav__item[data-menu] > .header-nav__trigger[aria-expanded="true"]::before {
+.header-nav__item[data-menu]:hover > .header-nav__trigger::before,
+.header-nav__item[data-menu]:focus-within > .header-nav__trigger::before,
+.header-nav__item[data-menu].is-dropdown-open > .header-nav__trigger::before {
   transform: translateY(.1em) rotate(-135deg);
+}
+
+.header-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  z-index: var(--z-dropdown, 50);
+  padding-top: .9rem; /* cầu nối để rê chuột từ chữ xuống khung không bị tắt */
+  min-width: 15rem;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 4px);
+  transition: opacity .18s ease-out, transform .18s ease-out, visibility .18s;
+}
+
+.header-nav__item[data-menu]:hover > .header-dropdown,
+.header-nav__item[data-menu]:focus-within > .header-dropdown,
+.header-nav__item[data-menu].is-dropdown-open > .header-dropdown {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(-50%, 0);
+}
+
+.header-dropdown__list {
+  list-style: none;
+  margin: 0;
+  padding: .4rem 0;
+  background: #7a1614;
+  border: 1px solid rgba(243, 210, 133, .28);
+  border-radius: .5rem;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, .3);
+}
+
+.header-dropdown__link {
+  display: block;
+  padding: .6rem 1.1rem;
+  color: #fff;
+  font-size: .72rem;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color .15s ease-out, background .15s ease-out;
+}
+
+.header-dropdown__link:hover,
+.header-dropdown__link:focus-visible {
+  color: #f3d285;
+  background: rgba(255, 255, 255, .08);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .header-dropdown,
+  .header-nav__item[data-menu] > .header-nav__trigger::before {
+    transition: none;
+  }
 }
 
 /* 3D tour card */

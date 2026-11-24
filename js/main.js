@@ -278,6 +278,61 @@ function initMegaMenu() {
   });
 
   updateActiveNavByUrl();
+  initNavDropdowns(panel);
+}
+
+/**
+ * 1b. Menu thả xuống nhỏ dưới từng mục (lấy link con từ mega panel có sẵn).
+ * Rê chuột / focus bàn phím để mở; bấm vào chữ mục cha vẫn đi tới trang cha.
+ */
+function initNavDropdowns(panel) {
+  document.querySelectorAll('.header-nav__item[data-menu]').forEach(item => {
+    if (item.querySelector('.header-dropdown')) return;
+    const key = item.getAttribute('data-menu');
+    const slot = panel.querySelector('.header-panel-slot[data-slot="' + key + '"]');
+    const links = slot ? slot.querySelectorAll('a[href]') : [];
+    if (!links.length) return;
+
+    const wrap = document.createElement('div');
+    wrap.className = 'header-dropdown';
+    const list = document.createElement('ul');
+    list.className = 'header-dropdown__list';
+    links.forEach(src => {
+      const li = document.createElement('li');
+      const a = document.createElement('a');
+      a.className = 'header-dropdown__link';
+      a.href = src.getAttribute('href');
+      a.textContent = src.textContent.trim();
+      a.addEventListener('click', (e) => {
+        e.preventDefault();
+        item.classList.remove('is-dropdown-open');
+        navigateOrScroll(a.getAttribute('href'));
+      });
+      li.appendChild(a);
+      list.appendChild(li);
+    });
+    wrap.appendChild(list);
+    item.appendChild(wrap);
+
+    // Màn hình cảm ứng cỡ lớn (iPad ngang): chạm lần 1 mở menu, chạm lần 2 vào chữ để vào trang
+    const trigger = item.querySelector('.header-nav__trigger');
+    if (trigger && window.matchMedia('(hover: none)').matches) {
+      trigger.addEventListener('click', (e) => {
+        if (!item.classList.contains('is-dropdown-open')) {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          document.querySelectorAll('.header-nav__item.is-dropdown-open').forEach(o => o.classList.remove('is-dropdown-open'));
+          item.classList.add('is-dropdown-open');
+        }
+      }, true);
+    }
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.header-nav__item[data-menu]')) {
+      document.querySelectorAll('.header-nav__item.is-dropdown-open').forEach(o => o.classList.remove('is-dropdown-open'));
+    }
+  });
 }
 
 /**
