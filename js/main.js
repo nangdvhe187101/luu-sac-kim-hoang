@@ -290,9 +290,21 @@ function initMobileMenu() {
 
   const backdrop = mobileOverlay.querySelector('.header-mobile-nav__backdrop');
 
+  // Đổi biểu tượng ☰ <-> ✕ và nhãn trợ năng theo trạng thái menu
+  const menuSvg = menuBtn.querySelector('svg');
+  const MENU_PATHS = '<path d="M4 5h16"></path><path d="M4 12h16"></path><path d="M4 19h16"></path>';
+  const CLOSE_PATHS = '<path d="M18 6 6 18"></path><path d="m6 6 12 12"></path>';
+  function setMenuBtnState(open) {
+    const isEn = (document.documentElement.lang || '').toLowerCase().startsWith('en') ||
+      document.documentElement.getAttribute('data-locale') === 'en';
+    if (menuSvg) menuSvg.innerHTML = open ? CLOSE_PATHS : MENU_PATHS;
+    menuBtn.setAttribute('aria-label', open ? (isEn ? 'Close menu' : 'Đóng menu') : (isEn ? 'Open menu' : 'Mở menu'));
+  }
+
   function openDrawer() {
     menuBtn.setAttribute('aria-expanded', 'true');
     menuBtn.classList.add('is-open');
+    setMenuBtnState(true);
     mobileOverlay.style.display = 'block';
     document.body.style.overflow = 'hidden';
   }
@@ -300,9 +312,14 @@ function initMobileMenu() {
   function closeDrawer() {
     menuBtn.setAttribute('aria-expanded', 'false');
     menuBtn.classList.remove('is-open');
+    setMenuBtnState(false);
     mobileOverlay.style.display = 'none';
     document.body.style.overflow = '';
   }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && menuBtn.getAttribute('aria-expanded') === 'true') closeDrawer();
+  });
 
   menuBtn.addEventListener('click', () => {
     const isOpen = menuBtn.getAttribute('aria-expanded') === 'true';
