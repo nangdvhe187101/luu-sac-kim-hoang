@@ -92,13 +92,11 @@ const server = http.createServer((req, res) => {
     '/qua-luu-niem': '/vi/services/souvenirs/index.html',
     '/tranh-sang-tao': '/vi/services/souvenirs/index.html',
     '/creative-products': '/vi/services/souvenirs/index.html',
-    '/vi/creative-products': '/vi/services/souvenirs/index.html',
     '/su-kien': '/vi/events/index.html',
     '/events': '/vi/events/index.html',
     '/tin-tuc': '/vi/posts/index.html',
     '/posts': '/vi/posts/index.html',
     '/news': '/vi/posts/index.html',
-    '/vi/news': '/vi/posts/index.html',
     '/tim-kiem': '/vi/search/index.html',
     '/search': '/vi/search/index.html'
   };
