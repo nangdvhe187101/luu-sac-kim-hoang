@@ -2904,14 +2904,14 @@ export async function createKimHoangStation({
     const sigName = sigNameInput ? sigNameInput.value.trim() : '';
     const hangBtn = $('hang');
     if (hangBtn) hangBtn.disabled = true;
-    $('hangmsg').textContent = 'Đang đóng khung và treo tranh lên đám mây R2...';
+    $('hangmsg').textContent = 'Đang đóng khung và treo tranh...';
     let res = null;
     if (onHangPainting) {
       res = await onHangPainting(out, sigName);
     }
     if (hangBtn) hangBtn.disabled = false;
     $('hangmsg').textContent = res && res.uploadedToR2
-      ? 'Đã treo bức tranh của bạn lên Cloudflare R2 và bức tường chữ LƯU SẮC KIM HOÀNG! Hãy đứng dậy quay lại ngắm nhé.'
+      ? 'Đã đóng khung và treo bức tranh của bạn lên bức tường chữ LƯU SẮC KIM HOÀNG! Hãy đứng dậy quay lại ngắm nhé.'
       : 'Đã đóng khung và treo bức tranh có chữ ký của bạn lên bức tường chữ LƯU SẮC KIM HOÀNG! Hãy đứng dậy để ngắm.';
   };
   $('again').onclick = () => {
