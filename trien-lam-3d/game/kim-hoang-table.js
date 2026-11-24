@@ -425,7 +425,7 @@ export async function createKimHoangStation({
   ]);
 
   const samples = [
-    { id: 'ngua', name: 'Ngựa', img: horseImg, block: `${basePath}/kim-hoang-assets/blockPhoto.jpg` },
+    { id: 'ngua', name: 'Ngựa', img: horseImg, regionGap: 0, block: `${basePath}/kim-hoang-assets/blockPhoto.jpg` },
     {
       id: 'ga',
       name: 'Gà',
@@ -1758,11 +1758,50 @@ export async function createKimHoangStation({
   const recent = [];
   const undoStack = [];
 
+  // Độ "hàn" khe hở trong nét mực (px trên canvas 600x800). Nét khắc gỗ của nhiều bức bị đứt,
+  // khiến thân con vật thông ra nền và màu tô bị loang. Hàn các khe nhỏ để mỗi mảng thành vùng kín
+  // như bức Ngựa. Bức có ảnh vùng riêng (Gà) hoặc nét đã khép kín (Ngựa) thì không cần hàn.
+  const DEFAULT_REGION_GAP = 6;
+
   function buildRegions() {
     const d = rctx.getImageData(0, 0, W, H).data;
     const N = W * H;
+    const gap =
+      sample && sample.regionGap != null ? sample.regionGap : sample && sample.regionImg ? 0 : DEFAULT_REGION_GAP;
     regionMap = new Int32Array(N);
-    for (let i = 0; i < N; i++) if (d[i * 4 + 3] > 90) regionMap[i] = -1;
+    const ink = new Uint8Array(N);
+    for (let i = 0; i < N; i++) if (d[i * 4 + 3] > 90) ink[i] = 1;
+    if (gap > 0) {
+      // Nở nét mực ra `gap` px (cửa sổ vuông, tách 2 chiều) để bịt các khe hở
+      const tmp = new Uint8Array(N);
+      for (let y = 0; y < H; y++) {
+        const row = y * W;
+        let last = -1e9;
+        for (let x = 0; x < W; x++) {
+          if (ink[row + x]) last = x;
+          if (x - last <= gap) tmp[row + x] = 1;
+        }
+        last = 1e9;
+        for (let x = W - 1; x >= 0; x--) {
+          if (ink[row + x]) last = x;
+          if (last - x <= gap) tmp[row + x] = 1;
+        }
+      }
+      for (let x = 0; x < W; x++) {
+        let last = -1e9;
+        for (let y = 0; y < H; y++) {
+          if (tmp[y * W + x]) last = y;
+          if (y - last <= gap) regionMap[y * W + x] = -1;
+        }
+        last = 1e9;
+        for (let y = H - 1; y >= 0; y--) {
+          if (tmp[y * W + x]) last = y;
+          if (last - y <= gap) regionMap[y * W + x] = -1;
+        }
+      }
+    } else {
+      for (let i = 0; i < N; i++) if (ink[i]) regionMap[i] = -1;
+    }
     const st = new Int32Array(N);
     let label = 0;
     for (let s = 0; s < N; s++) {
@@ -1789,6 +1828,54 @@ export async function createKimHoangStation({
         if (i < N - W && regionMap[i + W] === 0) {
           regionMap[i + W] = label;
           st[sp++] = i + W;
+        }
+      }
+    }
+    if (gap > 0) {
+      // Trả lại phần giấy trắng bị nét nở che mất cho vùng gần nhất (lan đồng thời từ mọi vùng,
+      // chỉ đi trên giấy trắng, không vượt qua nét mực thật) để màu tô sát mép nét như cũ.
+      let frontier = [];
+      for (let i = 0; i < N; i++) {
+        if (regionMap[i] <= 0) continue;
+        const x = i % W;
+        if (
+          (x > 0 && regionMap[i - 1] < 0 && !ink[i - 1]) ||
+          (x < W - 1 && regionMap[i + 1] < 0 && !ink[i + 1]) ||
+          (i >= W && regionMap[i - W] < 0 && !ink[i - W]) ||
+          (i < N - W && regionMap[i + W] < 0 && !ink[i + W])
+        )
+          frontier.push(i);
+      }
+      while (frontier.length) {
+        const next = [];
+        for (const i of frontier) {
+          const l = regionMap[i];
+          const x = i % W;
+          const nb = [x > 0 ? i - 1 : -1, x < W - 1 ? i + 1 : -1, i >= W ? i - W : -1, i < N - W ? i + W : -1];
+          for (const j of nb) {
+            if (j < 0 || ink[j] || regionMap[j] >= 0) continue;
+            regionMap[j] = l;
+            next.push(j);
+          }
+        }
+        frontier = next;
+      }
+      // Khoảng giấy nhỏ bị nét nở bịt kín hoàn toàn: cho thành vùng riêng để vẫn tô được
+      for (let s0 = 0; s0 < N; s0++) {
+        if (regionMap[s0] >= 0 || ink[s0]) continue;
+        label++;
+        let sp = 0;
+        st[sp++] = s0;
+        regionMap[s0] = label;
+        while (sp) {
+          const i = st[--sp];
+          const x = i % W;
+          const nb = [x > 0 ? i - 1 : -1, x < W - 1 ? i + 1 : -1, i >= W ? i - W : -1, i < N - W ? i + W : -1];
+          for (const j of nb) {
+            if (j < 0 || ink[j] || regionMap[j] >= 0) continue;
+            regionMap[j] = label;
+            st[sp++] = j;
+          }
         }
       }
     }

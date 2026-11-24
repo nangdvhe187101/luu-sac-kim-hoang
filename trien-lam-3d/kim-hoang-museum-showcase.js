@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { createKimHoangStation } from './game/kim-hoang-table.js?v=kim_hoang_shared_v5';
+import { createKimHoangStation } from './game/kim-hoang-table.js?v=kim_hoang_shared_v6';
 
 export const MOSAIC_FONT = {
   L: ['00000','00000','00000','10000','10000','10000','10000','10000','11111'],
