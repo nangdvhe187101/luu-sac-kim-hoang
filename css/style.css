@@ -22596,12 +22596,23 @@ html {
 }
 
 /* ========================================================= */
-/* DISABLE MEGA PANEL DROPDOWNS (TOP-LEVEL NAV ONLY)         */
+/* MENU XỔ XUỐNG: mũi tên báo mục có trang con                */
 /* ========================================================= */
-.header-panel,
-#header-mega-panel {
-  display: none !important;
-  pointer-events: none !important;
+.header-nav__item[data-menu] > .header-nav__trigger::before {
+  content: "";
+  order: 2;
+  width: .4em;
+  height: .4em;
+  margin-left: .2em;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  opacity: .85;
+  transform: translateY(-.15em) rotate(45deg);
+  transition: transform var(--dur-fast) var(--easing-out);
+}
+
+.header-nav__item[data-menu] > .header-nav__trigger[aria-expanded="true"]::before {
+  transform: translateY(.1em) rotate(-135deg);
 }
 
 /* 3D tour card */
