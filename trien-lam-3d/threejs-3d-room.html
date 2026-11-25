@@ -3323,17 +3323,11 @@
         else line2 = line2 ? line2 + ' ' + w : w;
       }
       if (!line2) {
-        ctx.fillText(line1, 14, 60);
+        ctx.fillText(line1, 14, 82);
       } else {
-        ctx.fillText(line1, 14, 55);
-        ctx.fillText(line2, 14, 75);
+        ctx.fillText(line1, 14, 72);
+        ctx.fillText(line2, 14, 94);
       }
-
-      // Metadata details
-      ctx.fillStyle = '#555860';
-      ctx.font = '10px Montserrat, sans-serif';
-      ctx.fillText('Khắc gỗ trên giấy đỏ hồng điều', 14, 102);
-      ctx.fillText('Nét vẽ thanh thoát, điểm kim nhũ', 14, 118);
 
       // Interactive Action Hint
       ctx.fillStyle = '#a66224';
@@ -3347,62 +3341,62 @@
     }
 
     const KIM_HOANG_CATALOG = {
-      "01": { title: "Thần Tướng Cưỡi Rồng (Hộ Pháp Trấn Trạch)", desc: "Tác phẩm mang ý nghĩa trấn trạch, trừ tà, bảo hộ gia đạo bình an và mang lại khí thế uy nghiêm, cát tường cho gia chủ." },
-      "02": { title: "Ngựa Đỏ (Xích Thố / Ngựa Hồng Điều)", desc: "Thuộc bộ Tứ Mã dâng lễ với lọng tàn và cờ phướn, tượng trưng cho lòng trung nghĩa, sức mạnh bền bỉ, thăng tiến và \"mã đáo thành công\"." },
-      "03": { title: "Ngựa Xanh (Thanh Mã)", desc: "Tượng trưng cho sinh khí mùa xuân, sự thanh cao, hanh thông trên đường công danh và khởi đầu thuận lợi trong năm mới." },
-      "04": { title: "Ngựa Vàng (Hoàng Mã)", desc: "Sắc vàng hoàng gia biểu trưng cho sự phú quý, thịnh vượng, tài lộc dồi dào và địa vị vững bền." },
-      "05": { title: "Ngựa Trắng (Bạch Mã)", desc: "Biểu tượng của sự thuần khiết, cao quý, trí tuệ sáng suốt và bước tiến vững vàng, bình an trên mọi nẻo đường." },
+      "01": { title: "Thần Tướng Cưỡi Rồng", desc: "Tác phẩm mang ý nghĩa trấn trạch, trừ tà, bảo hộ gia đạo bình an và mang lại khí thế uy nghiêm, cát tường cho gia chủ." },
+      "02": { title: "Ngựa Đỏ", desc: "Thuộc bộ Tứ Mã dâng lễ với lọng tàn và cờ phướn, tượng trưng cho lòng trung nghĩa, sức mạnh bền bỉ, thăng tiến và \"mã đáo thành công\"." },
+      "03": { title: "Ngựa Xanh", desc: "Tượng trưng cho sinh khí mùa xuân, sự thanh cao, hanh thông trên đường công danh và khởi đầu thuận lợi trong năm mới." },
+      "04": { title: "Ngựa Vàng", desc: "Sắc vàng hoàng gia biểu trưng cho sự phú quý, thịnh vượng, tài lộc dồi dào và địa vị vững bền." },
+      "05": { title: "Ngựa Trắng", desc: "Biểu tượng của sự thuần khiết, cao quý, trí tuệ sáng suốt và bước tiến vững vàng, bình an trên mọi nẻo đường." },
       "06": { title: "Mèo Vàng Ngắm Trăng & Hoa Sen", desc: "Hình ảnh chú mèo vàng bên đóa sen hồng và ánh trăng tròn, gửi gắm ước vọng về cuộc sống thanh bình, an nhiên, gia đình êm ấm và may mắn." },
       "07": { title: "Hứng Dừa", desc: "Bức tranh sinh hoạt dân gian vui tươi mô tả cảnh gia đình sum vầy hái dừa, tượng trưng cho phúc lộc viên mãn, con đàn cháu đống và hạnh phúc giản dị làng quê." },
-      "08": { title: "Thần Tướng Tuổi Tý (Chuột)", desc: "Một trong 12 Thần Tướng Thập Nhị Chi, đại diện cho trí tuệ nhanh nhạy, sự lanh lợi, biết tích lũy và bảo hộ người tuổi Tý bình an, hanh thông." },
-      "09": { title: "Thần Tướng Tuổi Dậu (Gà)", desc: "Thuộc bộ Thập Nhị Chi, biểu trưng cho sự cần cù, đúng giờ, tinh thần chính trực, xua tan tà khí và đón ánh bình minh cát tường." },
-      "10": { title: "Thần Tướng Tuổi Tuất (Chó)", desc: "Thuộc bộ Thập Nhị Chi, tượng trưng cho lòng trung thành, nghĩa khí, giữ gìn cửa nhà, trấn trạch và bảo vệ gia chủ khỏi điều dữ." },
-      "11": { title: "Thần Tướng Tuổi Tỵ (Rắn)", desc: "Thuộc bộ Thập Nhị Chi, biểu trưng cho sự uyển chuyển, mưu trí, tái sinh và khả năng hóa giải khó khăn, mang lại bình an." },
-      "12": { title: "Thần Tướng Tuổi Thân (Khỉ)", desc: "Thuộc bộ Thập Nhị Chi, đại diện cho sự thông minh, linh hoạt, khéo léo và thăng tiến (chữ \"Hầu\" đồng âm với tước hầu phong quan)." },
-      "13": { title: "Thần Tướng Tuổi Ngọ (Ngựa)", desc: "Thuộc bộ Thập Nhị Chi, tượng trưng cho ý chí mạnh mẽ, tự do, tốc độ và sự bứt phá thành công trên con đường sự nghiệp." },
-      "14": { title: "Thần Tướng Tuổi Mùi (Dê)", desc: "Thuộc bộ Thập Nhị Chi, biểu trưng cho đức tính ôn hòa, nhân hậu, sự sung túc (\"Tam dương khai thái\") và cuộc sống an lành." },
-      "15": { title: "Thần Tướng Tuổi Sửu (Trâu)", desc: "Thuộc bộ Thập Nhị Chi, tôn vinh sự chăm chỉ, bền bỉ, vững chãi như nền tảng nông nghiệp Việt, cầu mùa màng bội thu và no ấm." },
-      "16": { title: "Thần Tướng Tuổi Hợi (Lợn)", desc: "Thuộc bộ Thập Nhị Chi, tượng trưng cho sự sung túc, an nhàn, phúc hậu, tài lộc tròn đầy và cuộc sống đủ đầy." },
-      "17": { title: "Thần Tướng Tuổi Thìn (Rồng)", desc: "Thuộc bộ Thập Nhị Chi, biểu tượng của quyền uy tối thượng, khát vọng vươn cao, mưa thuận gió hòa và vận hội hưng thịnh." },
-      "18": { title: "Thần Tướng Tuổi Dần (Hổ)", desc: "Thuộc bộ Thập Nhị Chi, tượng trưng cho sức mạnh dũng mãnh, uy phong lẫm liệt, trừ tà trấn giữ bốn phương và bảo hộ bình an." },
-      "19": { title: "Rồng Vàng Vờn Mây (Long Vân Khánh Hội)", desc: "Hình tượng Rồng uốn lượn giữa ngũ sắc tường vân, biểu trưng cho khí phách dân tộc, quyền uy, tài lộc và điềm lành hưng thịnh." },
-      "20": { title: "Chữ Phúc (Cửu Long / Bát Bửu)", desc: "Nghệ thuật chữ Hán lồng họa tiết linh vật và sóng nước trong nét chữ Phúc, cầu chúc phúc lành, may mắn, trường thọ và gia đạo hưng long." },
-      "21": { title: "Chữ Đức (Tùng Cúc Trúc Mai)", desc: "Chữ Đức kết hợp họa tiết tứ quý và hổ vờn, nhắc nhở giữ gìn đạo đức, cốt cách quân tử để phúc đức bền lâu cho con cháu." },
+      "08": { title: "Thần Tướng Tuổi Tý", desc: "Một trong 12 Thần Tướng Thập Nhị Chi, đại diện cho trí tuệ nhanh nhạy, sự lanh lợi, biết tích lũy và bảo hộ người tuổi Tý bình an, hanh thông." },
+      "09": { title: "Thần Tướng Tuổi Dậu", desc: "Thuộc bộ Thập Nhị Chi, biểu trưng cho sự cần cù, đúng giờ, tinh thần chính trực, xua tan tà khí và đón ánh bình minh cát tường." },
+      "10": { title: "Thần Tướng Tuổi Tuất", desc: "Thuộc bộ Thập Nhị Chi, tượng trưng cho lòng trung thành, nghĩa khí, giữ gìn cửa nhà, trấn trạch và bảo vệ gia chủ khỏi điều dữ." },
+      "11": { title: "Thần Tướng Tuổi Tỵ", desc: "Thuộc bộ Thập Nhị Chi, biểu trưng cho sự uyển chuyển, mưu trí, tái sinh và khả năng hóa giải khó khăn, mang lại bình an." },
+      "12": { title: "Thần Tướng Tuổi Thân", desc: "Thuộc bộ Thập Nhị Chi, đại diện cho sự thông minh, linh hoạt, khéo léo và thăng tiến (chữ \"Hầu\" đồng âm với tước hầu phong quan)." },
+      "13": { title: "Thần Tướng Tuổi Ngọ", desc: "Thuộc bộ Thập Nhị Chi, tượng trưng cho ý chí mạnh mẽ, tự do, tốc độ và sự bứt phá thành công trên con đường sự nghiệp." },
+      "14": { title: "Thần Tướng Tuổi Mùi", desc: "Thuộc bộ Thập Nhị Chi, biểu trưng cho đức tính ôn hòa, nhân hậu, sự sung túc (\"Tam dương khai thái\") và cuộc sống an lành." },
+      "15": { title: "Thần Tướng Tuổi Sửu", desc: "Thuộc bộ Thập Nhị Chi, tôn vinh sự chăm chỉ, bền bỉ, vững chãi như nền tảng nông nghiệp Việt, cầu mùa màng bội thu và no ấm." },
+      "16": { title: "Thần Tướng Tuổi Hợi", desc: "Thuộc bộ Thập Nhị Chi, tượng trưng cho sự sung túc, an nhàn, phúc hậu, tài lộc tròn đầy và cuộc sống đủ đầy." },
+      "17": { title: "Thần Tướng Tuổi Thìn", desc: "Thuộc bộ Thập Nhị Chi, biểu tượng của quyền uy tối thượng, khát vọng vươn cao, mưa thuận gió hòa và vận hội hưng thịnh." },
+      "18": { title: "Thần Tướng Tuổi Dần", desc: "Thuộc bộ Thập Nhị Chi, tượng trưng cho sức mạnh dũng mãnh, uy phong lẫm liệt, trừ tà trấn giữ bốn phương và bảo hộ bình an." },
+      "19": { title: "Rồng Vàng Vờn Mây", desc: "Hình tượng Rồng uốn lượn giữa ngũ sắc tường vân, biểu trưng cho khí phách dân tộc, quyền uy, tài lộc và điềm lành hưng thịnh." },
+      "20": { title: "Chữ Phúc", desc: "Nghệ thuật chữ Hán lồng họa tiết linh vật và sóng nước trong nét chữ Phúc, cầu chúc phúc lành, may mắn, trường thọ và gia đạo hưng long." },
+      "21": { title: "Chữ Đức", desc: "Chữ Đức kết hợp họa tiết tứ quý và hổ vờn, nhắc nhở giữ gìn đạo đức, cốt cách quân tử để phúc đức bền lâu cho con cháu." },
       "22": { title: "Song Xà & Hoa Mẫu Đơn", desc: "Hình ảnh đôi rắn quấn quýt bên đóa mẫu đơn rực rỡ, biểu trưng cho sự hòa hợp âm dương, phú quý, trường thọ và tình duyên gắn kết." },
       "23": { title: "Mèo Tam Thể & Bướm Xuân", desc: "Nét vẽ mộc mạc, uyển chuyển trên giấy hồng điều, tượng trưng cho sự may mắn, linh hoạt, bắt lộc và không khí xuân tươi vui." },
-      "24": { title: "Thần Kê (Gà Trống Ngũ Sắc)", desc: "Bức tranh nổi tiếng bậc nhất của dòng Kim Hoàng với câu thơ chữ Hán chúc phúc đầu xuân, cầu ngũ đức (Văn – Vũ – Dũng – Nhân – Tín), xua tà đón phúc." },
+      "24": { title: "Thần Kê", desc: "Bức tranh nổi tiếng bậc nhất của dòng Kim Hoàng với câu thơ chữ Hán chúc phúc đầu xuân, cầu ngũ đức (Văn – Vũ – Dũng – Nhân – Tín), xua tà đón phúc." },
       "25": { title: "Mèo Đen Trắng Bên Hoa Sen & Bướm", desc: "Biểu trưng cho sự thanh tịnh, bình an trong tâm hồn, xua đuổi điều không may và mang lại sự êm ấm cho gia đình." },
-      "26": { title: "Cá Chép Hóa Rồng (Lý Ngư Hóa Long)", desc: "Tượng trưng cho ý chí vượt vũ môn kiên cường, tinh thần hiếu học, đỗ đạt công danh và thăng hoa vượt bậc." },
-      "27": { title: "Em Bé Cưỡi Trâu Chơi Cành Lúa (\"Thiên Xuân Hạnh Phúc\")", desc: "Cảnh mục đồng vui tươi cưỡi trâu cầm bông lúa chín, cầu chúc một năm mới mùa màng bội thu, thái bình và hạnh phúc." },
-      "28": { title: "Mục Đồng Thổi Sáo Cưỡi Trâu (\"Xuân Nhật Vinh Hoa\")", desc: "Biểu trưng cho cuộc sống thanh bình, an lạc nơi đồng quê, niềm vui lao động và ước vọng vinh hoa phú quý." },
-      "29": { title: "Cá Chép Vượt Vũ Môn (Cá Chép Đỏ Hóa Rồng)", desc: "Sắc đỏ vàng rực rỡ trên nền sóng bạc đầu, gửi gắm niềm tin vào sự bứt phá, thành công rực rỡ trong học hành và sự nghiệp." },
-      "30": { title: "Nghê Xanh (\"Càn Nguyên Hanh Lợi Trinh\")", desc: "Linh vật thuần Việt giữ đền miếu và gia trạch, mang lời chúc từ quẻ Càn trong Kinh Dịch: mọi sự khởi đầu thuận lợi, bền vững và chính trực." },
-      "31": { title: "Nghê Vàng (\"Càn Nguyên Hanh Lợi Trinh\")", desc: "Nghê vàng uy nghi canh giữ bình an, tượng trưng cho sự bảo hộ linh thiêng, thu hút vượng khí và tài lộc cho gia đình." },
-      "32": { title: "Phật Di Lặc (Bố Đại Hòa Thượng)", desc: "Nụ cười hoan hỉ với túi vải đựng phúc lộc, biểu trưng cho lòng bao dung, niềm vui vô ưu, an lạc và tài lộc viên mãn." },
+      "26": { title: "Cá Chép Hóa Rồng", desc: "Tượng trưng cho ý chí vượt vũ môn kiên cường, tinh thần hiếu học, đỗ đạt công danh và thăng hoa vượt bậc." },
+      "27": { title: "Em Bé Cưỡi Trâu Chơi Cành Lúa", desc: "Cảnh mục đồng vui tươi cưỡi trâu cầm bông lúa chín, cầu chúc một năm mới mùa màng bội thu, thái bình và hạnh phúc." },
+      "28": { title: "Mục Đồng Thổi Sáo Cưỡi Trâu", desc: "Biểu trưng cho cuộc sống thanh bình, an lạc nơi đồng quê, niềm vui lao động và ước vọng vinh hoa phú quý." },
+      "29": { title: "Cá Chép Vượt Vũ Môn", desc: "Sắc đỏ vàng rực rỡ trên nền sóng bạc đầu, gửi gắm niềm tin vào sự bứt phá, thành công rực rỡ trong học hành và sự nghiệp." },
+      "30": { title: "Nghê Xanh", desc: "Linh vật thuần Việt giữ đền miếu và gia trạch, mang lời chúc từ quẻ Càn trong Kinh Dịch: mọi sự khởi đầu thuận lợi, bền vững và chính trực." },
+      "31": { title: "Nghê Vàng", desc: "Nghê vàng uy nghi canh giữ bình an, tượng trưng cho sự bảo hộ linh thiêng, thu hút vượng khí và tài lộc cho gia đình." },
+      "32": { title: "Phật Di Lặc", desc: "Nụ cười hoan hỉ với túi vải đựng phúc lộc, biểu trưng cho lòng bao dung, niềm vui vô ưu, an lạc và tài lộc viên mãn." },
       "33": { title: "Mèo Mướp & Bướm", desc: "Chú mèo mướp gần gũi với nét tỉa lông tinh xảo đặc trưng Kim Hoàng, tượng trưng cho sự bình dị, ấm áp và xua tan muộn phiền." },
       "34": { title: "Rồng Vàng Ngũ Sắc", desc: "Hình tượng Rồng bay lên giữa mây lành, cầu chúc khí vận hanh thông, thăng tiến và sức sống mãnh liệt." },
-      "35": { title: "Rồng Xanh Đuôi Mây (Thanh Long)", desc: "Đại diện cho phương Đông và mùa xuân, biểu trưng cho sinh khí dồi dào, mưa thuận gió hòa và sự khởi sắc bền vững." },
-      "36": { title: "Rồng Bay Lên (Thăng Long)", desc: "Dáng rồng uốn lượn vươn cao đầy khí phách, tượng trưng cho khát vọng vươn lên, tài trí và sự thịnh vượng lâu dài." },
-      "37": { title: "Phượng Hoàng Múa (Phụng Vũ)", desc: "Loài chim quý đứng đầu tứ linh về vẻ thanh cao, biểu trưng cho đức hạnh, vẻ đẹp rực rỡ, hòa bình và cát tường." },
+      "35": { title: "Rồng Xanh Đuôi Mây", desc: "Đại diện cho phương Đông và mùa xuân, biểu trưng cho sinh khí dồi dào, mưa thuận gió hòa và sự khởi sắc bền vững." },
+      "36": { title: "Rồng Bay Lên", desc: "Dáng rồng uốn lượn vươn cao đầy khí phách, tượng trưng cho khát vọng vươn lên, tài trí và sự thịnh vượng lâu dài." },
+      "37": { title: "Phượng Hoàng Múa", desc: "Loài chim quý đứng đầu tứ linh về vẻ thanh cao, biểu trưng cho đức hạnh, vẻ đẹp rực rỡ, hòa bình và cát tường." },
       "38": { title: "Cậu Bé Cưỡi Ngựa Bắn Cung", desc: "Tái hiện tinh thần thượng võ, sự dũng cảm, nhanh nhẹn và ý chí vươn tới mục tiêu, cầu mong con trẻ khôn lớn mạnh khỏe, tài giỏi." },
-      "39": { title: "Lợn Độc Lập & Khóm Khoai (Lợn Âm Dương)", desc: "Biểu tượng kinh điển của sự no ấm, sung túc, sinh sôi nảy nở và cuộc sống điền viên thanh bình." },
+      "39": { title: "Lợn Độc Lập & Khóm Khoai", desc: "Biểu tượng kinh điển của sự no ấm, sung túc, sinh sôi nảy nở và cuộc sống điền viên thanh bình." },
       "40": { title: "Thần Kê Trên Giấy Dó Vàng", desc: "Tác phẩm khắc họa gà trống oai phong cùng bài thơ chữ Hán cầu bình an, trừ tà khí nơi cửa nhà vào dịp Tết đến xuân về." },
       "41": { title: "Thần Tướng / Quan Công Trấn Trạch", desc: "Hình tượng vị tướng uy nghi bảo hộ gia trạch, tượng trưng cho lòng trung nghĩa, chính trực và sức mạnh đẩy lùi tà ma." },
-      "42": { title: "Hà Trì Hạ Thưởng Duyên (Vui Chơi Ao Sen Ngày Hạ)", desc: "Bức tranh tròn mô tả trẻ thơ nô đùa hái sen dưới nắng hè, ca ngợi niềm vui sum vầy, sự trong sáng và hạnh phúc gia đình." },
-      "43": { title: "Gà Trống Đỏ Giấy Hồng Điều (Thần Kê)", desc: "Nét khắc mộc bản tinh tế kết hợp tô màu tay tỉ mỉ, mang ý nghĩa đón dương khí đầu ngày, cầu công danh và bình an." },
+      "42": { title: "Hà Trì Hạ Thưởng Duyên", desc: "Bức tranh tròn mô tả trẻ thơ nô đùa hái sen dưới nắng hè, ca ngợi niềm vui sum vầy, sự trong sáng và hạnh phúc gia đình." },
+      "43": { title: "Gà Trống Đỏ Giấy Hồng Điều", desc: "Nét khắc mộc bản tinh tế kết hợp tô màu tay tỉ mỉ, mang ý nghĩa đón dương khí đầu ngày, cầu công danh và bình an." },
       "44": { title: "Em Bé Ôm Chim Phượng Hoàng & Hoa Sen", desc: "Kết hợp hình tượng trẻ thơ bụ bẫm với phượng hoàng và hoa sen thanh cao, gửi gắm ước nguyện \"phúc – quý – thanh – bình\" cho thế hệ tương lai." },
-      "45": { title: "Bộ Tam Bình Tứ Linh (Phượng – Long – Ngư – Phượng)", desc: "Bộ tranh liên hoàn kết hợp Rồng, Phượng và Cá Chép vượt sóng, biểu trưng cho hội tụ linh khí trời đất, tài lộc và vinh hoa viên mãn." },
-      "46": { title: "Hứng Dừa (Bản Đóng Khung Cổ)", desc: "Tái hiện sinh động trò chơi và sinh hoạt dân gian xưa, mang thông điệp gia đình hòa thuận, phúc lộc sum vầy." },
-      "47": { title: "Mẹ Con Nhà Hổ (Hổ Mẫu Tử)", desc: "Khắc họa tình mẫu tử thiêng liêng giữa rừng sâu với nét vẽ vừa uy nghiêm vừa ấm áp, tượng trưng cho sự che chở, bình an và sức mạnh gia đình." },
+      "45": { title: "Bộ Tam Bình Tứ Linh", desc: "Bộ tranh liên hoàn kết hợp Rồng, Phượng và Cá Chép vượt sóng, biểu trưng cho hội tụ linh khí trời đất, tài lộc và vinh hoa viên mãn." },
+      "46": { title: "Hứng Dừa", desc: "Tái hiện sinh động trò chơi và sinh hoạt dân gian xưa, mang thông điệp gia đình hòa thuận, phúc lộc sum vầy." },
+      "47": { title: "Mẹ Con Nhà Hổ", desc: "Khắc họa tình mẫu tử thiêng liêng giữa rừng sâu với nét vẽ vừa uy nghiêm vừa ấm áp, tượng trưng cho sự che chở, bình an và sức mạnh gia đình." },
       "48": { title: "Tiên Nữ Cưỡi Phụng", desc: "Hình ảnh tiên nữ duyên dáng cưỡi chim phượng giữa mây ngũ sắc, biểu trưng cho vẻ đẹp thanh tao, cát tường và những điều tốt lành." },
-      "49": { title: "Tiến Tài – Tiến Lộc (Đôi Ông Phúc Lộc)", desc: "Hai vị thần quan mặc triều phục cầm hoa sen và bảng chữ \"Tiến Tài – Tiến Lộc\", là lời chúc kinh điển ngày Tết cầu tài lộc, may mắn gõ cửa quanh năm." },
-      "50": { title: "Thân Thần Tướng (Thần Tướng Tuổi Thân)", desc: "Vị linh thần thủ hộ tuổi Thân trong bộ Thập Nhị Địa Chi Kim Hoàng. Hình tượng Hầu Thần oai phong tay vung kim bổng, khoác giáp chiến bào vàng kim, cưỡi mây cát tường, biểu trưng cho trí tuệ linh hoạt, tài trí mưu lược, trừ tà diệt ác và thăng tiến công danh phong hầu vinh hiển." },
-      "51": { title: "Dần Thần Tướng (Thần Tướng Tuổi Dần)", desc: "Vị linh thần thủ hộ tuổi Dần trong bộ Thập Nhị Địa Chi Kim Hoàng. Hình tượng chúa sơn lâm uy dũng đầu hổ khoác long bào, tay cầm đinh ba hộ pháp đứng trên tường vân, biểu trưng cho uy quyền tối thượng, dũng khí kiên cường, hộ quốc an dân và trấn trạch trừ tà." },
-      "52": { title: "Hợi Thần Tướng (Thần Tướng Tuổi Hợi)", desc: "Vị linh thần thủ hộ tuổi Hợi trong bộ Thập Nhị Địa Chi Kim Hoàng. Hình tượng thần tướng mình mặc giáp vảy cá, tay giương thanh đao uy dũng lướt trên vầng mây hoàng kim, biểu trưng cho sự sung túc, phúc lộc viên mãn, no ấm đủ đầy và bình an gia đạo." },
-      "53": { title: "Mùi Thần Tướng (Thần Tướng Tuổi Mùi)", desc: "Vị linh thần thủ hộ tuổi Mùi trong bộ Thập Nhị Địa Chi Kim Hoàng. Hình tượng thần tướng đầu dê dũng mãnh, hai tay tuốt thanh trường kiếm sắc bén, khoác áo giáp kim sa đứng trên mây lành, biểu trưng cho đức khiêm nhường nhưng cương trực, tam dương khai thái mang lại điềm lành và tài lộc." },
-      "54": { title: "Sửu Thần Tướng (Thần Tướng Tuổi Sửu)", desc: "Vị linh thần thủ hộ tuổi Sửu trong bộ Thập Nhị Địa Chi Kim Hoàng. Thần tướng đầu ngưu dũng mãnh, tay cầm tam xoa kích (đinh ba), một tay giơ cao thi lễ trời đất, biểu trưng cho đức tính bền bỉ, cần cù kiến tạo cơ nghiệp, gia tài hưng thịnh và mùa màng bội thu." },
-      "55": { title: "Tỵ Thần Tướng (Thần Tướng Tuổi Tỵ)", desc: "Vị linh thần thủ hộ tuổi Tỵ trong bộ Thập Nhị Địa Chi Kim Hoàng. Hình tượng linh xà hóa thần tướng uy linh, tay chống thanh bảo kiếm lam ngọc, khoác chiến bào ngũ sắc rực rỡ, biểu trưng cho sự tái sinh, linh hoạt ứng biến, trí tuệ sâu sắc và bảo vệ bình an trường cửu." },
-      "56": { title: "Tuất Thần Tướng (Thần Tướng Tuổi Tuất)", desc: "Vị linh thần thủ hộ tuổi Tuất trong bộ Thập Nhị Địa Chi Kim Hoàng. Thần tướng đầu cẩu trung dũng tay nắm chặt chuôi đại đao, mình khoác giáp bào uy vệ cưỡi tường vân, biểu trưng cho lòng trung thành son sắt, trừ tà xua đuổi ám khí, giữ gìn gia đạo bình an và của cải bền lâu." },
+      "49": { title: "Tiến Tài – Tiến Lộc", desc: "Hai vị thần quan mặc triều phục cầm hoa sen và bảng chữ \"Tiến Tài – Tiến Lộc\", là lời chúc kinh điển ngày Tết cầu tài lộc, may mắn gõ cửa quanh năm." },
+      "50": { title: "Thân Thần Tướng", desc: "Vị linh thần thủ hộ tuổi Thân trong bộ Thập Nhị Địa Chi Kim Hoàng. Hình tượng Hầu Thần oai phong tay vung kim bổng, khoác giáp chiến bào vàng kim, cưỡi mây cát tường, biểu trưng cho trí tuệ linh hoạt, tài trí mưu lược, trừ tà diệt ác và thăng tiến công danh phong hầu vinh hiển." },
+      "51": { title: "Dần Thần Tướng", desc: "Vị linh thần thủ hộ tuổi Dần trong bộ Thập Nhị Địa Chi Kim Hoàng. Hình tượng chúa sơn lâm uy dũng đầu hổ khoác long bào, tay cầm đinh ba hộ pháp đứng trên tường vân, biểu trưng cho uy quyền tối thượng, dũng khí kiên cường, hộ quốc an dân và trấn trạch trừ tà." },
+      "52": { title: "Hợi Thần Tướng", desc: "Vị linh thần thủ hộ tuổi Hợi trong bộ Thập Nhị Địa Chi Kim Hoàng. Hình tượng thần tướng mình mặc giáp vảy cá, tay giương thanh đao uy dũng lướt trên vầng mây hoàng kim, biểu trưng cho sự sung túc, phúc lộc viên mãn, no ấm đủ đầy và bình an gia đạo." },
+      "53": { title: "Mùi Thần Tướng", desc: "Vị linh thần thủ hộ tuổi Mùi trong bộ Thập Nhị Địa Chi Kim Hoàng. Hình tượng thần tướng đầu dê dũng mãnh, hai tay tuốt thanh trường kiếm sắc bén, khoác áo giáp kim sa đứng trên mây lành, biểu trưng cho đức khiêm nhường nhưng cương trực, tam dương khai thái mang lại điềm lành và tài lộc." },
+      "54": { title: "Sửu Thần Tướng", desc: "Vị linh thần thủ hộ tuổi Sửu trong bộ Thập Nhị Địa Chi Kim Hoàng. Thần tướng đầu ngưu dũng mãnh, tay cầm tam xoa kích (đinh ba), một tay giơ cao thi lễ trời đất, biểu trưng cho đức tính bền bỉ, cần cù kiến tạo cơ nghiệp, gia tài hưng thịnh và mùa màng bội thu." },
+      "55": { title: "Tỵ Thần Tướng", desc: "Vị linh thần thủ hộ tuổi Tỵ trong bộ Thập Nhị Địa Chi Kim Hoàng. Hình tượng linh xà hóa thần tướng uy linh, tay chống thanh bảo kiếm lam ngọc, khoác chiến bào ngũ sắc rực rỡ, biểu trưng cho sự tái sinh, linh hoạt ứng biến, trí tuệ sâu sắc và bảo vệ bình an trường cửu." },
+      "56": { title: "Tuất Thần Tướng", desc: "Vị linh thần thủ hộ tuổi Tuất trong bộ Thập Nhị Địa Chi Kim Hoàng. Thần tướng đầu cẩu trung dũng tay nắm chặt chuôi đại đao, mình khoác giáp bào uy vệ cưỡi tường vân, biểu trưng cho lòng trung thành son sắt, trừ tà xua đuổi ám khí, giữ gìn gia đạo bình an và của cải bền lâu." },
     };
 
     function placeCircularPaintings() {
@@ -3421,7 +3415,6 @@
           htmlVi: `
             <div class="painting-meta-box">
               <span class="painting-meta-tag">Tranh dân gian Kim Hoàng #${num}</span>
-              <p class="painting-meta-sub">Khắc gỗ trên giấy đỏ hồng điều • Nét vẽ điểm kim nhũ</p>
             </div>
             <div class="painting-desc-content">
               <h4>Ý nghĩa tác phẩm:</h4>
@@ -3431,7 +3424,6 @@
           htmlEn: `
             <div class="painting-meta-box">
               <span class="painting-meta-tag">Kim Hoang Folk Art #${num}</span>
-              <p class="painting-meta-sub">Woodblock on scarlet paper • Gold-ink highlights</p>
             </div>
             <div class="painting-desc-content">
               <h4>Artwork Meaning:</h4>

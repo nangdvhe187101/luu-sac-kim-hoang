@@ -1065,7 +1065,7 @@ function initLanguageTabs() {
   async function loadEnDict() {
     if (enDict) return enDict;
     if (!enDictPromise) {
-      enDictPromise = fetch('/js/i18n-en.json?v=6')
+      enDictPromise = fetch('/js/i18n-en.json?v=7')
         .then(r => (r.ok ? r.json() : {}))
         .then(data => {
           enDict = data || {};
